@@ -932,14 +932,14 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 
       <!-- 관심사 선택 -->
       <div class="field">
-        <label>💡 받아볼 관심사 선택 <span style="font-size:11px;color:var(--gold);font-weight:500">(1개 이상 필수)</span></label>
+        <label>💡 받아볼 관심사 선택 <span id="catLabelHint" style="font-size:11px;color:var(--gold);font-weight:500">(1개 이상 필수)</span></label>
         <div id="catSelector" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
           <button type="button" class="cat-btn" data-cat="economy" onclick="toggleCat('economy')">📊 경제</button>
           <button type="button" class="cat-btn" data-cat="realestate" onclick="toggleCat('realestate')">🏠 부동산</button>
           <button type="button" class="cat-btn" data-cat="english" onclick="toggleCat('english')">🇬🇧 영어</button>
           <button type="button" class="cat-btn" data-cat="trivia" onclick="toggleCat('trivia')">🧠 상식</button>
         </div>
-        <div style="font-size:11px;color:var(--muted);margin-top:6px">
+        <div id="catGuide" style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">
           선택한 관심사를 매일 한 편씩 순환 발송합니다. 여러 개 선택 시 매일 하나씩 돌아갑니다.
         </div>
       </div>
@@ -1205,6 +1205,20 @@ function openModal(plan) {
   document.getElementById('planField').style.display = (plan !== 'free') ? 'block' : 'none';
   if (plan !== 'free') document.getElementById('mPlan').value = plan;
 
+  // ── 플랜별 카테고리 안내 동적 변경 ─────────────────────────
+  const labelHint = document.getElementById('catLabelHint');
+  const guideEl   = document.getElementById('catGuide');
+  if (plan === 'free') {
+    if (labelHint) labelHint.textContent = '(1개만 선택 가능)';
+    if (guideEl) guideEl.innerHTML =
+      '🎁 <strong style="color:var(--gold)">무료 체험은 1개 카테고리</strong>만 받아볼 수 있습니다.<br>' +
+      '여러 카테고리를 받고 싶으시면 월간/연간 구독을 이용해주세요.';
+  } else {
+    if (labelHint) labelHint.textContent = '(1개 이상 필수)';
+    if (guideEl) guideEl.textContent =
+      '선택한 관심사를 매일 한 편씩 순환 발송합니다. 여러 개 선택 시 매일 하나씩 돌아갑니다.';
+  }
+
   // 히어로 폰 미리채우기
   const hp = document.getElementById('heroPhone').value;
   if (hp) document.getElementById('mPhone').value = hp;
@@ -1219,6 +1233,7 @@ function openModal(plan) {
   selectedCategories = [];
   document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
   updateFirstSendInfo();
+  updateModalBtn(); // 카테고리 0개 → 버튼 disabled
 
   // 스텝 초기화
   showStep(1);
@@ -1277,6 +1292,12 @@ async function submitStep1() {
   }
   if (!ok) return;
 
+  // 무료 플랜인데 여러 개 선택돼있으면 첫 번째만 (안전장치, 이론상 불가능)
+  let finalCats = [...selectedCategories];
+  if (plan === 'free' && finalCats.length > 1) {
+    finalCats = [finalCats[0]];
+  }
+
   setLoading('step1Btn','step1Spin','step1BtnTxt', true);
 
   try {
@@ -1284,8 +1305,12 @@ async function submitStep1() {
     const res = await apiPost('/api/signup', {
       name, phone, plan,
       send_hour: hour,
-      categories: selectedCategories
+      categories: finalCats
     });
+    // 백엔드 에러 응답 체크
+    if (res && res.success === false) {
+      throw new Error(res.message || '신청 처리 중 오류가 발생했습니다');
+    }
     subscriberId = res.subscriber_id;
     customerKey  = res.customer_key;
     // 카드 등록 생략 → 바로 완료
@@ -1343,17 +1368,31 @@ if (urlParams.has('billingSuccess')) {
 
 // ── 관심사(카테고리) 선택 ────────────────────────────────────
 function toggleCat(cat) {
-  const idx = selectedCategories.indexOf(cat);
-  if (idx >= 0) {
-    selectedCategories.splice(idx, 1);
+  // 무료 플랜은 1개만 (라디오 버튼처럼 동작)
+  if (currentPlan === 'free') {
+    if (selectedCategories.length === 1 && selectedCategories[0] === cat) {
+      // 이미 선택된 걸 다시 누르면 해제
+      selectedCategories = [];
+    } else {
+      // 다른 걸 선택하면 기존 해제하고 새로 선택
+      selectedCategories = [cat];
+    }
   } else {
-    selectedCategories.push(cat);
+    // 유료 플랜은 다중 선택 (체크박스처럼)
+    const idx = selectedCategories.indexOf(cat);
+    if (idx >= 0) {
+      selectedCategories.splice(idx, 1);
+    } else {
+      selectedCategories.push(cat);
+    }
   }
   // UI 갱신
   document.querySelectorAll('.cat-btn').forEach(btn => {
     const c = btn.dataset.cat;
     btn.classList.toggle('active', selectedCategories.includes(c));
   });
+  // 신청 버튼 활성화 상태 갱신
+  updateModalBtn();
 }
 
 // 카테고리 페이지에서 "이 관심사 신청하기" 클릭 시 호출 — 해당 카테고리를 미리 체크하고 모달 오픈
@@ -1397,8 +1436,19 @@ function updateHeroBtn() {
 }
 function updateModalBtn() {
   const checked = document.getElementById('modalAgree')?.checked;
+  const hasCat  = (selectedCategories && selectedCategories.length > 0);
   const btn = document.getElementById('step1Btn');
-  if (btn) btn.style.opacity = checked ? '1' : '0.6';
+  if (!btn) return;
+  // 동의 ✓ + 카테고리 1개 이상 → 활성화
+  if (checked && hasCat) {
+    btn.style.opacity = '1';
+    btn.style.cursor = 'pointer';
+    btn.removeAttribute('data-disabled');
+  } else {
+    btn.style.opacity = '0.55';
+    btn.style.cursor = 'not-allowed';
+    btn.setAttribute('data-disabled', '1');
+  }
 }
 
 // ── 정보 팝업 ─────────────────────────────────────────────

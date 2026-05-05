@@ -1116,20 +1116,59 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
       </button>
     </div>
 
-    <!-- STEP 2: 카드 등록 (임시 비활성화) -->
-    <div id="step2Panel" style="display:none"></div>
+    <!-- STEP 2: 카드 등록 안내 -->
+    <div id="step2Panel" style="display:none">
+      <div class="modal-title" id="step2Title">💳 결제수단 등록</div>
+      <p class="modal-desc" id="step2Desc">3일 무료 체험 후 자동 결제를 위한 카드를 등록해주세요.</p>
+
+      <!-- 진행 안내 박스 -->
+      <div style="background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.25);border-radius:10px;padding:16px 18px;margin:16px 0;font-size:13px;line-height:1.85">
+        <div style="font-size:13px;font-weight:700;color:#5eea91;margin-bottom:10px">💡 이렇게 진행됩니다</div>
+        <div style="display:flex;flex-direction:column;gap:6px;color:var(--text)">
+          <div><span style="display:inline-block;width:18px;color:#5eea91;font-weight:700">✓</span> <strong>오늘</strong>: 카드 등록 (결제 0원)</div>
+          <div><span style="display:inline-block;width:18px;color:#5eea91;font-weight:700">✓</span> <strong>내일부터 3일간</strong>: 무료 콘텐츠 발송</div>
+          <div><span style="display:inline-block;width:18px;color:#5eea91;font-weight:700">✓</span> <strong>4일째 새벽</strong>: <span id="step2Amount">₩24,900</span> 자동 결제</div>
+          <div><span style="display:inline-block;width:18px;color:#5eea91;font-weight:700">✓</span> <strong>3일 이내 해지</strong>: 무료 (결제 X)</div>
+        </div>
+      </div>
+
+      <!-- 토스 비활성화 안내 (현재 베타 단계) -->
+      <div id="tossDisabledBox" style="background:rgba(251,191,36,.06);border:1px dashed rgba(251,191,36,.4);border-radius:10px;padding:14px 16px;margin:14px 0;font-size:12px;line-height:1.7;color:var(--text)">
+        <div style="font-weight:700;color:var(--amber);margin-bottom:6px">⚠️ 결제 시스템 준비 중</div>
+        <div style="font-size:11.5px;color:var(--muted)">
+          현재 토스페이먼츠 결제 시스템 연동을 준비 중입니다.<br>
+          베타 기간 동안 <strong style="color:var(--text)">카드 등록 없이 무료로 가입</strong>하실 수 있으며, 결제 시스템 도입 시 별도 안내드립니다.
+        </div>
+      </div>
+
+      <!-- 토스 활성화 시 사용 (현재 숨김) -->
+      <div id="tossPaymentBox" style="display:none;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px;padding:18px;margin:14px 0">
+        <div id="tossPaymentMethod"><!-- 토스 결제 위젯 마운트 --></div>
+      </div>
+
+      <button class="modal-btn" id="step2Btn" onclick="submitStep2()">
+        <span id="step2BtnTxt">임시 가입 완료</span>
+        <span id="step2Spin" style="display:none"><span class="spinner"></span></span>
+      </button>
+      <button class="modal-btn" onclick="backToStep1()" style="margin-top:8px;background:transparent;border:1px solid var(--border);color:var(--muted)">
+        ← 이전
+      </button>
+    </div>
 
     <!-- STEP 완료 -->
     <div id="donePanel" style="display:none;text-align:center;padding:20px 0">
       <div style="font-size:52px;margin-bottom:16px">🎉</div>
-      <div class="modal-title">등록 완료!</div>
+      <div class="modal-title">신청 완료!</div>
       <p class="modal-desc" style="margin-top:8px">
-        내일 아침 첫 메시지를 보내드립니다.<br>
-        매일 오전 <span id="doneHour" style="color:var(--gold);font-weight:700">8시</span>에 카카오톡으로 받아보세요.
+        내일 아침부터 <strong id="doneCategory" style="color:var(--gold)">선택하신 카테고리</strong>를 받아보세요.<br>
+        매일 오전 <span id="doneHour" style="color:var(--gold);font-weight:700">8시</span> 카카오톡 발송.
       </p>
-      <div style="background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:12px;margin:14px 0;font-size:12px;color:var(--muted)">
-        📅 첫 발송: <strong id="doneFirstSend" style="color:var(--gold)">내일 오전 8시</strong><br>
-        ✅ 무료 체험 신청이 완료되었습니다
+      <div style="background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:14px;margin:14px 0;font-size:12px;color:var(--muted);text-align:left">
+        <div style="font-weight:700;color:var(--gold);margin-bottom:8px;text-align:center">📅 첫 발송: <strong id="doneFirstSend" style="color:var(--gold)">내일 오전 8시</strong></div>
+        <div style="font-size:11.5px;line-height:1.7;border-top:1px solid var(--border);padding-top:10px;margin-top:8px">
+          <strong style="color:var(--text)">⚠️ 베타 안내</strong><br>
+          현재 결제 시스템 연동 준비 중입니다. 카드 등록 없이 임시 가입되었으며, 베타 기간 종료 후 결제 안내를 드립니다.
+        </div>
       </div>
       <button class="modal-btn" style="margin-top:8px" onclick="closeModal()">확인</button>
     </div>
@@ -1475,13 +1514,64 @@ async function submitStep1() {
     }
     subscriberId = res.subscriber_id;
     customerKey  = res.customer_key;
-    // 카드 등록 생략 → 바로 완료
-    showStep(3);
+    // Step 2로 이동 (카드 등록 안내)
+    showStep(2);
+    updateStep2Display();
   } catch(err) {
     showToast(err.message || '오류가 발생했습니다', 'ng');
   } finally {
     setLoading('step1Btn','step1Spin','step1BtnTxt', false);
   }
+}
+
+// ── STEP 2: 카드 등록 안내 (TOSS_ENABLED 토글로 분기) ──────────────
+const TOSS_ENABLED = false;  // 토스페이먼츠 가맹점 등록 완료 시 true로 변경
+
+function updateStep2Display() {
+  // plan별 결제 금액 표시
+  const amounts = {
+    monthly: '₩9,900/월',
+    yearly:  '₩79,000/년',
+    pkg3m:   '₩14,900',
+    pkg6m:   '₩24,900',
+    pkg1y:   '₩41,900',
+    free:    '₩0',
+  };
+  const amountEl = document.getElementById('step2Amount');
+  if (amountEl) amountEl.textContent = amounts[currentPlan] || '결제 금액';
+
+  // TOSS_ENABLED에 따라 토스 결제 위젯 vs 비활성 안내 표시
+  const tossDisabled = document.getElementById('tossDisabledBox');
+  const tossPayment  = document.getElementById('tossPaymentBox');
+  const step2Btn     = document.getElementById('step2Btn');
+  const step2BtnTxt  = document.getElementById('step2BtnTxt');
+
+  if (TOSS_ENABLED) {
+    if (tossDisabled) tossDisabled.style.display = 'none';
+    if (tossPayment)  tossPayment.style.display  = 'block';
+    if (step2BtnTxt)  step2BtnTxt.textContent    = '카드 등록 후 시작';
+    // TODO: 토스 위젯 마운트 (Phase 6에서)
+  } else {
+    if (tossDisabled) tossDisabled.style.display = 'block';
+    if (tossPayment)  tossPayment.style.display  = 'none';
+    if (step2BtnTxt)  step2BtnTxt.textContent    = '임시 가입 완료';
+  }
+}
+
+function backToStep1() {
+  showStep(1);
+}
+
+async function submitStep2() {
+  // TOSS_ENABLED 활성 시: 토스 결제 위젯 호출 → 카드 등록 → 완료
+  // 비활성 시: 그냥 완료 화면으로 (이미 Step 1에서 DB 저장됨)
+  if (TOSS_ENABLED) {
+    // TODO: Phase 6에서 토스 결제 처리
+    showToast('결제 시스템 연동 작업 중입니다.', 'ng');
+    return;
+  }
+  // 비활성 모드: 임시 가입 완료
+  showStep(3);
 }
 
 // ── STEP 2: 토스페이먼츠 위젯 ────────────────────────────────

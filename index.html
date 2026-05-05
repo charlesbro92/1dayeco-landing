@@ -316,7 +316,36 @@ nav {
 
 /* ── PRICING ── */
 .pricing-wrap { background:var(--dark2); border-top:1px solid var(--border); border-bottom:1px solid var(--border); padding:96px 24px; }
-.plans { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:56px; max-width:860px; margin-left:auto; margin-right:auto; }
+
+/* 탭 */
+.plan-tabs {
+  display:flex; gap:0; max-width:560px; margin:48px auto 0;
+  background:rgba(255,255,255,.02); border:1px solid var(--border);
+  border-radius:12px; padding:5px;
+}
+.plan-tab {
+  flex:1; padding:12px 18px; background:transparent; border:none;
+  color:var(--muted); font-size:13px; font-weight:700; font-family:var(--sans);
+  cursor:pointer; border-radius:8px; transition:all .25s; white-space:nowrap;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.plan-tab.active {
+  background:var(--gold); color:var(--dark);
+  box-shadow:0 4px 14px rgba(201,168,76,.25);
+}
+.plan-tab:not(.active):hover { color:var(--text); }
+
+/* 탭 패널 */
+.plan-panel { display:none; }
+.plan-panel.active { display:block; }
+
+/* 월정액 (단일 카드) */
+.plans-mono {
+  max-width:420px; margin:32px auto 0;
+}
+
+/* 일시불 (3개 카드) */
+.plans { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:32px; max-width:860px; margin-left:auto; margin-right:auto; }
 .plan { background:var(--dark); border:1px solid var(--border); border-radius:16px; padding:32px 24px; position:relative; transition:all .3s; }
 .plan:hover { border-color:rgba(201,168,76,.35); }
 .plan.hot { border-color:var(--gold); background:linear-gradient(145deg,var(--dark3),var(--dark)); }
@@ -326,9 +355,22 @@ nav {
   padding:4px 14px; border-radius:100px; white-space:nowrap;
 }
 .plan-name { font-size:13px; font-weight:700; letter-spacing:1px; color:var(--muted); text-transform:uppercase; margin-bottom:14px; }
+
+/* 정가 (줄긋기) */
+.plan-price-original {
+  font-family:var(--mono); font-size:13px; color:var(--muted);
+  text-decoration:line-through; margin-bottom:4px; height:16px;
+}
 .plan-price { font-family:var(--serif); font-size:42px; font-weight:900; letter-spacing:-2px; line-height:1; }
 .plan-price .w { font-size:20px; vertical-align:top; margin-top:8px; display:inline-block; }
-.plan-mo { font-size:12px; color:var(--muted); margin-bottom:22px; margin-top:2px; }
+
+/* 할인율 배지 */
+.plan-discount {
+  display:inline-block; background:rgba(255,77,77,.12);
+  color:#ff7676; font-size:10px; font-weight:700;
+  padding:3px 8px; border-radius:4px; margin-top:6px; letter-spacing:.3px;
+}
+.plan-mo { font-size:12px; color:var(--muted); margin-bottom:22px; margin-top:8px; }
 .plan-feats { list-style:none; display:flex; flex-direction:column; gap:9px; margin-bottom:24px; padding-bottom:22px; border-bottom:1px solid var(--border); }
 .plan-feats li { display:flex; gap:9px; font-size:13px; color:var(--muted); }
 .plan-feats li::before { content:'✓'; color:var(--gold); font-weight:700; flex-shrink:0; }
@@ -341,6 +383,28 @@ nav {
 .plan.hot .plan-btn { background:var(--gold); color:var(--dark); border-color:var(--gold); }
 .plan-btn:hover { transform:translateY(-1px); }
 .plan.hot .plan-btn:hover { background:var(--gold-light); }
+
+/* 무료 체험 안내 (가격 섹션 하단) */
+.free-trial-cta {
+  max-width:560px; margin:32px auto 0; text-align:center;
+  background:rgba(201,168,76,.04); border:1px dashed rgba(201,168,76,.3);
+  border-radius:12px; padding:18px 24px;
+  font-size:13px; color:var(--muted); line-height:1.7;
+}
+.free-trial-cta strong { color:var(--gold); }
+.free-trial-cta a {
+  color:var(--gold); font-weight:700; text-decoration:none;
+  border-bottom:1px solid rgba(201,168,76,.4); padding-bottom:1px;
+  cursor:pointer; transition:all .2s;
+}
+.free-trial-cta a:hover { color:var(--gold-light); border-bottom-color:var(--gold-light); }
+
+/* 모바일 */
+@media (max-width: 720px) {
+  .plans { grid-template-columns:1fr; }
+  .plan-tabs { max-width:100%; }
+  .plan-tab { padding:10px 12px; font-size:12px; }
+}
 
 /* ── TESTIMONIALS ── */
 .testis { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:56px; }
@@ -643,8 +707,8 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
         <div class="breakdown-item">
           <div class="breakdown-num">1</div>
           <div class="breakdown-content">
-            <h4>4가지 카테고리, 매일 한 편</h4>
-            <p>경제·부동산·영어·상식 — 직장인이 알아야 할 핵심 분야를 매일 순환 발송합니다. 한 분야로 쏠리지 않게 균형 있게 채워드립니다.</p>
+            <h4>4가지 카테고리 중 선택, 매일 한 편</h4>
+            <p>경제·부동산·영어·상식 — 직장인이 알아야 할 핵심 분야 중 <strong>관심 있는 1개를 선택</strong>해 매일 한 편씩 받아봅니다. 선택한 분야의 깊이를 차근차근 쌓아가세요.</p>
           </div>
         </div>
         <div class="breakdown-item">
@@ -777,48 +841,99 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     <div class="sec-eye">Pricing</div>
     <h2 class="sec-title">커피 한 잔보다 저렴한<br>지식 구독</h2>
   </div>
-  <div class="plans">
-    <div class="plan">
-      <div class="plan-name">월간</div>
-      <div class="plan-price"><span class="w">₩</span>9,900</div>
-      <div class="plan-mo">/ 월</div>
-      <ul class="plan-feats">
-        <li>매일 1편 카테고리 콘텐츠</li>
-        <li>4개 카테고리 순환</li>
-        <li>언제든 해지</li>
-        <li class="off">아카이브 검색</li>
-        <li class="off">시리즈 전체 보관</li>
-      </ul>
-      <button class="plan-btn" onclick="openModal('monthly')">시작하기</button>
-    </div>
-    <div class="plan hot">
-      <div class="plan-badge">🔥 가장 인기</div>
-      <div class="plan-name">연간</div>
-      <div class="plan-price"><span class="w">₩</span>79,000</div>
-      <div class="plan-mo">/ 년 · 월 6,583원 (33% 할인)</div>
-      <ul class="plan-feats">
-        <li>매일 1편 카테고리 콘텐츠</li>
-        <li>4개 카테고리 순환</li>
-        <li>언제든 해지</li>
-        <li>아카이브 검색</li>
-        <li>시리즈 전체 보관</li>
-      </ul>
-      <button class="plan-btn" onclick="openModal('yearly')">33% 할인 시작</button>
-    </div>
-    <div class="plan">
-      <div class="plan-name">무료 체험</div>
-      <div class="plan-price"><span class="w">₩</span>0</div>
-      <div class="plan-mo">카드 등록 후 3일 무료</div>
-      <ul class="plan-feats">
-        <li>매일 1편 카테고리 콘텐츠</li>
-        <li>3일 후 자동 구독 전환</li>
-        <li>3일 이내 해지 시 무료</li>
-        <li class="off">전체 카테고리 즉시</li>
-        <li class="off">아카이브</li>
-      </ul>
-      <button class="plan-btn" onclick="openModal('free')">무료로 시작</button>
+
+  <!-- 탭 -->
+  <div class="plan-tabs" role="tablist">
+    <button class="plan-tab active" data-tab="onetime" onclick="switchPricingTab('onetime')">
+      <span>💳</span> <span>한 번에 결제</span>
+    </button>
+    <button class="plan-tab" data-tab="subscribe" onclick="switchPricingTab('subscribe')">
+      <span>🔄</span> <span>매달 결제</span>
+    </button>
+  </div>
+
+  <!-- 탭 1: 일시불 (3개월 / 6개월 / 1년) - 디폴트 -->
+  <div class="plan-panel active" id="panel-onetime">
+    <div class="plans">
+
+      <!-- 3개월 -->
+      <div class="plan">
+        <div class="plan-name">3개월</div>
+        <div class="plan-price-original">정가 ₩29,900</div>
+        <div class="plan-price"><span class="w">₩</span>14,900</div>
+        <div class="plan-mo">월 환산 약 ₩4,967 · <span style="color:#ff7676;font-weight:700">50.2% 할인</span></div>
+        <ul class="plan-feats">
+          <li>매일 1편 카테고리 콘텐츠</li>
+          <li>선택한 카테고리 집중 발송</li>
+          <li>3개월 일시불 결제</li>
+          <li>무료체험 기간 내 언제든 해지</li>
+          <li>일 단가 약 ₩332</li>
+        </ul>
+        <button class="plan-btn" onclick="openModal('pkg3m')">3개월 시작</button>
+      </div>
+
+      <!-- 6개월 (HOT) -->
+      <div class="plan hot">
+        <div class="plan-badge">🔥 가장 인기</div>
+        <div class="plan-name">6개월</div>
+        <div class="plan-price-original">정가 ₩59,900</div>
+        <div class="plan-price"><span class="w">₩</span>24,900</div>
+        <div class="plan-mo">월 환산 ₩4,150 · <span style="color:#ff7676;font-weight:700">58.4% 할인</span></div>
+        <ul class="plan-feats">
+          <li>매일 1편 카테고리 콘텐츠</li>
+          <li>선택한 카테고리 집중 발송</li>
+          <li>6개월 일시불 결제</li>
+          <li>무료체험 기간 내 언제든 해지</li>
+          <li>일 단가 약 ₩333</li>
+        </ul>
+        <button class="plan-btn" onclick="openModal('pkg6m')">6개월 시작</button>
+      </div>
+
+      <!-- 1년 -->
+      <div class="plan">
+        <div class="plan-name">1년</div>
+        <div class="plan-price-original">정가 ₩119,900</div>
+        <div class="plan-price"><span class="w">₩</span>41,900</div>
+        <div class="plan-mo">월 환산 약 ₩3,492 · <span style="color:#ff7676;font-weight:700">65.1% 할인</span></div>
+        <ul class="plan-feats">
+          <li>매일 1편 카테고리 콘텐츠</li>
+          <li>선택한 카테고리 집중 발송</li>
+          <li>1년 일시불 결제</li>
+          <li>무료체험 기간 내 언제든 해지</li>
+          <li>일 단가 약 ₩329</li>
+        </ul>
+        <button class="plan-btn" onclick="openModal('pkg1y')">1년 시작</button>
+      </div>
+
     </div>
   </div>
+
+  <!-- 탭 2: 월 정액 (구독형) -->
+  <div class="plan-panel" id="panel-subscribe">
+    <div class="plans-mono">
+      <div class="plan">
+        <div class="plan-name">월 정액</div>
+        <div class="plan-price-original">&nbsp;</div>
+        <div class="plan-price"><span class="w">₩</span>9,900</div>
+        <div class="plan-mo">/ 월 · 자동 결제</div>
+        <ul class="plan-feats">
+          <li>매일 1편 카테고리 콘텐츠</li>
+          <li>선택한 카테고리 집중 발송</li>
+          <li>매달 자동 결제</li>
+          <li>무료체험 기간 내 언제든 해지</li>
+          <li>일 단가 ₩330</li>
+        </ul>
+        <button class="plan-btn" onclick="openModal('monthly')">시작하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 무료 체험 안내 (탭 외부, 항상 표시) -->
+  <div class="free-trial-cta">
+    💡 결제 전 먼저 체험해보고 싶다면? <a onclick="openModal('free')">3일 무료 체험</a>으로 시작해보세요.<br>
+    <span style="font-size:11px;opacity:.7">카드 등록 없이 바로 시작 · 매일 1편 카테고리 콘텐츠</span>
+  </div>
+
 </div>
 
 <!-- TESTIMONIALS -->
@@ -932,7 +1047,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 
       <!-- 관심사 선택 -->
       <div class="field">
-        <label>💡 받아볼 관심사 선택 <span id="catLabelHint" style="font-size:11px;color:var(--gold);font-weight:500">(1개 이상 필수)</span></label>
+        <label>💡 받아볼 관심사 선택 <span id="catLabelHint" style="font-size:11px;color:var(--gold);font-weight:500">(1개 선택 필수)</span></label>
         <div id="catSelector" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
           <button type="button" class="cat-btn" data-cat="economy" onclick="toggleCat('economy')">📊 경제</button>
           <button type="button" class="cat-btn" data-cat="realestate" onclick="toggleCat('realestate')">🏠 부동산</button>
@@ -940,7 +1055,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
           <button type="button" class="cat-btn" data-cat="trivia" onclick="toggleCat('trivia')">🧠 상식</button>
         </div>
         <div id="catGuide" style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">
-          선택한 관심사를 매일 한 편씩 순환 발송합니다. 여러 개 선택 시 매일 하나씩 돌아갑니다.
+          관심 있는 카테고리를 1개 선택하면 매일 그 카테고리 콘텐츠를 받아볼 수 있습니다.
         </div>
       </div>
 
@@ -1193,30 +1308,47 @@ function heroSubmit() {
 function openModal(plan) {
   currentPlan = plan;
 
-  const titles = { free:'무료 체험 시작', monthly:'월간 구독 시작', yearly:'연간 구독 시작' };
+  const titles = {
+    free:    '무료 체험 시작',
+    monthly: '월 정액 구독 시작',
+    yearly:  '연간 구독 시작',          // 호환용 (옛 카드 그대로)
+    pkg3m:   '3개월 일시불 시작',
+    pkg6m:   '6개월 일시불 시작',
+    pkg1y:   '1년 일시불 시작',
+  };
   const descs  = {
-    free:    '카드를 등록하면 <strong>내일 아침 첫 메시지</strong>를 보내드립니다. 3일 무료 후 자동 전환.',
-    monthly: '3일 무료 체험 후 <strong>₩9,900/월</strong>이 청구됩니다.',
+    free:    '카드 등록 없이 <strong>3일 무료</strong>로 시작합니다. 3일 후 자동 전환되지 않습니다.',
+    monthly: '<strong>₩9,900/월</strong>이 매달 자동 결제됩니다. 언제든 해지 가능.',
     yearly:  '3일 무료 체험 후 <strong>₩79,000/년</strong>이 청구됩니다.',
+    pkg3m:   '<strong>₩14,900</strong>이 한 번 결제됩니다 (3개월간 발송 · 정가 ₩29,900에서 50.2% 할인).',
+    pkg6m:   '<strong>₩24,900</strong>이 한 번 결제됩니다 (6개월간 발송 · 정가 ₩59,900에서 58.4% 할인).',
+    pkg1y:   '<strong>₩41,900</strong>이 한 번 결제됩니다 (1년간 발송 · 정가 ₩119,900에서 65.1% 할인).',
   };
 
-  document.getElementById('modalTitle').textContent = titles[plan];
-  document.getElementById('modalDesc').innerHTML    = descs[plan];
-  document.getElementById('planField').style.display = (plan !== 'free') ? 'block' : 'none';
-  if (plan !== 'free') document.getElementById('mPlan').value = plan;
+  document.getElementById('modalTitle').textContent = titles[plan] || '구독 시작';
+  document.getElementById('modalDesc').innerHTML    = descs[plan] || '';
+  // mPlan 셀렉트는 monthly/yearly에서만 보임 (사용자가 모달 안에서 월/연 변경 가능)
+  // 일시불(pkg3m/pkg6m/pkg1y) 및 무료(free)는 mPlan 안 보임 (선택지 고정)
+  const showPlanField = (plan === 'monthly' || plan === 'yearly');
+  document.getElementById('planField').style.display = showPlanField ? 'block' : 'none';
+  if (showPlanField) {
+    document.getElementById('mPlan').value = plan;
+  }
 
-  // ── 플랜별 카테고리 안내 동적 변경 ─────────────────────────
+  // ── 카테고리 안내 (모든 플랜 동일: 1개 선택) ────────────────
   const labelHint = document.getElementById('catLabelHint');
   const guideEl   = document.getElementById('catGuide');
-  if (plan === 'free') {
-    if (labelHint) labelHint.textContent = '(1개만 선택 가능)';
-    if (guideEl) guideEl.innerHTML =
-      '🎁 <strong style="color:var(--gold)">무료 체험은 1개 카테고리</strong>만 받아볼 수 있습니다.<br>' +
-      '여러 카테고리를 받고 싶으시면 월간/연간 구독을 이용해주세요.';
-  } else {
-    if (labelHint) labelHint.textContent = '(1개 이상 필수)';
-    if (guideEl) guideEl.textContent =
-      '선택한 관심사를 매일 한 편씩 순환 발송합니다. 여러 개 선택 시 매일 하나씩 돌아갑니다.';
+  if (labelHint) labelHint.textContent = '(1개 선택 필수)';
+  if (guideEl) {
+    if (plan === 'free') {
+      guideEl.innerHTML =
+        '🎁 <strong style="color:var(--gold)">관심 있는 카테고리 1개</strong>를 선택해 매일 받아보세요.<br>' +
+        '<span style="font-size:10px;opacity:.8">여러 카테고리를 받고 싶으시면 각 카테고리별로 별도 신청해주세요.</span>';
+    } else {
+      guideEl.innerHTML =
+        '관심 있는 <strong style="color:var(--gold)">카테고리 1개</strong>를 선택해 매일 깊이 있게 학습하세요.<br>' +
+        '<span style="font-size:10px;opacity:.8">여러 분야를 원하시면 각 카테고리별로 별도 신청 가능합니다.</span>';
+    }
   }
 
   // 히어로 폰 미리채우기
@@ -1266,7 +1398,16 @@ function showStep(n) {
 async function submitStep1() {
   const name   = document.getElementById('mName').value.trim();
   const phone  = document.getElementById('mPhone').value;
-  const plan   = currentPlan === 'free' ? 'free' : document.getElementById('mPlan').value;
+  // currentPlan이 free / monthly / yearly / pkg3m / pkg6m / pkg1y 중 하나
+  // monthly/yearly는 mPlan 셀렉트로 사용자 변경 가능, 일시불은 currentPlan 그대로
+  let plan;
+  if (currentPlan === 'free') {
+    plan = 'free';
+  } else if (currentPlan === 'monthly' || currentPlan === 'yearly') {
+    plan = document.getElementById('mPlan').value;
+  } else {
+    plan = currentPlan; // pkg3m, pkg6m, pkg1y 그대로
+  }
   const agreed = document.getElementById('modalAgree')?.checked;
   const hour   = FIXED_SEND_HOUR;
 
@@ -1292,11 +1433,9 @@ async function submitStep1() {
   }
   if (!ok) return;
 
-  // 무료 플랜인데 여러 개 선택돼있으면 첫 번째만 (안전장치, 이론상 불가능)
-  let finalCats = [...selectedCategories];
-  if (plan === 'free' && finalCats.length > 1) {
-    finalCats = [finalCats[0]];
-  }
+  // 모든 플랜에서 카테고리 1개만 (라디오 모드 안전장치)
+  // 만약 어떤 이유로 2개 이상 선택돼있으면 첫 번째만 사용
+  let finalCats = selectedCategories.length > 0 ? [selectedCategories[0]] : [];
 
   setLoading('step1Btn','step1Spin','step1BtnTxt', true);
 
@@ -1368,23 +1507,14 @@ if (urlParams.has('billingSuccess')) {
 
 // ── 관심사(카테고리) 선택 ────────────────────────────────────
 function toggleCat(cat) {
-  // 무료 플랜은 1개만 (라디오 버튼처럼 동작)
-  if (currentPlan === 'free') {
-    if (selectedCategories.length === 1 && selectedCategories[0] === cat) {
-      // 이미 선택된 걸 다시 누르면 해제
-      selectedCategories = [];
-    } else {
-      // 다른 걸 선택하면 기존 해제하고 새로 선택
-      selectedCategories = [cat];
-    }
+  // 모든 플랜에서 1개만 선택 (라디오 버튼처럼 동작)
+  // 1개 콘텐츠에 집중 - 여러 분야 원하면 별도 신청 (독립 구독)
+  if (selectedCategories.length === 1 && selectedCategories[0] === cat) {
+    // 이미 선택된 걸 다시 누르면 해제
+    selectedCategories = [];
   } else {
-    // 유료 플랜은 다중 선택 (체크박스처럼)
-    const idx = selectedCategories.indexOf(cat);
-    if (idx >= 0) {
-      selectedCategories.splice(idx, 1);
-    } else {
-      selectedCategories.push(cat);
-    }
+    // 다른 걸 선택하면 기존 해제하고 새로 선택
+    selectedCategories = [cat];
   }
   // UI 갱신
   document.querySelectorAll('.cat-btn').forEach(btn => {
@@ -1636,6 +1766,18 @@ const counter_obs = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.4 });
 counter_obs.observe(document.querySelector('.stats-bar'));
+// ── PRICING 탭 전환 ────────────────────────────────────────
+function switchPricingTab(tabName) {
+  // 탭 버튼 active 토글
+  document.querySelectorAll('.plan-tab').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === tabName);
+  });
+  // 패널 토글
+  document.querySelectorAll('.plan-panel').forEach(p => {
+    p.classList.toggle('active', p.id === 'panel-' + tabName);
+  });
+}
+
 // 초기 발송 예정일 계산
 updateFirstSendInfo();
 </script>

@@ -1099,10 +1099,10 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
         <div class="agree-err" id="modalAgreeErr">약관에 동의해 주세요</div>
       </div>
 
-      <!-- D-1 알림 동의 (옵트인, 디폴트 체크) -->
+      <!-- D-1 알림 동의 (옵트인, 디폴트 체크 해제) -->
       <div style="margin:6px 0 14px">
         <div class="agree-row" style="opacity:.95">
-          <input type="checkbox" id="modalNotifyD1" checked>
+          <input type="checkbox" id="modalNotifyD1">
           <label for="modalNotifyD1" style="cursor:pointer;font-size:12px;color:var(--muted);line-height:1.5">
             🔔 <strong style="color:var(--text)">결제 전날(D-1) 카카오톡 알림 받기</strong> (선택)<br>
             <span style="font-size:11px;opacity:.85">3일 무료 체험 종료 전날 결제 예정 안내를 받습니다.</span>
@@ -1456,8 +1456,8 @@ async function submitStep1() {
   // 만약 어떤 이유로 2개 이상 선택돼있으면 첫 번째만 사용
   let finalCats = selectedCategories.length > 0 ? [selectedCategories[0]] : [];
 
-  // D-1 알림 동의 여부 (옵트인, 디폴트 체크)
-  const notifyD1 = document.getElementById('modalNotifyD1')?.checked ?? true;
+  // D-1 알림 동의 여부 (옵트인, 디폴트 체크 해제 → false)
+  const notifyD1 = document.getElementById('modalNotifyD1')?.checked ?? false;
 
   setLoading('step1Btn','step1Spin','step1BtnTxt', true);
 

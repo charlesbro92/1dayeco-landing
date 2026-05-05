@@ -1365,6 +1365,10 @@ function heroSubmit() {
 // ── 모달 ─────────────────────────────────────────────────────
 function openModal(plan) {
   currentPlan = plan;
+  // 새 모달 열림 → 이전 가입 정보 초기화 (다른 plan으로 새 신청 가능)
+  subscriberId = null;
+  customerKey  = null;
+  showStep(1);  // 항상 Step 1부터 시작
 
   const titles = {
     free:    '무료 체험 시작',  // legacy 호환 (헤더에서 안 쓰지만 안전망)
@@ -1454,6 +1458,14 @@ function showStep(n) {
 
 // ── STEP 1: 회원가입 API ─────────────────────────────────────
 async function submitStep1() {
+  // 이미 가입 처리 완료된 상태 (Step 2에서 이전 버튼으로 돌아왔다가 다시 다음)
+  // → 백엔드 재호출 안 하고 바로 Step 2로 이동
+  if (subscriberId) {
+    showStep(2);
+    updateStep2Display();
+    return;
+  }
+
   const name   = document.getElementById('mName').value.trim();
   const phone  = document.getElementById('mPhone').value;
   // currentPlan이 free / monthly / yearly / pkg3m / pkg6m / pkg1y 중 하나
@@ -1558,7 +1570,22 @@ function updateStep2Display() {
   }
 }
 
-function backToStep1() {
+async function backToStep1() {
+  // 사용자에게 확인 (이미 신청 정보가 백엔드에 저장됨 → 삭제하고 다시 입력)
+  if (!confirm('이전 단계로 돌아가면 입력하신 정보로 작성된 신청 내역이 삭제되고 처음부터 다시 신청해야 합니다. 계속하시겠습니까?')) {
+    return;
+  }
+  // 백엔드 row 삭제 (DB 정리)
+  if (subscriberId) {
+    try {
+      await apiPost('/api/signup-cancel/' + subscriberId, {});
+    } catch (e) {
+      console.warn('signup-cancel 실패 (무시):', e);
+    }
+  }
+  // 상태 초기화 → Step 1로 (입력값은 그대로 유지)
+  subscriberId = null;
+  customerKey  = null;
   showStep(1);
 }
 

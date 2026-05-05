@@ -375,6 +375,15 @@ nav {
 .plan-feats li { display:flex; gap:9px; font-size:13px; color:var(--muted); }
 .plan-feats li::before { content:'✓'; color:var(--gold); font-weight:700; flex-shrink:0; }
 .plan-feats li.off::before { content:'—'; color:var(--border); }
+
+/* 3일 무료 체험 배지 (카드 안에) */
+.plan-trial-badge {
+  display:inline-flex; align-items:center; gap:5px;
+  background:rgba(74,222,128,.1); border:1px solid rgba(74,222,128,.3);
+  color:#5eea91; font-size:11px; font-weight:700;
+  padding:5px 10px; border-radius:100px;
+  margin-bottom:12px; letter-spacing:.2px;
+}
 .plan-btn {
   width:100%; padding:12px; border-radius:8px; font-size:14px; font-weight:700;
   font-family:var(--sans); cursor:pointer; border:1px solid var(--border);
@@ -610,7 +619,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     <button class="nav-tab" onclick="showCategory('english', this)">영어</button>
     <button class="nav-tab" onclick="showCategory('trivia', this)">상식</button>
   </div>
-  <button class="nav-cta" onclick="openModal('free')">무료 체험하기</button>
+  <button class="nav-cta" onclick="document.querySelector('.pricing-wrap').scrollIntoView({behavior:'smooth'})">지금 시작하기</button>
 </nav>
 
 <!-- ─────────── 소개 페이지 (메인 콘텐츠) ─────────── -->
@@ -859,50 +868,53 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
       <!-- 3개월 -->
       <div class="plan">
         <div class="plan-name">3개월</div>
+        <div class="plan-trial-badge">🎁 3일 무료 체험</div>
         <div class="plan-price-original">정가 ₩29,900</div>
         <div class="plan-price"><span class="w">₩</span>14,900</div>
         <div class="plan-mo">월 환산 약 ₩4,967 · <span style="color:#ff7676;font-weight:700">50.2% 할인</span></div>
         <ul class="plan-feats">
           <li>매일 1편 카테고리 콘텐츠</li>
           <li>선택한 카테고리 집중 발송</li>
-          <li>3개월 일시불 결제</li>
-          <li>무료체험 기간 내 언제든 해지</li>
+          <li>3일 무료 후 ₩14,900 결제</li>
+          <li>3일 이내 해지 시 무료</li>
           <li>일 단가 약 ₩332</li>
         </ul>
-        <button class="plan-btn" onclick="openModal('pkg3m')">3개월 시작</button>
+        <button class="plan-btn" onclick="openModal('pkg3m')">3일 무료로 시작하기</button>
       </div>
 
       <!-- 6개월 (HOT) -->
       <div class="plan hot">
         <div class="plan-badge">🔥 가장 인기</div>
         <div class="plan-name">6개월</div>
+        <div class="plan-trial-badge">🎁 3일 무료 체험</div>
         <div class="plan-price-original">정가 ₩59,900</div>
         <div class="plan-price"><span class="w">₩</span>24,900</div>
         <div class="plan-mo">월 환산 ₩4,150 · <span style="color:#ff7676;font-weight:700">58.4% 할인</span></div>
         <ul class="plan-feats">
           <li>매일 1편 카테고리 콘텐츠</li>
           <li>선택한 카테고리 집중 발송</li>
-          <li>6개월 일시불 결제</li>
-          <li>무료체험 기간 내 언제든 해지</li>
+          <li>3일 무료 후 ₩24,900 결제</li>
+          <li>3일 이내 해지 시 무료</li>
           <li>일 단가 약 ₩333</li>
         </ul>
-        <button class="plan-btn" onclick="openModal('pkg6m')">6개월 시작</button>
+        <button class="plan-btn" onclick="openModal('pkg6m')">3일 무료로 시작하기</button>
       </div>
 
       <!-- 1년 -->
       <div class="plan">
         <div class="plan-name">1년</div>
+        <div class="plan-trial-badge">🎁 3일 무료 체험</div>
         <div class="plan-price-original">정가 ₩119,900</div>
         <div class="plan-price"><span class="w">₩</span>41,900</div>
         <div class="plan-mo">월 환산 약 ₩3,492 · <span style="color:#ff7676;font-weight:700">65.1% 할인</span></div>
         <ul class="plan-feats">
           <li>매일 1편 카테고리 콘텐츠</li>
           <li>선택한 카테고리 집중 발송</li>
-          <li>1년 일시불 결제</li>
-          <li>무료체험 기간 내 언제든 해지</li>
+          <li>3일 무료 후 ₩41,900 결제</li>
+          <li>3일 이내 해지 시 무료</li>
           <li>일 단가 약 ₩329</li>
         </ul>
-        <button class="plan-btn" onclick="openModal('pkg1y')">1년 시작</button>
+        <button class="plan-btn" onclick="openModal('pkg1y')">3일 무료로 시작하기</button>
       </div>
 
     </div>
@@ -913,25 +925,20 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     <div class="plans-mono">
       <div class="plan">
         <div class="plan-name">월 정액</div>
+        <div class="plan-trial-badge">🎁 3일 무료 체험</div>
         <div class="plan-price-original">&nbsp;</div>
         <div class="plan-price"><span class="w">₩</span>9,900</div>
         <div class="plan-mo">/ 월 · 자동 결제</div>
         <ul class="plan-feats">
           <li>매일 1편 카테고리 콘텐츠</li>
           <li>선택한 카테고리 집중 발송</li>
-          <li>매달 자동 결제</li>
-          <li>무료체험 기간 내 언제든 해지</li>
+          <li>3일 무료 후 매달 ₩9,900</li>
+          <li>3일 이내 해지 시 무료</li>
           <li>일 단가 ₩330</li>
         </ul>
-        <button class="plan-btn" onclick="openModal('monthly')">시작하기</button>
+        <button class="plan-btn" onclick="openModal('monthly')">3일 무료로 시작하기</button>
       </div>
     </div>
-  </div>
-
-  <!-- 무료 체험 안내 (탭 외부, 항상 표시) -->
-  <div class="free-trial-cta">
-    💡 결제 전 먼저 체험해보고 싶다면? <a onclick="openModal('free')">3일 무료 체험</a>으로 시작해보세요.<br>
-    <span style="font-size:11px;opacity:.7">카드 등록 없이 바로 시작 · 매일 1편 카테고리 콘텐츠</span>
   </div>
 
 </div>
@@ -952,7 +959,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   <div class="eyebrow" style="display:inline-flex;margin-bottom:28px">지금 신청하면 내일 아침 첫 메시지 발송</div>
   <h2 class="hero-title" style="font-size:clamp(30px,5vw,58px)">오늘부터<br><span class="gold">매일 1분, 지식이 쌓이는</span><br><span class="thin">사람이 되어보세요</span></h2>
   <p style="color:var(--muted);margin:18px 0 36px;font-size:15px">3일 무료 체험 · 언제든 해지 가능</p>
-  <button class="submit-btn" style="font-size:15px;padding:16px 44px;border-radius:10px" onclick="openModal('free')">무료로 시작하기 →</button>
+  <button class="submit-btn" style="font-size:15px;padding:16px 44px;border-radius:10px" onclick="document.querySelector('.pricing-wrap').scrollIntoView({behavior:'smooth'})">3일 무료로 시작하기 →</button>
 </section>
 
 </div><!-- /#intro-page -->
@@ -1091,8 +1098,20 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
         </div>
         <div class="agree-err" id="modalAgreeErr">약관에 동의해 주세요</div>
       </div>
+
+      <!-- D-1 알림 동의 (옵트인, 디폴트 체크) -->
+      <div style="margin:6px 0 14px">
+        <div class="agree-row" style="opacity:.95">
+          <input type="checkbox" id="modalNotifyD1" checked>
+          <label for="modalNotifyD1" style="cursor:pointer;font-size:12px;color:var(--muted);line-height:1.5">
+            🔔 <strong style="color:var(--text)">결제 전날(D-1) 카카오톡 알림 받기</strong> (선택)<br>
+            <span style="font-size:11px;opacity:.85">3일 무료 체험 종료 전날 결제 예정 안내를 받습니다.</span>
+          </label>
+        </div>
+      </div>
+
       <button class="modal-btn" id="step1Btn" onclick="submitStep1()" style="opacity:0.6">
-        <span id="step1BtnTxt">무료 체험 시작하기 →</span>
+        <span id="step1BtnTxt">다음 →</span>
         <span id="step1Spin" style="display:none"><span class="spinner"></span></span>
       </button>
     </div>
@@ -1298,7 +1317,7 @@ function heroSubmit() {
     showToast('개인정보처리방침에 동의해 주세요','ng'); return;
   }
   if (p.length < 12) { showToast('올바른 전화번호를 입력해주세요','ng'); return; }
-  openModal('free');
+  openModal('pkg6m');  // 디폴트: 6개월 (가장 인기), 모달 안에서 변경 가능
   document.getElementById('mPhone').value = p;
   const mAgree = document.getElementById('modalAgree');
   if (mAgree) { mAgree.checked = true; updateModalBtn(); }
@@ -1309,20 +1328,20 @@ function openModal(plan) {
   currentPlan = plan;
 
   const titles = {
-    free:    '무료 체험 시작',
-    monthly: '월 정액 구독 시작',
-    yearly:  '연간 구독 시작',          // 호환용 (옛 카드 그대로)
+    free:    '무료 체험 시작',  // legacy 호환 (헤더에서 안 쓰지만 안전망)
+    monthly: '월 정액 시작',
+    yearly:  '연간 구독 시작',
     pkg3m:   '3개월 일시불 시작',
     pkg6m:   '6개월 일시불 시작',
     pkg1y:   '1년 일시불 시작',
   };
   const descs  = {
-    free:    '카드 등록 없이 <strong>3일 무료</strong>로 시작합니다. 3일 후 자동 전환되지 않습니다.',
-    monthly: '<strong>₩9,900/월</strong>이 매달 자동 결제됩니다. 언제든 해지 가능.',
-    yearly:  '3일 무료 체험 후 <strong>₩79,000/년</strong>이 청구됩니다.',
-    pkg3m:   '<strong>₩14,900</strong>이 한 번 결제됩니다 (3개월간 발송 · 정가 ₩29,900에서 50.2% 할인).',
-    pkg6m:   '<strong>₩24,900</strong>이 한 번 결제됩니다 (6개월간 발송 · 정가 ₩59,900에서 58.4% 할인).',
-    pkg1y:   '<strong>₩41,900</strong>이 한 번 결제됩니다 (1년간 발송 · 정가 ₩119,900에서 65.1% 할인).',
+    free:    '<strong>3일 무료 체험</strong>으로 시작합니다.',
+    monthly: '🎁 <strong>3일 무료 체험 후</strong> ₩9,900/월 자동 결제됩니다. 3일 이내 해지 시 무료.',
+    yearly:  '🎁 <strong>3일 무료 체험 후</strong> ₩79,000/년 결제됩니다. 3일 이내 해지 시 무료.',
+    pkg3m:   '🎁 <strong>3일 무료 체험 후</strong> ₩14,900 결제 (정가 ₩29,900에서 50.2% 할인). 3일 이내 해지 시 무료.',
+    pkg6m:   '🎁 <strong>3일 무료 체험 후</strong> ₩24,900 결제 (정가 ₩59,900에서 58.4% 할인). 3일 이내 해지 시 무료.',
+    pkg1y:   '🎁 <strong>3일 무료 체험 후</strong> ₩41,900 결제 (정가 ₩119,900에서 65.1% 할인). 3일 이내 해지 시 무료.',
   };
 
   document.getElementById('modalTitle').textContent = titles[plan] || '구독 시작';
@@ -1437,6 +1456,9 @@ async function submitStep1() {
   // 만약 어떤 이유로 2개 이상 선택돼있으면 첫 번째만 사용
   let finalCats = selectedCategories.length > 0 ? [selectedCategories[0]] : [];
 
+  // D-1 알림 동의 여부 (옵트인, 디폴트 체크)
+  const notifyD1 = document.getElementById('modalNotifyD1')?.checked ?? true;
+
   setLoading('step1Btn','step1Spin','step1BtnTxt', true);
 
   try {
@@ -1444,7 +1466,8 @@ async function submitStep1() {
     const res = await apiPost('/api/signup', {
       name, phone, plan,
       send_hour: hour,
-      categories: finalCats
+      categories: finalCats,
+      notify_d1: notifyD1,  // D-1 결제 알림 동의 여부
     });
     // 백엔드 에러 응답 체크
     if (res && res.success === false) {
@@ -1527,7 +1550,7 @@ function toggleCat(cat) {
 
 // 카테고리 페이지에서 "이 관심사 신청하기" 클릭 시 호출 — 해당 카테고리를 미리 체크하고 모달 오픈
 function openModalWithCategory(cat) {
-  openModal('free');
+  openModal('pkg6m');  // 6개월 (가장 인기) 디폴트, 모달 안에서 변경 가능
   // 모달이 열리면서 selectedCategories는 []로 초기화되므로 약간의 지연 후 추가
   setTimeout(() => {
     if (!selectedCategories.includes(cat)) selectedCategories.push(cat);

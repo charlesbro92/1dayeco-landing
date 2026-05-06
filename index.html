@@ -75,6 +75,18 @@ nav {
   content:''; position:absolute; bottom:-15px; left:50%; transform:translateX(-50%);
   width:24px; height:2px; background:var(--gold);
 }
+/* COMING SOON 탭 배지 */
+.nav-tab-soon { display:flex; align-items:center; gap:6px; }
+.nav-tab-badge {
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:18px; height:18px; padding:0 5px;
+  background:rgba(201,168,76,.15); border:1px solid rgba(201,168,76,.4);
+  color:var(--gold); border-radius:20px; font-size:10px; font-weight:800;
+  letter-spacing:0;
+}
+.nav-tab-soon.active .nav-tab-badge {
+  background:var(--gold); color:var(--dark); border-color:var(--gold);
+}
 
 .nav-cta {
   background:var(--gold); color:var(--dark); border:none;
@@ -126,6 +138,91 @@ nav {
   border-radius:6px; cursor:pointer; transition:all .2s;
 }
 .category-back:hover { background:rgba(201,168,76,.08); border-color:var(--gold); }
+
+/* ── COMING SOON 전용 페이지 ── */
+.category-page.comingsoon-page {
+  justify-content:flex-start;  /* 위에서부터 배치 */
+  padding:120px 24px 80px;
+}
+.category-page.comingsoon-page .category-title {
+  font-size:clamp(34px, 5vw, 52px);
+  margin-bottom:14px;
+}
+.category-page.comingsoon-page .category-subtitle {
+  margin-bottom:24px;
+}
+.cs-page-inner {
+  width:100%; max-width:1100px; margin:0 auto;
+  position:relative; z-index:2;
+}
+.cs-hero {
+  text-align:center; margin-bottom:48px;
+}
+.cs-hero-eyebrow {
+  display:inline-flex; align-items:center; gap:8px;
+  border:1px solid var(--border); background:var(--gold-dim); color:var(--gold);
+  font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  padding:6px 14px; border-radius:100px; margin-bottom:24px;
+}
+.cs-hero-dot {
+  width:6px; height:6px; border-radius:50%;
+  background:var(--gold); animation:pulse 2s infinite;
+}
+.cs-hero-stats {
+  display:inline-flex; align-items:center; gap:0;
+  background:rgba(255,255,255,.02); border:1px solid var(--border);
+  border-radius:14px; padding:16px 8px; margin-top:16px;
+}
+.cs-stat {
+  display:flex; flex-direction:column; align-items:center;
+  padding:0 24px; min-width:90px;
+}
+.cs-stat-num {
+  font-family:var(--serif); font-size:26px; font-weight:900;
+  color:var(--gold); line-height:1;
+}
+.cs-stat-label {
+  font-size:11px; color:var(--muted); margin-top:6px; letter-spacing:.3px;
+}
+.cs-stat-divider {
+  width:1px; height:32px; background:var(--border);
+}
+.cs-section-title {
+  font-family:var(--serif); font-size:18px; font-weight:700;
+  color:var(--text); margin:36px 0 14px;
+  display:flex; align-items:center; gap:10px;
+  letter-spacing:.3px;
+}
+.cs-section-title::after {
+  content:''; flex:1; height:1px; background:var(--border);
+}
+.cs-grid {
+  display:grid; grid-template-columns:repeat(3, 1fr); gap:14px;
+}
+.cs-info-box {
+  display:flex; gap:16px; align-items:flex-start;
+  background:rgba(201,168,76,.04); border:1px dashed rgba(201,168,76,.3);
+  border-radius:14px; padding:22px 24px; margin-top:48px;
+  text-align:left;
+}
+.cs-info-icon { font-size:28px; flex-shrink:0; }
+.cs-info-content h4 {
+  font-size:14px; font-weight:700; color:var(--text); margin-bottom:6px;
+}
+.cs-info-content p {
+  font-size:13px; color:var(--muted); line-height:1.75; margin:0;
+}
+@media (max-width: 900px) {
+  .cs-grid { grid-template-columns:repeat(2, 1fr); }
+  .cs-stat { padding:0 14px; min-width:70px; }
+  .cs-stat-num { font-size:22px; }
+}
+@media (max-width: 480px) {
+  .cs-grid { grid-template-columns:1fr; }
+  .cs-hero-stats { flex-wrap:wrap; padding:12px 4px; }
+  .cs-stat-divider { display:none; }
+  .cs-info-box { flex-direction:column; gap:10px; }
+}
 
 .cta-subscribe-btn {
   margin-top:32px; background:var(--gold); border:1px solid var(--gold);
@@ -622,6 +719,9 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     <button class="nav-tab" onclick="showCategory('realestate', this)">부동산</button>
     <button class="nav-tab" onclick="showCategory('english', this)">영어</button>
     <button class="nav-tab" onclick="showCategory('trivia', this)">상식</button>
+    <button class="nav-tab nav-tab-soon" onclick="showCategory('comingsoon', this)">
+      COMING SOON <span class="nav-tab-badge">7</span>
+    </button>
   </div>
   <button class="nav-cta" onclick="document.querySelector('.pricing-wrap').scrollIntoView({behavior:'smooth'})">지금 시작하기</button>
 </nav>
@@ -816,6 +916,33 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   background:var(--border); vertical-align:middle; margin:0 12px;
 }
 
+/* 미리보기 3개 그리드 (소개 페이지) */
+.cat-grid-3 { grid-template-columns:repeat(3, 1fr) !important; }
+@media (max-width: 900px) { .cat-grid-3 { grid-template-columns:repeat(2, 1fr) !important; } }
+@media (max-width: 480px) { .cat-grid-3 { grid-template-columns:1fr !important; } }
+
+/* 전체 보기 버튼 (소개 페이지 → 전용 페이지로) */
+.cat-viewall-wrap { text-align:center; margin-top:32px; }
+.cat-viewall-btn {
+  display:inline-flex; align-items:center; gap:10px;
+  background:linear-gradient(135deg, rgba(201,168,76,.08), rgba(201,168,76,.04));
+  border:1px solid var(--border); color:var(--text);
+  padding:14px 30px; font-size:14px; font-weight:600; font-family:var(--sans);
+  border-radius:100px; cursor:pointer; transition:all .25s;
+  letter-spacing:.3px;
+}
+.cat-viewall-btn:hover {
+  border-color:var(--gold); background:rgba(201,168,76,.12);
+  transform:translateY(-2px); box-shadow:0 8px 24px rgba(201,168,76,.15);
+}
+.cat-viewall-arrow {
+  color:var(--gold); font-weight:700; transition:transform .2s;
+}
+.cat-viewall-btn:hover .cat-viewall-arrow { transform:translateX(4px); }
+.cat-viewall-hint {
+  margin-top:12px; font-size:11px; color:var(--muted); letter-spacing:.3px;
+}
+
 @media (max-width: 900px) {
   .cat-grid { grid-template-columns:repeat(2, 1fr); gap:14px; }
 }
@@ -858,9 +985,9 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     </div>
   </div>
 
-  <!-- Coming Soon 섹션 -->
-  <div class="cat-section-divider">COMING SOON</div>
-  <div class="cat-grid">
+  <!-- Coming Soon 미리보기 (3개만) -->
+  <div class="cat-section-divider">COMING SOON · 출시 예정</div>
+  <div class="cat-grid cat-grid-3">
     <div class="cat-card coming-soon" onclick="notifyComingSoon('kr_stock', '한국 증시')">
       <div class="coming-badge">출시 예정</div>
       <div class="cat-card-icon">📈</div>
@@ -877,14 +1004,6 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
       <p class="cat-card-desc">전날 미국 시장 마감 동향과 주요 빅테크 이슈를 한국 시간 출근 전에.</p>
       <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
     </div>
-    <div class="cat-card coming-soon" onclick="notifyComingSoon('crypto', '코인')">
-      <div class="coming-badge">출시 예정</div>
-      <div class="cat-card-icon">🪙</div>
-      <div class="cat-card-name">코인</div>
-      <div class="cat-card-tag">암호화폐 동향</div>
-      <p class="cat-card-desc">비트코인·이더리움 등 주요 코인 시장 동향과 글로벌 규제 이슈.</p>
-      <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
-    </div>
     <div class="cat-card coming-soon" onclick="notifyComingSoon('it_news', 'IT 뉴스')">
       <div class="coming-badge">출시 예정</div>
       <div class="cat-card-icon">💻</div>
@@ -893,30 +1012,15 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
       <p class="cat-card-desc">AI·빅테크·국내외 스타트업 핵심 뉴스를 한 줄로. 트렌드를 놓치지 마세요.</p>
       <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
     </div>
-    <div class="cat-card coming-soon" onclick="notifyComingSoon('law', '법률 상식')">
-      <div class="coming-badge">출시 예정</div>
-      <div class="cat-card-icon">⚖️</div>
-      <div class="cat-card-name">법률 상식</div>
-      <div class="cat-card-tag">생활 법률</div>
-      <p class="cat-card-desc">월급·계약·임대차·소비자 권리. 내 일상에 꼭 필요한 법률 한 줄.</p>
-      <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
-    </div>
-    <div class="cat-card coming-soon" onclick="notifyComingSoon('japanese', '일본어')">
-      <div class="coming-badge">출시 예정</div>
-      <div class="cat-card-icon">🇯🇵</div>
-      <div class="cat-card-name">일본어</div>
-      <div class="cat-card-tag">생활·여행 회화</div>
-      <p class="cat-card-desc">일본 여행·드라마·비즈니스에서 바로 쓰는 표현을 매일 한 줄씩.</p>
-      <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
-    </div>
-    <div class="cat-card coming-soon" onclick="notifyComingSoon('vietnamese', '베트남어')">
-      <div class="coming-badge">출시 예정</div>
-      <div class="cat-card-icon">🇻🇳</div>
-      <div class="cat-card-name">베트남어</div>
-      <div class="cat-card-tag">생활·비즈니스</div>
-      <p class="cat-card-desc">베트남 진출 직장인·여행자를 위한 실전 베트남어 표현.</p>
-      <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
-    </div>
+  </div>
+
+  <!-- 전체 보기 버튼 -->
+  <div class="cat-viewall-wrap">
+    <button class="cat-viewall-btn" onclick="showCategory('comingsoon')">
+      <span>출시 예정 카테고리 4개 더 보기</span>
+      <span class="cat-viewall-arrow">→</span>
+    </button>
+    <p class="cat-viewall-hint">한국 증시 · 미국 증시 · 코인 · IT · 법률 · 일본어 · 베트남어 (총 7개)</p>
   </div>
 </section>
 
@@ -1127,6 +1231,113 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:8px">
     <button class="category-back" onclick="showCategory('intro', document.querySelector('.nav-tab'))">← 소개로 돌아가기</button>
     <button class="cta-subscribe-btn" onclick="openModalWithCategory('trivia')">📬 상식 신청하기 →</button>
+  </div>
+</div>
+
+<!-- ─────────── COMING SOON 전용 페이지 ─────────── -->
+<div class="category-page comingsoon-page" id="comingsoon-page">
+  <div class="category-page-bg"></div>
+  <div class="cs-page-inner">
+    <div class="cs-hero">
+      <div class="cs-hero-eyebrow">
+        <span class="cs-hero-dot"></span>
+        <span>출시 예정 카테고리</span>
+      </div>
+      <h2 class="category-title">곧 만나볼<br><span style="color:var(--text)">새로운 카테고리</span></h2>
+      <p class="category-subtitle">
+        관심 있는 카테고리를 선택해 알림 신청해 두세요.<br>
+        출시되는 즉시 카카오톡으로 가장 먼저 알려드립니다.
+      </p>
+      <div class="cs-hero-stats">
+        <div class="cs-stat"><span class="cs-stat-num">7</span><span class="cs-stat-label">출시 예정</span></div>
+        <div class="cs-stat-divider"></div>
+        <div class="cs-stat"><span class="cs-stat-num">🔔</span><span class="cs-stat-label">사전 알림 무료</span></div>
+        <div class="cs-stat-divider"></div>
+        <div class="cs-stat"><span class="cs-stat-num">⚡</span><span class="cs-stat-label">출시 시 즉시 발송</span></div>
+      </div>
+    </div>
+
+    <!-- 7개 카드 그리드 -->
+    <div class="cs-section-title">📊 금융·투자</div>
+    <div class="cs-grid">
+      <div class="cat-card coming-soon" onclick="notifyComingSoon('kr_stock', '한국 증시')">
+        <div class="coming-badge">출시 예정</div>
+        <div class="cat-card-icon">📈</div>
+        <div class="cat-card-name">한국 증시</div>
+        <div class="cat-card-tag">시황·종목·이슈</div>
+        <p class="cat-card-desc">코스피·코스닥 일일 마감 시황과 핫이슈 종목 동향을 매일 아침에.</p>
+        <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
+      </div>
+      <div class="cat-card coming-soon" onclick="notifyComingSoon('us_stock', '미국 증시')">
+        <div class="coming-badge">출시 예정</div>
+        <div class="cat-card-icon">🇺🇸</div>
+        <div class="cat-card-name">미국 증시</div>
+        <div class="cat-card-tag">월가·빅테크</div>
+        <p class="cat-card-desc">전날 미국 시장 마감 동향과 주요 빅테크 이슈를 한국 시간 출근 전에.</p>
+        <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
+      </div>
+      <div class="cat-card coming-soon" onclick="notifyComingSoon('crypto', '코인')">
+        <div class="coming-badge">출시 예정</div>
+        <div class="cat-card-icon">🪙</div>
+        <div class="cat-card-name">코인</div>
+        <div class="cat-card-tag">암호화폐 동향</div>
+        <p class="cat-card-desc">비트코인·이더리움 등 주요 코인 시장 동향과 글로벌 규제 이슈.</p>
+        <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
+      </div>
+    </div>
+
+    <div class="cs-section-title">💻 테크·법률</div>
+    <div class="cs-grid">
+      <div class="cat-card coming-soon" onclick="notifyComingSoon('it_news', 'IT 뉴스')">
+        <div class="coming-badge">출시 예정</div>
+        <div class="cat-card-icon">💻</div>
+        <div class="cat-card-name">IT 뉴스</div>
+        <div class="cat-card-tag">AI·테크·스타트업</div>
+        <p class="cat-card-desc">AI·빅테크·국내외 스타트업 핵심 뉴스를 한 줄로. 트렌드를 놓치지 마세요.</p>
+        <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
+      </div>
+      <div class="cat-card coming-soon" onclick="notifyComingSoon('law', '법률 상식')">
+        <div class="coming-badge">출시 예정</div>
+        <div class="cat-card-icon">⚖️</div>
+        <div class="cat-card-name">법률 상식</div>
+        <div class="cat-card-tag">생활 법률</div>
+        <p class="cat-card-desc">월급·계약·임대차·소비자 권리. 내 일상에 꼭 필요한 법률 한 줄.</p>
+        <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
+      </div>
+    </div>
+
+    <div class="cs-section-title">🌏 외국어</div>
+    <div class="cs-grid">
+      <div class="cat-card coming-soon" onclick="notifyComingSoon('japanese', '일본어')">
+        <div class="coming-badge">출시 예정</div>
+        <div class="cat-card-icon">🇯🇵</div>
+        <div class="cat-card-name">일본어</div>
+        <div class="cat-card-tag">생활·여행 회화</div>
+        <p class="cat-card-desc">일본 여행·드라마·비즈니스에서 바로 쓰는 표현을 매일 한 줄씩.</p>
+        <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
+      </div>
+      <div class="cat-card coming-soon" onclick="notifyComingSoon('vietnamese', '베트남어')">
+        <div class="coming-badge">출시 예정</div>
+        <div class="cat-card-icon">🇻🇳</div>
+        <div class="cat-card-name">베트남어</div>
+        <div class="cat-card-tag">생활·비즈니스</div>
+        <p class="cat-card-desc">베트남 진출 직장인·여행자를 위한 실전 베트남어 표현.</p>
+        <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
+      </div>
+    </div>
+
+    <!-- 안내 박스 -->
+    <div class="cs-info-box">
+      <div class="cs-info-icon">💡</div>
+      <div class="cs-info-content">
+        <h4>알림 신청은 어떻게 진행되나요?</h4>
+        <p>전화번호와 개인정보 동의만 입력하시면 됩니다. 카드 등록·결제 절차는 전혀 없습니다. 해당 카테고리가 출시되는 시점에 카카오톡으로 1회 안내 메시지를 보내드린 후, 신청 정보는 자동 폐기됩니다.</p>
+      </div>
+    </div>
+
+    <div style="text-align:center;margin-top:32px">
+      <button class="category-back" onclick="showCategory('intro', document.querySelector('.nav-tab'))">← 소개로 돌아가기</button>
+    </div>
   </div>
 </div>
 
@@ -1436,7 +1647,7 @@ function showCategory(category, btnEl) {
   } else {
     // "소개로 돌아가기" 버튼에서 호출 시 첫 번째 탭 활성화
     const tabs = document.querySelectorAll('.nav-tab');
-    const idx = ['intro','economy','realestate','english','trivia'].indexOf(category);
+    const idx = ['intro','economy','realestate','english','trivia','comingsoon'].indexOf(category);
     if (tabs[idx]) tabs[idx].classList.add('active');
   }
 

@@ -766,6 +766,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   border:1px solid var(--border); border-radius:14px;
   padding:30px 22px; text-align:center; transition:all .3s;
   cursor:pointer;
+  position:relative;
 }
 .cat-card:hover {
   border-color:var(--gold); transform:translateY(-4px);
@@ -786,6 +787,35 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   margin-top:14px; padding-top:14px; border-top:1px dashed rgba(201,168,76,.15);
   font-size:11.5px; color:var(--muted); line-height:1.6; font-style:italic;
 }
+
+/* Coming Soon 카드 */
+.cat-card.coming-soon {
+  opacity:.55;
+  cursor:default;
+}
+.cat-card.coming-soon:hover {
+  border-color:var(--border); transform:none;
+  box-shadow:none; opacity:.75;
+}
+.cat-card.coming-soon .cat-card-icon { filter:grayscale(60%); }
+.cat-card.coming-soon .cat-card-name { color:var(--muted); }
+.cat-card .coming-badge {
+  position:absolute; top:12px; right:12px;
+  background:rgba(255,255,255,.04); border:1px solid var(--border);
+  color:var(--muted); font-size:10px; font-weight:700; letter-spacing:.5px;
+  padding:3px 9px; border-radius:20px;
+}
+
+/* Coming Soon 섹션 헤더 */
+.cat-section-divider {
+  margin:48px 0 24px; text-align:center;
+  font-size:13px; color:var(--muted); letter-spacing:1px;
+}
+.cat-section-divider::before, .cat-section-divider::after {
+  content:''; display:inline-block; width:60px; height:1px;
+  background:var(--border); vertical-align:middle; margin:0 12px;
+}
+
 @media (max-width: 900px) {
   .cat-grid { grid-template-columns:repeat(2, 1fr); gap:14px; }
 }
@@ -825,6 +855,67 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
       <div class="cat-card-tag">30일 알쓸 상식</div>
       <p class="cat-card-desc">친구·자녀·동료에게 들려줄 수 있는 흥미로운 이야기. 검증된 사실만 전달합니다.</p>
       <div class="cat-card-sample">"비행기 창문은 왜 둥근 모양일까?"</div>
+    </div>
+  </div>
+
+  <!-- Coming Soon 섹션 -->
+  <div class="cat-section-divider">COMING SOON</div>
+  <div class="cat-grid">
+    <div class="cat-card coming-soon" onclick="notifyComingSoon('kr_stock', '한국 증시')">
+      <div class="coming-badge">출시 예정</div>
+      <div class="cat-card-icon">📈</div>
+      <div class="cat-card-name">한국 증시</div>
+      <div class="cat-card-tag">시황·종목·이슈</div>
+      <p class="cat-card-desc">코스피·코스닥 일일 마감 시황과 핫이슈 종목 동향을 매일 아침에.</p>
+      <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
+    </div>
+    <div class="cat-card coming-soon" onclick="notifyComingSoon('us_stock', '미국 증시')">
+      <div class="coming-badge">출시 예정</div>
+      <div class="cat-card-icon">🇺🇸</div>
+      <div class="cat-card-name">미국 증시</div>
+      <div class="cat-card-tag">월가·빅테크</div>
+      <p class="cat-card-desc">전날 미국 시장 마감 동향과 주요 빅테크 이슈를 한국 시간 출근 전에.</p>
+      <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
+    </div>
+    <div class="cat-card coming-soon" onclick="notifyComingSoon('crypto', '코인')">
+      <div class="coming-badge">출시 예정</div>
+      <div class="cat-card-icon">🪙</div>
+      <div class="cat-card-name">코인</div>
+      <div class="cat-card-tag">암호화폐 동향</div>
+      <p class="cat-card-desc">비트코인·이더리움 등 주요 코인 시장 동향과 글로벌 규제 이슈.</p>
+      <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
+    </div>
+    <div class="cat-card coming-soon" onclick="notifyComingSoon('it_news', 'IT 뉴스')">
+      <div class="coming-badge">출시 예정</div>
+      <div class="cat-card-icon">💻</div>
+      <div class="cat-card-name">IT 뉴스</div>
+      <div class="cat-card-tag">AI·테크·스타트업</div>
+      <p class="cat-card-desc">AI·빅테크·국내외 스타트업 핵심 뉴스를 한 줄로. 트렌드를 놓치지 마세요.</p>
+      <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
+    </div>
+    <div class="cat-card coming-soon" onclick="notifyComingSoon('law', '법률 상식')">
+      <div class="coming-badge">출시 예정</div>
+      <div class="cat-card-icon">⚖️</div>
+      <div class="cat-card-name">법률 상식</div>
+      <div class="cat-card-tag">생활 법률</div>
+      <p class="cat-card-desc">월급·계약·임대차·소비자 권리. 내 일상에 꼭 필요한 법률 한 줄.</p>
+      <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
+    </div>
+    <div class="cat-card coming-soon" onclick="notifyComingSoon('japanese', '일본어')">
+      <div class="coming-badge">출시 예정</div>
+      <div class="cat-card-icon">🇯🇵</div>
+      <div class="cat-card-name">일본어</div>
+      <div class="cat-card-tag">생활·여행 회화</div>
+      <p class="cat-card-desc">일본 여행·드라마·비즈니스에서 바로 쓰는 표현을 매일 한 줄씩.</p>
+      <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
+    </div>
+    <div class="cat-card coming-soon" onclick="notifyComingSoon('vietnamese', '베트남어')">
+      <div class="coming-badge">출시 예정</div>
+      <div class="cat-card-icon">🇻🇳</div>
+      <div class="cat-card-name">베트남어</div>
+      <div class="cat-card-tag">생활·비즈니스</div>
+      <p class="cat-card-desc">베트남 진출 직장인·여행자를 위한 실전 베트남어 표현.</p>
+      <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
     </div>
   </div>
 </section>
@@ -1044,6 +1135,41 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   <div class="foot-links"><a onclick="openInfo('intro');return false;" href="#">서비스 소개</a><a onclick="openInfo('terms');return false;" href="#">이용약관</a><a onclick="openInfo('privacy');return false;" href="#">개인정보처리방침</a><a onclick="openInfo('cs');return false;" href="#">고객센터</a><a onclick="openCancelFlow();return false;" href="#" style="color:var(--error);opacity:.7">체험 취소</a></div>
   <div class="foot-copy">© 2026 1DAYECO · 사업자등록번호: 000-00-00000</div>
 </footer>
+
+<!-- ── COMING SOON 알림 신청 MODAL ── -->
+<div class="overlay" id="comingSoonOverlay" onclick="if(event.target.id==='comingSoonOverlay')closeComingSoonModal()">
+  <div class="modal" style="max-width:420px">
+    <button class="modal-x" onclick="closeComingSoonModal()">✕</button>
+    <div class="modal-title">🔔 출시 알림 신청</div>
+    <p class="modal-desc">
+      <strong style="color:var(--gold)" id="comingSoonCatName">선택한 카테고리</strong>가 출시되는 시점에<br>
+      카카오톡으로 알려드립니다.
+    </p>
+
+    <div class="field">
+      <label>카카오톡 전화번호</label>
+      <input type="tel" id="comingSoonPhone" placeholder="010-0000-0000"
+        maxlength="13" oninput="fmtPhone(this);updateComingSoonBtn()">
+    </div>
+
+    <div style="margin:12px 0 16px">
+      <div class="agree-row">
+        <input type="checkbox" id="comingSoonAgree" onchange="updateComingSoonBtn()">
+        <label for="comingSoonAgree" style="cursor:pointer">
+          <a onclick="openInfo('privacy');return false;" href="#">개인정보처리방침</a>에 동의합니다 (필수)
+        </label>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;padding-left:24px;line-height:1.5">
+        출시 시 1회 카카오톡 안내 후 자동 폐기됩니다.
+      </div>
+    </div>
+
+    <button class="modal-btn" id="comingSoonBtn" onclick="submitComingSoonNotify()" style="opacity:0.55;cursor:not-allowed" disabled>
+      <span id="comingSoonBtnTxt">알림 신청하기</span>
+      <span id="comingSoonSpin" style="display:none"><span class="spinner"></span></span>
+    </button>
+  </div>
+</div>
 
 <!-- ── MODAL ── -->
 <div class="overlay" id="overlay" onclick="closeOut(event)">
@@ -1331,6 +1457,56 @@ function showToast(msg, type='ok') {
   t.textContent = (type==='ok'?'✅ ':'❌ ') + msg;
   t.className = `toast ${type} show`;
   setTimeout(()=>t.classList.remove('show'), 4000);
+}
+
+// ── Coming Soon 카테고리 - 출시 알림 신청 ─────────────────────
+let _pendingComingSoonCat = null;
+function notifyComingSoon(catId, catName) {
+  _pendingComingSoonCat = { id: catId, name: catName };
+  document.getElementById('comingSoonCatName').textContent = catName;
+  document.getElementById('comingSoonOverlay').classList.add('open');
+  // 폼 초기화
+  document.getElementById('comingSoonPhone').value = '';
+  document.getElementById('comingSoonAgree').checked = false;
+  updateComingSoonBtn();
+}
+function closeComingSoonModal() {
+  document.getElementById('comingSoonOverlay').classList.remove('open');
+  _pendingComingSoonCat = null;
+}
+function updateComingSoonBtn() {
+  const phone = document.getElementById('comingSoonPhone').value;
+  const agree = document.getElementById('comingSoonAgree').checked;
+  const btn = document.getElementById('comingSoonBtn');
+  const valid = phone.length >= 12 && agree;
+  btn.style.opacity = valid ? '1' : '0.55';
+  btn.style.cursor = valid ? 'pointer' : 'not-allowed';
+  btn.disabled = !valid;
+}
+async function submitComingSoonNotify() {
+  if (!_pendingComingSoonCat) return;
+  const phone = document.getElementById('comingSoonPhone').value;
+  const agree = document.getElementById('comingSoonAgree').checked;
+  if (phone.length < 12) { showToast('올바른 전화번호를 입력해주세요', 'ng'); return; }
+  if (!agree) { showToast('개인정보 수집에 동의해 주세요', 'ng'); return; }
+  
+  setLoading('comingSoonBtn', 'comingSoonSpin', 'comingSoonBtnTxt', true);
+  try {
+    const res = await apiPost('/api/coming-soon-notify', {
+      category_id:   _pendingComingSoonCat.id,
+      category_name: _pendingComingSoonCat.name,
+      phone:         phone.replace(/-/g, ''),
+    });
+    if (res && res.success === false) {
+      throw new Error(res.message || '알림 신청 처리 중 오류');
+    }
+    closeComingSoonModal();
+    showToast(`${_pendingComingSoonCat.name} 출시 시 카카오톡으로 알려드립니다!`, 'ok');
+  } catch (e) {
+    showToast(e.message || '알림 신청 실패', 'ng');
+  } finally {
+    setLoading('comingSoonBtn', 'comingSoonSpin', 'comingSoonBtnTxt', false);
+  }
 }
 
 function setLoading(btnId, spinId, txtId, loading) {

@@ -995,42 +995,22 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     </div>
   </div>
 
-  <!-- Coming Soon 미리보기 (3개만) -->
+  <!-- Coming Soon 미리보기 (DB에서 동적 로드 — 최대 3개 미리보기) -->
   <div class="cat-section-divider">COMING SOON · 출시 예정</div>
-  <div class="cat-grid cat-grid-3">
-    <div class="cat-card coming-soon">
-      <div class="coming-badge">출시 예정</div>
-      <div class="cat-card-icon">📈</div>
-      <div class="cat-card-name">한국 증시</div>
-      <div class="cat-card-tag">시황·종목·이슈</div>
-      <p class="cat-card-desc">코스피·코스닥 일일 마감 시황과 핫이슈 종목 동향을 매일 아침에.</p>
-      <div class="cat-card-sample">출시 준비 중 ⏳</div>
-    </div>
-    <div class="cat-card coming-soon">
-      <div class="coming-badge">출시 예정</div>
-      <div class="cat-card-icon">🇺🇸</div>
-      <div class="cat-card-name">미국 증시</div>
-      <div class="cat-card-tag">월가·빅테크</div>
-      <p class="cat-card-desc">전날 미국 시장 마감 동향과 주요 빅테크 이슈를 한국 시간 출근 전에.</p>
-      <div class="cat-card-sample">출시 준비 중 ⏳</div>
-    </div>
-    <div class="cat-card coming-soon">
-      <div class="coming-badge">출시 예정</div>
-      <div class="cat-card-icon">💻</div>
-      <div class="cat-card-name">IT 뉴스</div>
-      <div class="cat-card-tag">AI·테크·스타트업</div>
-      <p class="cat-card-desc">AI·빅테크·국내외 스타트업 핵심 뉴스를 한 줄로. 트렌드를 놓치지 마세요.</p>
-      <div class="cat-card-sample">출시 준비 중 ⏳</div>
+  <div class="cat-grid cat-grid-3" id="comingSoonPreview">
+    <!-- _renderComingSoonPreview()에서 동적 채움 -->
+    <div class="cat-card coming-soon" style="opacity:.4;text-align:center">
+      <div class="cat-card-name" style="font-size:13px;color:var(--muted)">불러오는 중...</div>
     </div>
   </div>
 
   <!-- 전체 보기 버튼 -->
-  <div class="cat-viewall-wrap">
+  <div class="cat-viewall-wrap" id="comingSoonViewAllWrap">
     <button class="cat-viewall-btn" onclick="showCategory('comingsoon')">
-      <span>출시 예정 카테고리 4개 더 보기</span>
+      <span id="comingSoonViewAllText">출시 예정 카테고리 더 보기</span>
       <span class="cat-viewall-arrow">→</span>
     </button>
-    <p class="cat-viewall-hint">한국 증시 · 미국 증시 · 코인 · IT · 법률 · 일본어 · 베트남어 (총 7개)</p>
+    <p class="cat-viewall-hint" id="comingSoonViewAllHint">출시 준비 중인 카테고리들</p>
   </div>
 </section>
 
@@ -1254,85 +1234,26 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
         <span>출시 예정 카테고리</span>
       </div>
       <h2 class="category-title">곧 만나볼<br><span style="color:var(--text)">새로운 카테고리</span></h2>
-      <p class="category-subtitle" style="margin-left:auto;margin-right:auto;text-align:center">
-        7개의 새로운 카테고리가 출시를 준비하고 있습니다.<br>
+      <p class="category-subtitle" style="margin-left:auto;margin-right:auto;text-align:center" id="comingSoonHeroDesc">
+        새로운 카테고리들이 출시를 준비하고 있습니다.<br>
         준비가 끝나는 대로 빠르게 선보이겠습니다.
       </p>
       <div class="cs-hero-stats">
-        <div class="cs-stat"><span class="cs-stat-num">7</span><span class="cs-stat-label">출시 예정</span></div>
+        <div class="cs-stat"><span class="cs-stat-num" id="comingSoonHeroCount">—</span><span class="cs-stat-label">출시 예정</span></div>
         <div class="cs-stat-divider"></div>
-        <div class="cs-stat"><span class="cs-stat-num">3</span><span class="cs-stat-label">분야 그룹</span></div>
+        <div class="cs-stat"><span class="cs-stat-num" id="comingSoonGroupCount">—</span><span class="cs-stat-label">분야 그룹</span></div>
         <div class="cs-stat-divider"></div>
         <div class="cs-stat"><span class="cs-stat-num">⏳</span><span class="cs-stat-label">준비 중</span></div>
       </div>
     </div>
 
-    <!-- 7개 카드 그리드 -->
-    <div class="cs-section-title">📊 금융·투자</div>
-    <div class="cs-grid">
-      <div class="cat-card coming-soon">
-        <div class="coming-badge">출시 예정</div>
-        <div class="cat-card-icon">📈</div>
-        <div class="cat-card-name">한국 증시</div>
-        <div class="cat-card-tag">시황·종목·이슈</div>
-        <p class="cat-card-desc">코스피·코스닥 일일 마감 시황과 핫이슈 종목 동향을 매일 아침에.</p>
-        <div class="cat-card-sample">출시 준비 중 ⏳</div>
-      </div>
-      <div class="cat-card coming-soon">
-        <div class="coming-badge">출시 예정</div>
-        <div class="cat-card-icon">🇺🇸</div>
-        <div class="cat-card-name">미국 증시</div>
-        <div class="cat-card-tag">월가·빅테크</div>
-        <p class="cat-card-desc">전날 미국 시장 마감 동향과 주요 빅테크 이슈를 한국 시간 출근 전에.</p>
-        <div class="cat-card-sample">출시 준비 중 ⏳</div>
-      </div>
-      <div class="cat-card coming-soon">
-        <div class="coming-badge">출시 예정</div>
-        <div class="cat-card-icon">🪙</div>
-        <div class="cat-card-name">코인</div>
-        <div class="cat-card-tag">암호화폐 동향</div>
-        <p class="cat-card-desc">비트코인·이더리움 등 주요 코인 시장 동향과 글로벌 규제 이슈.</p>
-        <div class="cat-card-sample">출시 준비 중 ⏳</div>
-      </div>
-    </div>
-
-    <div class="cs-section-title">💻 테크·법률</div>
-    <div class="cs-grid">
-      <div class="cat-card coming-soon">
-        <div class="coming-badge">출시 예정</div>
-        <div class="cat-card-icon">💻</div>
-        <div class="cat-card-name">IT 뉴스</div>
-        <div class="cat-card-tag">AI·테크·스타트업</div>
-        <p class="cat-card-desc">AI·빅테크·국내외 스타트업 핵심 뉴스를 한 줄로. 트렌드를 놓치지 마세요.</p>
-        <div class="cat-card-sample">출시 준비 중 ⏳</div>
-      </div>
-      <div class="cat-card coming-soon">
-        <div class="coming-badge">출시 예정</div>
-        <div class="cat-card-icon">⚖️</div>
-        <div class="cat-card-name">법률 상식</div>
-        <div class="cat-card-tag">생활 법률</div>
-        <p class="cat-card-desc">월급·계약·임대차·소비자 권리. 내 일상에 꼭 필요한 법률 한 줄.</p>
-        <div class="cat-card-sample">출시 준비 중 ⏳</div>
-      </div>
-    </div>
-
-    <div class="cs-section-title">🌏 외국어</div>
-    <div class="cs-grid">
-      <div class="cat-card coming-soon">
-        <div class="coming-badge">출시 예정</div>
-        <div class="cat-card-icon">🇯🇵</div>
-        <div class="cat-card-name">일본어</div>
-        <div class="cat-card-tag">생활·여행 회화</div>
-        <p class="cat-card-desc">일본 여행·드라마·비즈니스에서 바로 쓰는 표현을 매일 한 줄씩.</p>
-        <div class="cat-card-sample">출시 준비 중 ⏳</div>
-      </div>
-      <div class="cat-card coming-soon">
-        <div class="coming-badge">출시 예정</div>
-        <div class="cat-card-icon">🇻🇳</div>
-        <div class="cat-card-name">베트남어</div>
-        <div class="cat-card-tag">생활·비즈니스</div>
-        <p class="cat-card-desc">베트남 진출 직장인·여행자를 위한 실전 베트남어 표현.</p>
-        <div class="cat-card-sample">출시 준비 중 ⏳</div>
+    <!-- 카드 그리드 (DB에서 동적 로드) -->
+    <div id="comingSoonFullGrid">
+      <!-- _renderComingSoonFull()에서 동적 채움 -->
+      <div class="cs-grid">
+        <div class="cat-card coming-soon" style="opacity:.4;text-align:center;grid-column:1/-1;padding:40px 20px">
+          <div class="cat-card-name" style="font-size:14px;color:var(--muted)">불러오는 중...</div>
+        </div>
       </div>
     </div>
 
@@ -2499,14 +2420,135 @@ function switchPricingTab(tabName) {
 // 초기 발송 예정일 계산
 updateFirstSendInfo();
 
+// ── Coming Soon 카테고리 렌더링 (DB 기반) ──────────────────────
+// 카테고리 ID → 그룹 분류 매핑 (display_order로 그룹 자동 결정)
+// 100~109: 금융·투자 / 110~119: 테크·법률 / 120~129: 외국어 / 그 외: 기타
+function _comingSoonGroupOf(c) {
+  const order = c.display_order || 999;
+  if (order >= 100 && order < 110) return { key: 'finance',  title: '📊 금융·투자' };
+  if (order >= 110 && order < 120) return { key: 'tech_law', title: '💻 테크·법률' };
+  if (order >= 120 && order < 130) return { key: 'language', title: '🌏 외국어' };
+  return { key: 'other', title: '🌟 그 외' };
+}
+
+// 카드 1개 HTML
+function _renderComingSoonCard(c) {
+  const desc = c.description || '출시 준비 중입니다.';
+  // tag는 description 첫 줄 또는 짧은 라벨로 — 간단하게 카테고리 이름으로 폴백
+  const tag = c.tag || c.tagline || '출시 예정';
+  return `
+    <div class="cat-card coming-soon">
+      <div class="coming-badge">출시 예정</div>
+      <div class="cat-card-icon">${c.emoji || '📌'}</div>
+      <div class="cat-card-name">${c.name || c.id}</div>
+      <div class="cat-card-tag">${tag}</div>
+      <p class="cat-card-desc">${desc}</p>
+      <div class="cat-card-sample">출시 준비 중 ⏳</div>
+    </div>`;
+}
+
+// 메인 인트로 Coming Soon 미리보기 (최대 3개)
+function _renderComingSoonPreview(cats) {
+  const wrap     = document.getElementById('comingSoonPreview');
+  const viewWrap = document.getElementById('comingSoonViewAllWrap');
+  const viewTxt  = document.getElementById('comingSoonViewAllText');
+  const viewHint = document.getElementById('comingSoonViewAllHint');
+  if (!wrap) return;
+
+  // 카테고리 0개면 미리보기 영역 자체 숨김
+  if (!cats || cats.length === 0) {
+    wrap.style.display = 'none';
+    if (viewWrap) viewWrap.style.display = 'none';
+    // 섹션 헤더(COMING SOON · 출시 예정)도 숨김
+    const headerDivider = wrap.previousElementSibling;
+    if (headerDivider && headerDivider.classList.contains('cat-section-divider')) {
+      headerDivider.style.display = 'none';
+    }
+    return;
+  }
+
+  wrap.style.display = '';
+  if (viewWrap) viewWrap.style.display = '';
+
+  // 미리보기는 display_order 순서대로 최대 3개
+  const sorted = [...cats].sort((a, b) => (a.display_order || 999) - (b.display_order || 999));
+  const preview = sorted.slice(0, 3);
+  wrap.innerHTML = preview.map(_renderComingSoonCard).join('');
+
+  // 더 보기 버튼 텍스트
+  const remaining = cats.length - preview.length;
+  if (viewTxt) {
+    viewTxt.textContent = remaining > 0
+      ? `출시 예정 카테고리 ${remaining}개 더 보기`
+      : `출시 예정 카테고리 전체 보기`;
+  }
+  if (viewHint) {
+    const allNames = sorted.map(c => c.name).join(' · ');
+    viewHint.textContent = `${allNames} (총 ${cats.length}개)`;
+  }
+}
+
+// Coming Soon 페이지 전체 (그룹별 분류)
+function _renderComingSoonFull(cats) {
+  const wrap = document.getElementById('comingSoonFullGrid');
+  if (!wrap) return;
+
+  // 헤더 통계 갱신
+  const heroCount  = document.getElementById('comingSoonHeroCount');
+  const groupCount = document.getElementById('comingSoonGroupCount');
+  const heroDesc   = document.getElementById('comingSoonHeroDesc');
+
+  if (!cats || cats.length === 0) {
+    if (heroCount)  heroCount.textContent = '0';
+    if (groupCount) groupCount.textContent = '0';
+    if (heroDesc)   heroDesc.innerHTML = '현재 출시 예정 카테고리가 없습니다.<br>새로운 소식이 있으면 빠르게 업데이트하겠습니다.';
+    wrap.innerHTML = '<div class="cs-grid"><div class="cat-card coming-soon" style="text-align:center;grid-column:1/-1;padding:40px 20px"><div class="cat-card-name" style="font-size:14px;color:var(--muted)">출시 예정 카테고리가 없습니다.</div></div></div>';
+    return;
+  }
+
+  // 그룹별로 분류
+  const groups = {};
+  const groupOrder = ['finance', 'tech_law', 'language', 'other'];
+  cats.forEach(c => {
+    const g = _comingSoonGroupOf(c);
+    if (!groups[g.key]) groups[g.key] = { title: g.title, items: [] };
+    groups[g.key].items.push(c);
+  });
+
+  // 각 그룹 안에서 display_order 순 정렬
+  Object.values(groups).forEach(g => {
+    g.items.sort((a, b) => (a.display_order || 999) - (b.display_order || 999));
+  });
+
+  const groupKeys = groupOrder.filter(k => groups[k]);
+
+  // 헤더 통계
+  if (heroCount)  heroCount.textContent = String(cats.length);
+  if (groupCount) groupCount.textContent = String(groupKeys.length);
+  if (heroDesc) {
+    heroDesc.innerHTML = `${cats.length}개의 새로운 카테고리가 출시를 준비하고 있습니다.<br>준비가 끝나는 대로 빠르게 선보이겠습니다.`;
+  }
+
+  // 그룹 + 카드 렌더
+  let html = '';
+  groupKeys.forEach(key => {
+    const g = groups[key];
+    html += `<div class="cs-section-title">${g.title}</div>`;
+    html += `<div class="cs-grid">${g.items.map(_renderComingSoonCard).join('')}</div>`;
+  });
+  wrap.innerHTML = html;
+}
+
 // 페이지 로드 시 카테고리 사전 로드 (visibility 정책 적용)
 // - active가 아닌 정식 카테고리(economy/realestate/english/trivia) 탭은 숨김
 //   (예: 어드민에서 '경제'를 hidden으로 바꾸면 네비 탭 자체가 사라짐)
+// - coming_soon 카테고리는 메인 미리보기 + Coming Soon 페이지에 동적 렌더
 async function _initCategoryVisibility() {
   try {
     const data = await loadCategoriesFromAPI();
-    const activeIds = new Set((data.active || []).map(c => c.id));
-    const NAV_CATS  = ['economy', 'realestate', 'english', 'trivia'];
+    const activeIds  = new Set((data.active || []).map(c => c.id));
+    const comingSoon = data.coming_soon || [];
+    const NAV_CATS   = ['economy', 'realestate', 'english', 'trivia'];
 
     document.querySelectorAll('.nav-tab').forEach(btn => {
       // onclick="showCategory('xxx', this)" 패턴에서 카테고리 ID 추출
@@ -2532,6 +2574,10 @@ async function _initCategoryVisibility() {
         card.style.display = 'none';
       }
     });
+
+    // Coming Soon 카테고리 동적 렌더
+    _renderComingSoonPreview(comingSoon);
+    _renderComingSoonFull(comingSoon);
   } catch (e) {
     console.warn('[카테고리 visibility 초기화 실패]', e);
   }

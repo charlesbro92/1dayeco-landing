@@ -1434,10 +1434,10 @@ HIDDEN_COMINGSOON_MODAL_END -->
       <div class="field">
         <label>💡 받아볼 관심사 선택 <span id="catLabelHint" style="font-size:11px;color:var(--gold);font-weight:500">(1개 선택 필수)</span></label>
         <div id="catSelector" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
-          <button type="button" class="cat-btn" data-cat="economy" onclick="toggleCat('economy')">📊 경제</button>
-          <button type="button" class="cat-btn" data-cat="realestate" onclick="toggleCat('realestate')">🏠 부동산</button>
-          <button type="button" class="cat-btn" data-cat="english" onclick="toggleCat('english')">🇬🇧 영어</button>
-          <button type="button" class="cat-btn" data-cat="trivia" onclick="toggleCat('trivia')">🧠 상식</button>
+          <!-- 동적으로 채워짐: loadActiveCategories() — visibility='active'만 표시 -->
+          <div style="grid-column:1/-1;text-align:center;padding:18px;color:var(--muted);font-size:12px">
+            카테고리 목록을 불러오는 중...
+          </div>
         </div>
         <div id="catGuide" style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">
           관심 있는 카테고리를 1개 선택하면 매일 그 카테고리 콘텐츠를 받아볼 수 있습니다.
@@ -1644,7 +1644,31 @@ let selectedCategories = [];   // 신청 시 선택한 관심사 (예: ['economy
 const FIXED_SEND_HOUR = 8;     // 발송 시간 고정
 
 // ── 카테고리 탭 전환 ─────────────────────────────────────────
-function showCategory(category, btnEl) {
+async function showCategory(category, btnEl) {
+  // hidden 카테고리는 랜딩에서 절대 노출 안 됨 — 자동 redirect
+  // 정식 4개 카테고리(economy/realestate/english/trivia)에 대해서만 visibility 체크
+  // (intro, comingsoon은 시스템 페이지라 항상 접근 가능)
+  if (['economy', 'realestate', 'english', 'trivia'].includes(category)) {
+    try {
+      const data = await loadCategoriesFromAPI();
+      const allActive   = (data.active || []).map(c => c.id);
+      const allComingSoon = (data.coming_soon || []).map(c => c.id);
+
+      if (!allActive.includes(category)) {
+        // active가 아닌 경우 — coming_soon이면 coming soon 페이지로, 그 외(hidden)면 intro로
+        if (allComingSoon.includes(category)) {
+          // coming_soon 카테고리는 통합 페이지로
+          category = 'comingsoon';
+        } else {
+          // hidden 또는 카테고리 자체가 없음 → 소개 페이지로
+          category = 'intro';
+        }
+      }
+    } catch (e) {
+      // API 실패 시 그냥 진행 (기본 4개는 active로 가정)
+    }
+  }
+
   // 모든 페이지 숨기기
   const intro = document.getElementById('intro-page');
   const pages = document.querySelectorAll('.category-page');
@@ -1853,6 +1877,9 @@ function openModal(plan) {
   document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
   updateFirstSendInfo();
   updateModalBtn(); // 카테고리 0개 → 버튼 disabled
+
+  // 카테고리 버튼 동적 렌더 (visibility='active'만)
+  renderModalCategoryButtons();
 
   // 스텝 초기화
   showStep(1);
@@ -2078,6 +2105,85 @@ if (urlParams.has('billingSuccess')) {
 }
 
 // ── 관심사(카테고리) 선택 ────────────────────────────────────
+
+// 백엔드에서 카테고리 정보 가져와서 캐시 (랜딩페이지에서 사용할 active/coming_soon 카테고리)
+let _categoriesCache = null;        // { active: [...], coming_soon: [...] }
+let _categoriesCachePromise = null; // 중복 호출 방지
+
+async function loadCategoriesFromAPI() {
+  // 이미 캐시되어 있으면 재사용
+  if (_categoriesCache) return _categoriesCache;
+  if (_categoriesCachePromise) return _categoriesCachePromise;
+
+  _categoriesCachePromise = (async () => {
+    try {
+      if (!API_BASE) {
+        // API 미연결 — 폴백: 정식 4개만 active로
+        return { active: [
+          { id: 'economy',    name: '경제',    emoji: '📊' },
+          { id: 'realestate', name: '부동산', emoji: '🏠' },
+          { id: 'english',    name: '영어',    emoji: '🇬🇧' },
+          { id: 'trivia',     name: '상식',    emoji: '🧠' },
+        ], coming_soon: [] };
+      }
+      const r = await fetch(API_BASE + '/api/categories');
+      const d = await r.json();
+      _categoriesCache = {
+        active:      d.active      || [],
+        coming_soon: d.coming_soon || [],
+      };
+      return _categoriesCache;
+    } catch (e) {
+      console.warn('[카테고리] 로드 실패, 폴백 사용:', e);
+      return { active: [
+        { id: 'economy',    name: '경제',    emoji: '📊' },
+        { id: 'realestate', name: '부동산', emoji: '🏠' },
+        { id: 'english',    name: '영어',    emoji: '🇬🇧' },
+        { id: 'trivia',     name: '상식',    emoji: '🧠' },
+      ], coming_soon: [] };
+    } finally {
+      _categoriesCachePromise = null;
+    }
+  })();
+
+  _categoriesCache = await _categoriesCachePromise;
+  return _categoriesCache;
+}
+
+// 모달의 카테고리 선택 버튼들을 active 카테고리로 동적 렌더
+async function renderModalCategoryButtons() {
+  const sel = document.getElementById('catSelector');
+  if (!sel) return;
+
+  const data = await loadCategoriesFromAPI();
+  const activeCats = data.active || [];
+
+  if (activeCats.length === 0) {
+    sel.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:18px;color:var(--muted);font-size:12px">현재 신청 가능한 카테고리가 없습니다.</div>';
+    return;
+  }
+
+  // 그리드: 카테고리가 1개면 1열, 그 외엔 2열
+  sel.style.gridTemplateColumns = activeCats.length === 1 ? '1fr' : '1fr 1fr';
+
+  sel.innerHTML = activeCats.map(c => {
+    const id    = c.id;
+    const name  = c.name || id;
+    const emoji = c.emoji || '📌';
+    return `<button type="button" class="cat-btn" data-cat="${id}" onclick="toggleCat('${id}')">${emoji} ${name}</button>`;
+  }).join('');
+
+  // 이전에 선택한 카테고리가 active 목록에 없으면 해제
+  if (selectedCategories.length > 0) {
+    const allowedIds = new Set(activeCats.map(c => c.id));
+    selectedCategories = selectedCategories.filter(c => allowedIds.has(c));
+    document.querySelectorAll('.cat-btn').forEach(btn => {
+      btn.classList.toggle('active', selectedCategories.includes(btn.dataset.cat));
+    });
+    updateModalBtn();
+  }
+}
+
 function toggleCat(cat) {
   // 모든 플랜에서 1개만 선택 (라디오 버튼처럼 동작)
   // 1개 콘텐츠에 집중 - 여러 분야 원하면 별도 신청 (독립 구독)
@@ -2098,15 +2204,27 @@ function toggleCat(cat) {
 }
 
 // 카테고리 페이지에서 "이 관심사 신청하기" 클릭 시 호출 — 해당 카테고리를 미리 체크하고 모달 오픈
-function openModalWithCategory(cat) {
+async function openModalWithCategory(cat) {
   openModal('pkg6m');  // 6개월 (가장 인기) 디폴트, 모달 안에서 변경 가능
-  // 모달이 열리면서 selectedCategories는 []로 초기화되므로 약간의 지연 후 추가
-  setTimeout(() => {
-    if (!selectedCategories.includes(cat)) selectedCategories.push(cat);
-    document.querySelectorAll('.cat-btn').forEach(btn => {
-      btn.classList.toggle('active', selectedCategories.includes(btn.dataset.cat));
-    });
-  }, 50);
+
+  // 카테고리 동적 렌더 완료 기다림
+  await loadCategoriesFromAPI();
+  // 한 프레임 더 기다려 DOM 반영 보장
+  await new Promise(r => setTimeout(r, 100));
+
+  // 카테고리가 active 목록에 있는지 확인 후 선택
+  const data = await loadCategoriesFromAPI();
+  const allowedIds = new Set((data.active || []).map(c => c.id));
+  if (!allowedIds.has(cat)) {
+    // 비활성/coming_soon/hidden 카테고리는 선택 불가
+    showToast('현재 신청할 수 없는 카테고리입니다', 'ng');
+    return;
+  }
+  if (!selectedCategories.includes(cat)) selectedCategories.push(cat);
+  document.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.classList.toggle('active', selectedCategories.includes(btn.dataset.cat));
+  });
+  updateModalBtn();
 }
 
 // ── 발송 시간 (8시 고정) ─────────────────────────────────────
@@ -2380,6 +2498,45 @@ function switchPricingTab(tabName) {
 
 // 초기 발송 예정일 계산
 updateFirstSendInfo();
+
+// 페이지 로드 시 카테고리 사전 로드 (visibility 정책 적용)
+// - active가 아닌 정식 카테고리(economy/realestate/english/trivia) 탭은 숨김
+//   (예: 어드민에서 '경제'를 hidden으로 바꾸면 네비 탭 자체가 사라짐)
+async function _initCategoryVisibility() {
+  try {
+    const data = await loadCategoriesFromAPI();
+    const activeIds = new Set((data.active || []).map(c => c.id));
+    const NAV_CATS  = ['economy', 'realestate', 'english', 'trivia'];
+
+    document.querySelectorAll('.nav-tab').forEach(btn => {
+      // onclick="showCategory('xxx', this)" 패턴에서 카테고리 ID 추출
+      const onclick = btn.getAttribute('onclick') || '';
+      const m = onclick.match(/showCategory\('([^']+)'/);
+      if (!m) return;
+      const cat = m[1];
+      // 정식 4개 카테고리에만 visibility 체크 적용
+      if (NAV_CATS.includes(cat)) {
+        if (!activeIds.has(cat)) {
+          btn.style.display = 'none';
+        }
+      }
+    });
+
+    // 메인 소개 페이지의 정식 카테고리 카드도 hidden 처리
+    document.querySelectorAll('.cat-grid .cat-card').forEach(card => {
+      const onclick = card.getAttribute('onclick') || '';
+      const m = onclick.match(/showCategory\('([^']+)'/);
+      if (!m) return;
+      const cat = m[1];
+      if (NAV_CATS.includes(cat) && !activeIds.has(cat)) {
+        card.style.display = 'none';
+      }
+    });
+  } catch (e) {
+    console.warn('[카테고리 visibility 초기화 실패]', e);
+  }
+}
+_initCategoryVisibility();
 </script>
 </body>
 </html>

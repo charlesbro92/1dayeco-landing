@@ -35,17 +35,6 @@
 html { scroll-behavior:smooth; }
 body { background:var(--dark); color:var(--text); font-family:var(--sans); overflow-x:hidden; }
 
-/* ── FOUC 방지: 카테고리 visibility 초기화 전까지 정식 카테고리 영역 숨김 ──
-   _initCategoryVisibility() 완료 시 html.cat-ready 클래스가 추가됨 */
-html:not(.cat-ready) .nav-tab[data-cat-check],
-html:not(.cat-ready) #mainActiveCatGrid .cat-card[data-cat] {
-  visibility: hidden;
-}
-html.cat-ready .nav-tab[data-cat-check],
-html.cat-ready #mainActiveCatGrid .cat-card[data-cat] {
-  visibility: visible;
-}
-
 /* grain */
 body::before {
   content:''; position:fixed; inset:0; pointer-events:none; z-index:999; opacity:.35;
@@ -85,18 +74,6 @@ nav {
 .nav-tab.active::after {
   content:''; position:absolute; bottom:-15px; left:50%; transform:translateX(-50%);
   width:24px; height:2px; background:var(--gold);
-}
-/* COMING SOON 탭 배지 */
-.nav-tab-soon { display:flex; align-items:center; gap:6px; }
-.nav-tab-badge {
-  display:inline-flex; align-items:center; justify-content:center;
-  min-width:18px; height:18px; padding:0 5px;
-  background:rgba(201,168,76,.15); border:1px solid rgba(201,168,76,.4);
-  color:var(--gold); border-radius:20px; font-size:10px; font-weight:800;
-  letter-spacing:0;
-}
-.nav-tab-soon.active .nav-tab-badge {
-  background:var(--gold); color:var(--dark); border-color:var(--gold);
 }
 
 .nav-cta {
@@ -149,91 +126,6 @@ nav {
   border-radius:6px; cursor:pointer; transition:all .2s;
 }
 .category-back:hover { background:rgba(201,168,76,.08); border-color:var(--gold); }
-
-/* ── COMING SOON 전용 페이지 ── */
-.category-page.comingsoon-page {
-  justify-content:flex-start;  /* 위에서부터 배치 */
-  padding:120px 24px 80px;
-}
-.category-page.comingsoon-page .category-title {
-  font-size:clamp(34px, 5vw, 52px);
-  margin-bottom:14px;
-}
-.category-page.comingsoon-page .category-subtitle {
-  margin-bottom:24px;
-}
-.cs-page-inner {
-  width:100%; max-width:1100px; margin:0 auto;
-  position:relative; z-index:2;
-}
-.cs-hero {
-  text-align:center; margin-bottom:48px;
-}
-.cs-hero-eyebrow {
-  display:inline-flex; align-items:center; gap:8px;
-  border:1px solid var(--border); background:var(--gold-dim); color:var(--gold);
-  font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
-  padding:6px 14px; border-radius:100px; margin-bottom:24px;
-}
-.cs-hero-dot {
-  width:6px; height:6px; border-radius:50%;
-  background:var(--gold); animation:pulse 2s infinite;
-}
-.cs-hero-stats {
-  display:inline-flex; align-items:center; gap:0;
-  background:rgba(255,255,255,.02); border:1px solid var(--border);
-  border-radius:14px; padding:16px 8px; margin-top:16px;
-}
-.cs-stat {
-  display:flex; flex-direction:column; align-items:center;
-  padding:0 24px; min-width:90px;
-}
-.cs-stat-num {
-  font-family:var(--serif); font-size:26px; font-weight:900;
-  color:var(--gold); line-height:1;
-}
-.cs-stat-label {
-  font-size:11px; color:var(--muted); margin-top:6px; letter-spacing:.3px;
-}
-.cs-stat-divider {
-  width:1px; height:32px; background:var(--border);
-}
-.cs-section-title {
-  font-family:var(--serif); font-size:18px; font-weight:700;
-  color:var(--text); margin:36px 0 14px;
-  display:flex; align-items:center; gap:10px;
-  letter-spacing:.3px;
-}
-.cs-section-title::after {
-  content:''; flex:1; height:1px; background:var(--border);
-}
-.cs-grid {
-  display:grid; grid-template-columns:repeat(3, 1fr); gap:14px;
-}
-.cs-info-box {
-  display:flex; gap:16px; align-items:flex-start;
-  background:rgba(201,168,76,.04); border:1px dashed rgba(201,168,76,.3);
-  border-radius:14px; padding:22px 24px; margin-top:48px;
-  text-align:left;
-}
-.cs-info-icon { font-size:28px; flex-shrink:0; }
-.cs-info-content h4 {
-  font-size:14px; font-weight:700; color:var(--text); margin-bottom:6px;
-}
-.cs-info-content p {
-  font-size:13px; color:var(--muted); line-height:1.75; margin:0;
-}
-@media (max-width: 900px) {
-  .cs-grid { grid-template-columns:repeat(2, 1fr); }
-  .cs-stat { padding:0 14px; min-width:70px; }
-  .cs-stat-num { font-size:22px; }
-}
-@media (max-width: 480px) {
-  .cs-grid { grid-template-columns:1fr; }
-  .cs-hero-stats { flex-wrap:wrap; padding:12px 4px; }
-  .cs-stat-divider { display:none; }
-  .cs-info-box { flex-direction:column; gap:10px; }
-}
 
 .cta-subscribe-btn {
   margin-top:32px; background:var(--gold); border:1px solid var(--gold);
@@ -550,34 +442,24 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   position:fixed; inset:0; background:rgba(0,0,0,.82); backdrop-filter:blur(10px);
   z-index:200; display:flex; align-items:center; justify-content:center; padding:24px;
   opacity:0; pointer-events:none; transition:opacity .3s;
-  overflow-y:auto;  /* 세로 스크롤이 필요하면 overlay에서 처리 */
 }
 .overlay.open { opacity:1; pointer-events:all; }
 .modal {
   background:var(--dark2); border:1px solid var(--border); border-radius:20px;
-  padding:36px 34px; width:100%; max-width:480px;
-  max-height:calc(100vh - 48px);  /* 화면 넘침 방지 */
-  overflow-y:auto;  /* 콘텐츠가 길면 모달 내부 스크롤 */
+  padding:44px 38px; width:100%; max-width:460px;
   transform:translateY(24px); transition:transform .3s; position:relative;
-  /* 스크롤바 디자인 */
-  scrollbar-width:thin;
-  scrollbar-color:var(--border) transparent;
 }
-.modal::-webkit-scrollbar { width:6px; }
-.modal::-webkit-scrollbar-track { background:transparent; }
-.modal::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
-.modal::-webkit-scrollbar-thumb:hover { background:var(--gold-dim); }
 .overlay.open .modal { transform:translateY(0); }
 .modal-x { position:absolute; top:18px; right:18px; background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer; transition:color .2s; }
 .modal-x:hover { color:var(--text); }
-.modal-title { font-family:var(--serif); font-size:22px; font-weight:700; margin-bottom:6px; letter-spacing:-.5px; }
-.modal-desc { font-size:13px; color:var(--muted); margin-bottom:18px; line-height:1.65; }
+.modal-title { font-family:var(--serif); font-size:24px; font-weight:700; margin-bottom:6px; letter-spacing:-.5px; }
+.modal-desc { font-size:13px; color:var(--muted); margin-bottom:26px; line-height:1.7; }
 .modal-desc strong { color:var(--text); }
-.field { margin-bottom:11px; }
+.field { margin-bottom:14px; }
 .field label { display:block; font-size:11px; color:var(--muted); margin-bottom:5px; letter-spacing:.3px; }
 .field input, .field select {
   width:100%; background:rgba(255,255,255,.04); border:1.5px solid var(--border);
-  border-radius:8px; padding:10px 14px; font-size:14px; color:var(--text);
+  border-radius:8px; padding:12px 16px; font-size:15px; color:var(--text);
   font-family:var(--sans); outline:none; transition:border-color .2s; -webkit-appearance:none;
 }
 .field input:focus, .field select:focus { border-color:var(--gold); }
@@ -585,7 +467,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 .field select option { background:var(--dark2); }
 .modal-btn {
   width:100%; background:var(--gold); color:var(--dark); border:none;
-  padding:13px; font-size:14px; font-weight:700; font-family:var(--sans);
+  padding:14px; font-size:15px; font-weight:700; font-family:var(--sans);
   border-radius:10px; cursor:pointer; margin-top:6px; transition:all .2s;
   display:flex; align-items:center; justify-content:center; gap:8px;
 }
@@ -736,13 +618,10 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   <div class="logo">1DAYECO</div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
-    <button class="nav-tab" data-cat-check="economy"    onclick="showCategory('economy', this)">경제</button>
-    <button class="nav-tab" data-cat-check="realestate" onclick="showCategory('realestate', this)">부동산</button>
-    <button class="nav-tab" data-cat-check="english"    onclick="showCategory('english', this)">영어</button>
-    <button class="nav-tab" data-cat-check="trivia"     onclick="showCategory('trivia', this)">상식</button>
-    <button class="nav-tab nav-tab-soon" onclick="showCategory('comingsoon', this)">
-      COMING SOON <span class="nav-tab-badge" id="navComingSoonBadge">—</span>
-    </button>
+    <button class="nav-tab" onclick="showCategory('economy', this)">경제</button>
+    <button class="nav-tab" onclick="showCategory('realestate', this)">부동산</button>
+    <button class="nav-tab" onclick="showCategory('english', this)">영어</button>
+    <button class="nav-tab" onclick="showCategory('trivia', this)">상식</button>
   </div>
   <button class="nav-cta" onclick="document.querySelector('.pricing-wrap').scrollIntoView({behavior:'smooth'})">지금 시작하기</button>
 </nav>
@@ -937,33 +816,6 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   background:var(--border); vertical-align:middle; margin:0 12px;
 }
 
-/* 미리보기 3개 그리드 (소개 페이지) */
-.cat-grid-3 { grid-template-columns:repeat(3, 1fr) !important; }
-@media (max-width: 900px) { .cat-grid-3 { grid-template-columns:repeat(2, 1fr) !important; } }
-@media (max-width: 480px) { .cat-grid-3 { grid-template-columns:1fr !important; } }
-
-/* 전체 보기 버튼 (소개 페이지 → 전용 페이지로) */
-.cat-viewall-wrap { text-align:center; margin-top:32px; }
-.cat-viewall-btn {
-  display:inline-flex; align-items:center; gap:10px;
-  background:linear-gradient(135deg, rgba(201,168,76,.08), rgba(201,168,76,.04));
-  border:1px solid var(--border); color:var(--text);
-  padding:14px 30px; font-size:14px; font-weight:600; font-family:var(--sans);
-  border-radius:100px; cursor:pointer; transition:all .25s;
-  letter-spacing:.3px;
-}
-.cat-viewall-btn:hover {
-  border-color:var(--gold); background:rgba(201,168,76,.12);
-  transform:translateY(-2px); box-shadow:0 8px 24px rgba(201,168,76,.15);
-}
-.cat-viewall-arrow {
-  color:var(--gold); font-weight:700; transition:transform .2s;
-}
-.cat-viewall-btn:hover .cat-viewall-arrow { transform:translateX(4px); }
-.cat-viewall-hint {
-  margin-top:12px; font-size:11px; color:var(--muted); letter-spacing:.3px;
-}
-
 @media (max-width: 900px) {
   .cat-grid { grid-template-columns:repeat(2, 1fr); gap:14px; }
 }
@@ -975,29 +827,29 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   <div class="sec-eye">Categories</div>
   <h2 class="sec-title">관심 분야를 골라 구독하세요</h2>
   <p class="sec-sub">경제·부동산·영어·상식 등 다양한 분야 중 원하는 만큼 자유롭게. 1년 내내 같은 콘텐츠는 단 하나도 없습니다.</p>
-  <div class="cat-grid" id="mainActiveCatGrid">
-    <div class="cat-card" data-cat="economy" onclick="showCategory('economy')">
+  <div class="cat-grid">
+    <div class="cat-card" onclick="showCategory('economy')">
       <div class="cat-card-icon">📊</div>
       <div class="cat-card-name">경제</div>
       <div class="cat-card-tag">30일 기본기</div>
       <p class="cat-card-desc">GDP·금리·환율·주식까지. 뉴스에 나오는 경제 용어가 비로소 이해되기 시작합니다.</p>
       <div class="cat-card-sample">"기준금리가 오르면 내 대출은 어떻게 될까?"</div>
     </div>
-    <div class="cat-card" data-cat="realestate" onclick="showCategory('realestate')">
+    <div class="cat-card" onclick="showCategory('realestate')">
       <div class="cat-card-icon">🏠</div>
       <div class="cat-card-name">부동산</div>
       <div class="cat-card-tag">30일 용어 마스터</div>
       <p class="cat-card-desc">LTV·청약가점·등기부등본 보는 법. 첫 집 마련 전에 꼭 알아야 할 것들.</p>
       <div class="cat-card-sample">"전세 vs 월세, 내 상황에선 뭐가 유리할까?"</div>
     </div>
-    <div class="cat-card" data-cat="english" onclick="showCategory('english')">
+    <div class="cat-card" onclick="showCategory('english')">
       <div class="cat-card-icon">🇬🇧</div>
       <div class="cat-card-name">영어</div>
       <div class="cat-card-tag">심슨 30일</div>
       <p class="cat-card-desc">애니메이션 심슨의 명대사로 자연스럽게 익히는 미국식 표현. 외워지는 게 아니라 박힙니다.</p>
       <div class="cat-card-sample">"Trying is the first step towards failure."</div>
     </div>
-    <div class="cat-card" data-cat="trivia" onclick="showCategory('trivia')">
+    <div class="cat-card" onclick="showCategory('trivia')">
       <div class="cat-card-icon">🧠</div>
       <div class="cat-card-name">상식</div>
       <div class="cat-card-tag">30일 알쓸 상식</div>
@@ -1006,22 +858,65 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     </div>
   </div>
 
-  <!-- Coming Soon 미리보기 (DB에서 동적 로드 — 최대 3개 미리보기) -->
-  <div class="cat-section-divider">COMING SOON · 출시 예정</div>
-  <div class="cat-grid cat-grid-3" id="comingSoonPreview">
-    <!-- _renderComingSoonPreview()에서 동적 채움 -->
-    <div class="cat-card coming-soon" style="opacity:.4;text-align:center">
-      <div class="cat-card-name" style="font-size:13px;color:var(--muted)">불러오는 중...</div>
+  <!-- Coming Soon 섹션 -->
+  <div class="cat-section-divider">COMING SOON</div>
+  <div class="cat-grid">
+    <div class="cat-card coming-soon" onclick="notifyComingSoon('kr_stock', '한국 증시')">
+      <div class="coming-badge">출시 예정</div>
+      <div class="cat-card-icon">📈</div>
+      <div class="cat-card-name">한국 증시</div>
+      <div class="cat-card-tag">시황·종목·이슈</div>
+      <p class="cat-card-desc">코스피·코스닥 일일 마감 시황과 핫이슈 종목 동향을 매일 아침에.</p>
+      <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
     </div>
-  </div>
-
-  <!-- 전체 보기 버튼 -->
-  <div class="cat-viewall-wrap" id="comingSoonViewAllWrap">
-    <button class="cat-viewall-btn" onclick="showCategory('comingsoon')">
-      <span id="comingSoonViewAllText">출시 예정 카테고리 더 보기</span>
-      <span class="cat-viewall-arrow">→</span>
-    </button>
-    <p class="cat-viewall-hint" id="comingSoonViewAllHint">출시 준비 중인 카테고리들</p>
+    <div class="cat-card coming-soon" onclick="notifyComingSoon('us_stock', '미국 증시')">
+      <div class="coming-badge">출시 예정</div>
+      <div class="cat-card-icon">🇺🇸</div>
+      <div class="cat-card-name">미국 증시</div>
+      <div class="cat-card-tag">월가·빅테크</div>
+      <p class="cat-card-desc">전날 미국 시장 마감 동향과 주요 빅테크 이슈를 한국 시간 출근 전에.</p>
+      <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
+    </div>
+    <div class="cat-card coming-soon" onclick="notifyComingSoon('crypto', '코인')">
+      <div class="coming-badge">출시 예정</div>
+      <div class="cat-card-icon">🪙</div>
+      <div class="cat-card-name">코인</div>
+      <div class="cat-card-tag">암호화폐 동향</div>
+      <p class="cat-card-desc">비트코인·이더리움 등 주요 코인 시장 동향과 글로벌 규제 이슈.</p>
+      <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
+    </div>
+    <div class="cat-card coming-soon" onclick="notifyComingSoon('it_news', 'IT 뉴스')">
+      <div class="coming-badge">출시 예정</div>
+      <div class="cat-card-icon">💻</div>
+      <div class="cat-card-name">IT 뉴스</div>
+      <div class="cat-card-tag">AI·테크·스타트업</div>
+      <p class="cat-card-desc">AI·빅테크·국내외 스타트업 핵심 뉴스를 한 줄로. 트렌드를 놓치지 마세요.</p>
+      <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
+    </div>
+    <div class="cat-card coming-soon" onclick="notifyComingSoon('law', '법률 상식')">
+      <div class="coming-badge">출시 예정</div>
+      <div class="cat-card-icon">⚖️</div>
+      <div class="cat-card-name">법률 상식</div>
+      <div class="cat-card-tag">생활 법률</div>
+      <p class="cat-card-desc">월급·계약·임대차·소비자 권리. 내 일상에 꼭 필요한 법률 한 줄.</p>
+      <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
+    </div>
+    <div class="cat-card coming-soon" onclick="notifyComingSoon('japanese', '일본어')">
+      <div class="coming-badge">출시 예정</div>
+      <div class="cat-card-icon">🇯🇵</div>
+      <div class="cat-card-name">일본어</div>
+      <div class="cat-card-tag">생활·여행 회화</div>
+      <p class="cat-card-desc">일본 여행·드라마·비즈니스에서 바로 쓰는 표현을 매일 한 줄씩.</p>
+      <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
+    </div>
+    <div class="cat-card coming-soon" onclick="notifyComingSoon('vietnamese', '베트남어')">
+      <div class="coming-badge">출시 예정</div>
+      <div class="cat-card-icon">🇻🇳</div>
+      <div class="cat-card-name">베트남어</div>
+      <div class="cat-card-tag">생활·비즈니스</div>
+      <p class="cat-card-desc">베트남 진출 직장인·여행자를 위한 실전 베트남어 표현.</p>
+      <div class="cat-card-sample">출시 시 알림 받기 🔔</div>
+    </div>
   </div>
 </section>
 
@@ -1235,72 +1130,17 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   </div>
 </div>
 
-<!-- ─────────── COMING SOON 전용 페이지 ─────────── -->
-<div class="category-page comingsoon-page" id="comingsoon-page">
-  <div class="category-page-bg"></div>
-  <div class="cs-page-inner">
-    <div class="cs-hero">
-      <div class="cs-hero-eyebrow">
-        <span class="cs-hero-dot"></span>
-        <span>출시 예정 카테고리</span>
-      </div>
-      <h2 class="category-title">곧 만나볼<br><span style="color:var(--text)">새로운 카테고리</span></h2>
-      <p class="category-subtitle" style="margin-left:auto;margin-right:auto;text-align:center" id="comingSoonHeroDesc">
-        새로운 카테고리들이 출시를 준비하고 있습니다.<br>
-        준비가 끝나는 대로 빠르게 선보이겠습니다.
-      </p>
-      <div class="cs-hero-stats">
-        <div class="cs-stat"><span class="cs-stat-num" id="comingSoonHeroCount">—</span><span class="cs-stat-label">출시 예정</span></div>
-        <div class="cs-stat-divider"></div>
-        <div class="cs-stat"><span class="cs-stat-num" id="comingSoonGroupCount">—</span><span class="cs-stat-label">분야 그룹</span></div>
-        <div class="cs-stat-divider"></div>
-        <div class="cs-stat"><span class="cs-stat-num">⏳</span><span class="cs-stat-label">준비 중</span></div>
-      </div>
-    </div>
-
-    <!-- 카드 그리드 (DB에서 동적 로드) -->
-    <div id="comingSoonFullGrid">
-      <!-- _renderComingSoonFull()에서 동적 채움 -->
-      <div class="cs-grid">
-        <div class="cat-card coming-soon" style="opacity:.4;text-align:center;grid-column:1/-1;padding:40px 20px">
-          <div class="cat-card-name" style="font-size:14px;color:var(--muted)">불러오는 중...</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 안내 박스 -->
-    <div class="cs-info-box">
-      <div class="cs-info-icon">💡</div>
-      <div class="cs-info-content">
-        <h4>언제쯤 출시되나요?</h4>
-        <p>각 카테고리는 콘텐츠 품질 검수와 카카오톡 알림톡 템플릿 승인이 완료되는 대로 순차 출시됩니다. 출시 일정이 확정되면 현재 구독자 분들께 가장 먼저 안내드릴 예정입니다.</p>
-      </div>
-    </div>
-
-    <div style="text-align:center;margin-top:32px">
-      <button class="category-back" onclick="showCategory('intro', document.querySelector('.nav-tab'))">← 소개로 돌아가기</button>
-    </div>
-  </div>
-</div>
-
 <footer>
   <div class="foot-logo" style="letter-spacing:1px;font-weight:900">1DAYECO</div>
   <div class="foot-links"><a onclick="openInfo('intro');return false;" href="#">서비스 소개</a><a onclick="openInfo('terms');return false;" href="#">이용약관</a><a onclick="openInfo('privacy');return false;" href="#">개인정보처리방침</a><a onclick="openInfo('cs');return false;" href="#">고객센터</a><a onclick="openCancelFlow();return false;" href="#" style="color:var(--error);opacity:.7">체험 취소</a></div>
   <div class="foot-copy">© 2026 1DAYECO · 사업자등록번호: 000-00-00000</div>
 </footer>
 
-<!-- ============================================================
-     COMING SOON 알림 신청 MODAL - 현재 비활성 (숨김)
-     부활 방법: 아래 주석 블록의 시작/끝 마커만 제거하면 즉시 작동
-     관련 JS 함수: notifyComingSoon, closeComingSoonModal,
-                  updateComingSoonBtn, submitComingSoonNotify
-                  (모두 <script> 안에 그대로 유지됨)
-============================================================ -->
-<!-- HIDDEN_COMINGSOON_MODAL_START
+<!-- ── COMING SOON 알림 신청 MODAL ── -->
 <div class="overlay" id="comingSoonOverlay" onclick="if(event.target.id==='comingSoonOverlay')closeComingSoonModal()">
   <div class="modal" style="max-width:420px">
-    <button class="modal-x" onclick="closeComingSoonModal()">X</button>
-    <div class="modal-title">출시 알림 신청</div>
+    <button class="modal-x" onclick="closeComingSoonModal()">✕</button>
+    <div class="modal-title">🔔 출시 알림 신청</div>
     <p class="modal-desc">
       <strong style="color:var(--gold)" id="comingSoonCatName">선택한 카테고리</strong>가 출시되는 시점에<br>
       카카오톡으로 알려드립니다.
@@ -1330,7 +1170,6 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     </button>
   </div>
 </div>
-HIDDEN_COMINGSOON_MODAL_END -->
 
 <!-- ── MODAL ── -->
 <div class="overlay" id="overlay" onclick="closeOut(event)">
@@ -1367,10 +1206,10 @@ HIDDEN_COMINGSOON_MODAL_END -->
       <div class="field">
         <label>💡 받아볼 관심사 선택 <span id="catLabelHint" style="font-size:11px;color:var(--gold);font-weight:500">(1개 선택 필수)</span></label>
         <div id="catSelector" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
-          <!-- 동적으로 채워짐: loadActiveCategories() — visibility='active'만 표시 -->
-          <div style="grid-column:1/-1;text-align:center;padding:18px;color:var(--muted);font-size:12px">
-            카테고리 목록을 불러오는 중...
-          </div>
+          <button type="button" class="cat-btn" data-cat="economy" onclick="toggleCat('economy')">📊 경제</button>
+          <button type="button" class="cat-btn" data-cat="realestate" onclick="toggleCat('realestate')">🏠 부동산</button>
+          <button type="button" class="cat-btn" data-cat="english" onclick="toggleCat('english')">🇬🇧 영어</button>
+          <button type="button" class="cat-btn" data-cat="trivia" onclick="toggleCat('trivia')">🧠 상식</button>
         </div>
         <div id="catGuide" style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">
           관심 있는 카테고리를 1개 선택하면 매일 그 카테고리 콘텐츠를 받아볼 수 있습니다.
@@ -1380,13 +1219,13 @@ HIDDEN_COMINGSOON_MODAL_END -->
       <!-- 발송 시간 안내 (고정) -->
       <div class="field">
         <label>📬 발송 시간 안내</label>
-        <div style="background:rgba(201,168,76,.06);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-top:6px">
-          <div style="font-size:13px;color:var(--gold);font-weight:700;margin-bottom:3px">매일 오전 8시 발송</div>
-          <div style="font-size:11px;color:var(--muted);line-height:1.55">
-            카카오톡 정책에 따라 <strong style="color:var(--text)">8시 이후 순차 발송</strong> (최대 5분 오차)
+        <div style="background:rgba(201,168,76,.06);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-top:6px">
+          <div style="font-size:14px;color:var(--gold);font-weight:700;margin-bottom:4px">매일 오전 8시 발송</div>
+          <div style="font-size:11.5px;color:var(--muted);line-height:1.6">
+            카카오톡 발송 정책에 따라 <strong style="color:var(--text)">8시 이후 순차 발송</strong>되어 약간의 오차(최대 5분)가 발생할 수 있습니다.
           </div>
         </div>
-        <div style="font-size:11px;color:var(--muted);margin-top:5px">
+        <div style="font-size:11px;color:var(--muted);margin-top:6px">
           📅 첫 발송 예정: <span id="firstSendDate" style="color:var(--gold)">계산 중...</span>
         </div>
       </div>
@@ -1454,7 +1293,7 @@ HIDDEN_COMINGSOON_MODAL_END -->
       </div>
 
       <button class="modal-btn" id="step2Btn" onclick="submitStep2()">
-        <span id="step2BtnTxt">임시 가입 완료</span>
+        <span id="step2BtnTxt">다음</span>
         <span id="step2Spin" style="display:none"><span class="spinner"></span></span>
       </button>
       <button class="modal-btn" onclick="backToStep1()" style="margin-top:8px;background:transparent;border:1px solid var(--border);color:var(--muted)">
@@ -1462,51 +1301,53 @@ HIDDEN_COMINGSOON_MODAL_END -->
       </button>
     </div>
 
-    <!-- STEP 3: 카카오톡 채널 친구 추가 (NEW) -->
+    <!-- STEP 3: 카카오톡 채널 친구추가 (마지막 단계 — 여기서 DB INSERT) -->
     <div id="step3Panel" style="display:none">
       <div class="modal-title">💬 카카오톡 채널 친구 추가</div>
       <p class="modal-desc">
         매일 아침 카카오톡으로 콘텐츠를 받으시려면<br>
-        <strong style="color:var(--gold)">@1DAYECO 채널을 친구추가</strong>해주세요.
+        <strong style="color:var(--gold)">@1DAYECO</strong> 채널을 <strong>친구추가</strong>해주세요.
       </p>
 
-      <!-- 안내 박스 -->
-      <div style="background:rgba(254,229,0,.06);border:1px solid rgba(254,229,0,.25);border-radius:12px;padding:18px 20px;margin:16px 0;text-align:center">
-        <div style="font-size:42px;margin-bottom:8px">💬</div>
-        <div style="font-size:15px;font-weight:700;color:#FEE500;font-family:var(--serif);margin-bottom:4px">@1DAYECO</div>
-        <div style="font-size:11.5px;color:var(--muted);line-height:1.6">아래 버튼을 눌러 카카오톡 앱에서<br>채널을 친구로 추가해주세요</div>
-      </div>
-
-      <!-- 채널 추가 버튼 (카카오톡 채널 URL 환경변수에서 로드) -->
-      <a id="kakaoChannelAddBtn" href="#" target="_blank" class="modal-btn" style="background:#FEE500;color:#000;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px" onclick="onKakaoChannelClicked()">
-        <span style="font-size:18px">💬</span>
-        <span>카카오톡 채널 친구추가하기</span>
-      </a>
-
-      <!-- 진행 안내 -->
-      <div style="background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.25);border-radius:10px;padding:14px 16px;margin:14px 0;font-size:12px;line-height:1.85;color:var(--text)">
-        <div style="font-weight:700;color:#5eea91;margin-bottom:8px">📌 친구추가 후 진행 방법</div>
-        <div style="display:flex;flex-direction:column;gap:5px;color:var(--muted)">
-          <div><span style="display:inline-block;width:18px;color:#5eea91;font-weight:700">1.</span> 위 버튼 눌러 카카오톡 채널 친구추가</div>
-          <div><span style="display:inline-block;width:18px;color:#5eea91;font-weight:700">2.</span> 추가 완료 후 이 화면으로 돌아오기</div>
-          <div><span style="display:inline-block;width:18px;color:#5eea91;font-weight:700">3.</span> "친구 추가 완료" 버튼 눌러 가입 마무리</div>
+      <!-- 채널 정보 카드 -->
+      <div style="background:rgba(254,229,0,.04);border:1px solid rgba(254,229,0,.2);border-radius:12px;padding:18px 20px;margin:16px 0;text-align:center">
+        <div style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;background:#FEE500;border-radius:14px;margin-bottom:10px">
+          <span style="font-size:22px">💬</span>
+        </div>
+        <div style="font-size:16px;font-weight:700;color:#FEE500;margin-bottom:4px;font-family:var(--serif)">@1DAYECO</div>
+        <div style="font-size:11.5px;color:var(--muted);line-height:1.6">
+          아래 버튼을 눌러 카카오톡 앱에서<br>채널을 친구로 추가해주세요
         </div>
       </div>
 
-      <!-- 친구추가 완료 버튼 -->
-      <button class="modal-btn" onclick="completeStep3('added')" style="margin-top:8px">
-        ✅ 친구 추가 완료, 가입 마무리하기
-      </button>
+      <!-- 카카오 채널 추가 버튼 (외부 링크) -->
+      <a href="https://pf.kakao.com/_1DAYECO" target="_blank" rel="noopener"
+        onclick="markChannelAddClicked()"
+        style="display:flex;align-items:center;justify-content:center;gap:8px;
+               width:100%;background:#FEE500;color:#000;
+               padding:14px;border-radius:10px;font-size:14px;font-weight:700;
+               font-family:var(--sans);text-decoration:none;
+               margin-bottom:14px;transition:all .2s">
+        💬 카카오톡 채널 친구추가하기
+      </a>
 
-      <!-- 나중에 추가 (옵션) -->
-      <button class="modal-btn" onclick="completeStep3('later')" style="margin-top:8px;background:transparent;border:1px solid var(--border);color:var(--muted);font-weight:500">
-        나중에 추가할게요 (SMS로 안내 받기)
-      </button>
+      <!-- 진행 안내 박스 -->
+      <div style="background:rgba(74,222,128,.04);border:1px solid rgba(74,222,128,.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:12px;line-height:1.85;color:var(--text)">
+        <div style="font-weight:700;color:#5eea91;margin-bottom:8px">📌 친구추가 후 진행 방법</div>
+        <div style="display:flex;flex-direction:column;gap:5px;color:var(--muted)">
+          <div><strong style="color:var(--text)">1.</strong> 위 버튼 눌러 카카오톡 채널 친구추가</div>
+          <div><strong style="color:var(--text)">2.</strong> 추가 완료 후 이 화면으로 돌아오기</div>
+          <div><strong style="color:var(--text)">3.</strong> "친구 추가 완료" 버튼 눌러 가입 마무리</div>
+        </div>
+      </div>
 
-      <p style="font-size:10.5px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.6">
-        ⚠️ 채널 친구추가를 안 하시면 첫 발송이 SMS로 대체될 수 있어요.<br>
-        나중에라도 친구추가하시면 그 다음 발송부터 카카오톡으로 받습니다.
-      </p>
+      <button class="modal-btn" id="step3Btn" onclick="submitStep3()">
+        <span id="step3BtnTxt">✅ 친구 추가 완료, 가입 마무리하기</span>
+        <span id="step3Spin" style="display:none"><span class="spinner"></span></span>
+      </button>
+      <button class="modal-btn" onclick="showStep(2)" style="margin-top:8px;background:transparent;border:1px solid var(--border);color:var(--muted)">
+        ← 이전
+      </button>
     </div>
 
     <!-- STEP 완료 -->
@@ -1520,8 +1361,8 @@ HIDDEN_COMINGSOON_MODAL_END -->
       <div style="background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:14px;margin:14px 0;font-size:12px;color:var(--muted);text-align:left">
         <div style="font-weight:700;color:var(--gold);margin-bottom:8px;text-align:center">📅 첫 발송: <strong id="doneFirstSend" style="color:var(--gold)">내일 오전 8시</strong></div>
         <div style="font-size:11.5px;line-height:1.7;border-top:1px solid var(--border);padding-top:10px;margin-top:8px">
-          <strong style="color:var(--text)">⚠️ 베타 안내</strong><br>
-          현재 결제 시스템 연동 준비 중입니다. 카드 등록 없이 임시 가입되었으며, 베타 기간 종료 후 결제 안내를 드립니다.
+          <strong style="color:var(--text)">💬 카카오톡 채널이 친구추가되어 있어야 도착합니다</strong><br>
+          @1DAYECO 채널 친구추가가 완료되었는지 한 번 더 확인해주세요.
         </div>
       </div>
       <button class="modal-btn" style="margin-top:8px" onclick="closeModal()">확인</button>
@@ -1619,36 +1460,18 @@ const TOSS_CLIENT_KEY = '';         // 토스페이먼츠 클라이언트 키
 let currentPlan = 'free';
 let subscriberId = null;
 let customerKey  = null;
+// Step 1에서 검증·수집된 데이터를 Step 2 신청 완료 시점까지 메모리에 보관
+// → 이렇게 하면 사용자가 Step 2에서 닫거나 이전 가도 DB에 row가 안 남음
+let pendingSignup = null;  // {name, phone, plan, send_hour, categories, notify_d1}
+// Step 2 (결제수단)에서 결제 완료 여부 — TOSS_ENABLED일 때 다음 버튼 활성화 조건
+// 베타 모드(TOSS_ENABLED=false)에서는 항상 무시됨 (즉시 활성)
+let paymentRegistered = false;
 let tossPayments = null;
 let selectedCategories = [];   // 신청 시 선택한 관심사 (예: ['economy','english'])
 const FIXED_SEND_HOUR = 8;     // 발송 시간 고정
 
 // ── 카테고리 탭 전환 ─────────────────────────────────────────
-async function showCategory(category, btnEl) {
-  // hidden 카테고리는 랜딩에서 절대 노출 안 됨 — 자동 redirect
-  // 정식 4개 카테고리(economy/realestate/english/trivia)에 대해서만 visibility 체크
-  // (intro, comingsoon은 시스템 페이지라 항상 접근 가능)
-  if (['economy', 'realestate', 'english', 'trivia'].includes(category)) {
-    try {
-      const data = await loadCategoriesFromAPI();
-      const allActive   = (data.active || []).map(c => c.id);
-      const allComingSoon = (data.coming_soon || []).map(c => c.id);
-
-      if (!allActive.includes(category)) {
-        // active가 아닌 경우 — coming_soon이면 coming soon 페이지로, 그 외(hidden)면 intro로
-        if (allComingSoon.includes(category)) {
-          // coming_soon 카테고리는 통합 페이지로
-          category = 'comingsoon';
-        } else {
-          // hidden 또는 카테고리 자체가 없음 → 소개 페이지로
-          category = 'intro';
-        }
-      }
-    } catch (e) {
-      // API 실패 시 그냥 진행 (기본 4개는 active로 가정)
-    }
-  }
-
+function showCategory(category, btnEl) {
   // 모든 페이지 숨기기
   const intro = document.getElementById('intro-page');
   const pages = document.querySelectorAll('.category-page');
@@ -1669,7 +1492,7 @@ async function showCategory(category, btnEl) {
   } else {
     // "소개로 돌아가기" 버튼에서 호출 시 첫 번째 탭 활성화
     const tabs = document.querySelectorAll('.nav-tab');
-    const idx = ['intro','economy','realestate','english','trivia','comingsoon'].indexOf(category);
+    const idx = ['intro','economy','realestate','english','trivia'].indexOf(category);
     if (tabs[idx]) tabs[idx].classList.add('active');
   }
 
@@ -1793,9 +1616,11 @@ function heroSubmit() {
 // ── 모달 ─────────────────────────────────────────────────────
 function openModal(plan) {
   currentPlan = plan;
-  // 새 모달 열림 → 이전 가입 정보 초기화 (다른 plan으로 새 신청 가능)
-  subscriberId = null;
-  customerKey  = null;
+  // 새 모달 열림 → 모든 메모리 state 초기화
+  subscriberId      = null;
+  customerKey       = null;
+  pendingSignup     = null;
+  paymentRegistered = false;
   showStep(1);  // 항상 Step 1부터 시작
 
   const titles = {
@@ -1858,9 +1683,6 @@ function openModal(plan) {
   updateFirstSendInfo();
   updateModalBtn(); // 카테고리 0개 → 버튼 disabled
 
-  // 카테고리 버튼 동적 렌더 (visibility='active'만)
-  renderModalCategoryButtons();
-
   // 스텝 초기화
   showStep(1);
   document.getElementById('overlay').classList.add('open');
@@ -1874,33 +1696,32 @@ function closeModal() {
   ['mName','mPhone'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; el&&el.classList.remove('err'); });
   const mAgreeEl = document.getElementById('modalAgree');
   if (mAgreeEl) { mAgreeEl.checked = false; updateModalBtn(); }
-  subscriberId = null; customerKey = null;
+  // 모든 메모리 state 정리 (DB는 건드릴 게 없음 — Step 3 전엔 INSERT 안 했음)
+  subscriberId      = null;
+  customerKey       = null;
+  pendingSignup     = null;
+  paymentRegistered = false;
 }
 function closeOut(e) { if (e.target.id==='overlay') closeModal(); }
 document.addEventListener('keydown', e => { if(e.key==='Escape') { closeModal(); if(typeof closeInfo==='function') closeInfo(); if(typeof closeCancelFlow==='function') closeCancelFlow(); } });
 
 function showStep(n) {
-  // n: 1=정보입력, 2=카드등록, 3=카카오톡채널추가, 4=완료
-  document.getElementById('step1Panel').style.display = n===1 ? 'block' : 'none';
-  document.getElementById('step2Panel').style.display = n===2 ? 'block' : 'none';
-  document.getElementById('step3Panel').style.display = n===3 ? 'block' : 'none';
-  document.getElementById('donePanel').style.display  = n===4 ? 'block' : 'none';
-  document.getElementById('stepsInd').style.display   = n===4 ? 'none'  : 'flex';
-  // 진행 인디케이터 (3개 점)
-  document.getElementById('si1').className = 'si done';                             // Step1은 항상 완료
-  document.getElementById('si2').className = 'si' + (n>=2 ? ' done' : '');           // Step2 진입 시 완료
-  document.getElementById('si3').className = 'si' + (n>=3 ? ' done' : '');           // Step3 진입 시 완료
+  // n: 1=회원정보 / 2=결제수단 / 3=채널 친구추가 / 4=완료
+  document.getElementById('step1Panel').style.display  = n===1 ? 'block' : 'none';
+  document.getElementById('step2Panel').style.display  = n===2 ? 'block' : 'none';
+  document.getElementById('step3Panel').style.display  = n===3 ? 'block' : 'none';
+  document.getElementById('donePanel').style.display   = n===4 ? 'block' : 'none';
+  document.getElementById('stepsInd').style.display    = n===4 ? 'none'  : 'flex';
+  // 진행도: n 단계까지 done 표시
+  document.getElementById('si1').className = 'si done';
+  document.getElementById('si2').className = 'si' + (n>=2 ? ' done' : '');
+  document.getElementById('si3').className = 'si' + (n>=3 ? ' done' : '');
 }
 
 // ── STEP 1: 회원가입 API ─────────────────────────────────────
 async function submitStep1() {
-  // 이미 가입 처리 완료된 상태 (Step 2에서 이전 버튼으로 돌아왔다가 다시 다음)
-  // → 백엔드 재호출 안 하고 바로 Step 2로 이동
-  if (subscriberId) {
-    showStep(2);
-    updateStep2Display();
-    return;
-  }
+  // 1) 검증 통과 → pendingSignup에 메모리 저장 → Step 2로 이동
+  // 2) DB INSERT는 Step 2 "신청 완료" 버튼에서만 발생 (submitStep2)
 
   const name   = document.getElementById('mName').value.trim();
   const phone  = document.getElementById('mPhone').value;
@@ -1945,38 +1766,22 @@ async function submitStep1() {
   }
   if (!ok) return;
 
-  // 모든 플랜에서 카테고리 1개만 (라디오 모드 안전장치)
-  // 만약 어떤 이유로 2개 이상 선택돼있으면 첫 번째만 사용
+  // 카테고리 1개로 제한 (라디오 모드 안전장치)
   let finalCats = selectedCategories.length > 0 ? [selectedCategories[0]] : [];
 
-  // 자동결제 동의 (필수 체크) - DB에는 notify_d1 필드 재활용 안 하고 false 보냄
-  // notify_d1 필드는 향후 운영자 알림 옵션용으로 남겨둠
-  const notifyD1 = false;
+  // ⭐ 메모리에만 저장 (DB INSERT 안 함)
+  pendingSignup = {
+    name:       name,
+    phone:      phone,
+    plan:       plan,
+    send_hour:  hour,
+    categories: finalCats,
+    notify_d1:  false,
+  };
 
-  setLoading('step1Btn','step1Spin','step1BtnTxt', true);
-
-  try {
-    // 신청 정보 저장 (카드 등록 없이 바로 완료)
-    const res = await apiPost('/api/signup', {
-      name, phone, plan,
-      send_hour: hour,
-      categories: finalCats,
-      notify_d1: notifyD1,  // D-1 결제 알림 동의 여부
-    });
-    // 백엔드 에러 응답 체크
-    if (res && res.success === false) {
-      throw new Error(res.message || '신청 처리 중 오류가 발생했습니다');
-    }
-    subscriberId = res.subscriber_id;
-    customerKey  = res.customer_key;
-    // Step 2로 이동 (카드 등록 안내)
-    showStep(2);
-    updateStep2Display();
-  } catch(err) {
-    showToast(err.message || '오류가 발생했습니다', 'ng');
-  } finally {
-    setLoading('step1Btn','step1Spin','step1BtnTxt', false);
-  }
+  // Step 2 (채널 친구추가 안내) 으로 이동
+  showStep(2);
+  updateStep2Display();
 }
 
 // ── STEP 2: 카드 등록 안내 (TOSS_ENABLED 토글로 분기) ──────────────
@@ -2001,124 +1806,82 @@ function updateStep2Display() {
   const step2Btn     = document.getElementById('step2Btn');
   const step2BtnTxt  = document.getElementById('step2BtnTxt');
 
+  if (step2BtnTxt) step2BtnTxt.textContent = '다음';
+
   if (TOSS_ENABLED) {
+    // 토스 활성 모드: 결제 완료 시까지 버튼 비활성
     if (tossDisabled) tossDisabled.style.display = 'none';
     if (tossPayment)  tossPayment.style.display  = 'block';
-    if (step2BtnTxt)  step2BtnTxt.textContent    = '카드 등록 후 시작';
-    // TODO: 토스 위젯 마운트 (Phase 6에서)
+    if (step2Btn) {
+      step2Btn.disabled = !paymentRegistered;
+      step2Btn.style.opacity = paymentRegistered ? '1' : '0.5';
+      step2Btn.style.cursor  = paymentRegistered ? 'pointer' : 'not-allowed';
+    }
+    // TODO: 토스 위젯 마운트 + 등록 콜백에서 paymentRegistered=true 설정
   } else {
+    // 베타 모드: 결제 시스템 준비 중 → "다음" 즉시 활성 (스킵)
     if (tossDisabled) tossDisabled.style.display = 'block';
     if (tossPayment)  tossPayment.style.display  = 'none';
-    if (step2BtnTxt)  step2BtnTxt.textContent    = '임시 가입 완료';
+    if (step2Btn) {
+      step2Btn.disabled = false;
+      step2Btn.style.opacity = '1';
+      step2Btn.style.cursor  = 'pointer';
+    }
   }
 }
 
-async function backToStep1() {
-  // 사용자에게 확인 (이미 신청 정보가 백엔드에 저장됨 → 삭제하고 다시 입력)
-  if (!confirm('이전 단계로 돌아가면 입력하신 정보로 작성된 신청 내역이 삭제되고 처음부터 다시 신청해야 합니다. 계속하시겠습니까?')) {
-    return;
-  }
-  // 백엔드 row 삭제 (DB 정리)
-  if (subscriberId) {
-    try {
-      await apiPost('/api/signup-cancel/' + subscriberId, {});
-    } catch (e) {
-      console.warn('signup-cancel 실패 (무시):', e);
-    }
-  }
-  // 상태 초기화 → Step 1로 (입력값은 그대로 유지)
-  subscriberId = null;
-  customerKey  = null;
+function backToStep1() {
+  // DB INSERT는 Step 3에서만 발생하므로 이전 단계로 돌아가도 정리할 DB row 없음
+  // 입력값은 모달 폼에 그대로 유지됨 (사용자가 다시 입력 안 해도 됨)
   showStep(1);
 }
 
 async function submitStep2() {
-  // TOSS_ENABLED 활성 시: 토스 결제 위젯 호출 → 카드 등록 → Step3
-  // 비활성 시: 그냥 Step3(채널추가)로 (이미 Step 1에서 DB 저장됨)
-  if (TOSS_ENABLED) {
-    // TODO: Phase 6에서 토스 결제 처리
-    showToast('결제 시스템 연동 작업 중입니다.', 'ng');
+  // Step 2: 결제수단 등록 단계 → "다음" 버튼은 결제 완료 시(또는 베타 모드) 활성
+  // 이 단계에서는 아직 DB INSERT 하지 않음 — Step 3 마지막 버튼에서만 INSERT
+  if (TOSS_ENABLED && !paymentRegistered) {
+    showToast('결제수단을 먼저 등록해주세요', 'ng');
     return;
   }
-  // 비활성 모드: 다음 단계 = Step3 (카카오톡 채널 친구 추가)
+  // Step 3 (카카오톡 채널 친구추가)으로 이동
   showStep(3);
-  // 채널 추가 URL 세팅
-  setupKakaoChannelLink();
 }
 
-// ── STEP 3: 카카오톡 채널 친구 추가 ───────────────────────────
-// 카카오톡 채널 친구 추가 URL은 백엔드에서 동적 로드 (환경변수 KAKAO_CHANNEL_ADD_URL)
-// API 응답이 오기 전엔 placeholder 사용; 응답 후 실제 URL로 교체
-let KAKAO_CHANNEL_ADD_URL = '';        // 백엔드에서 로드됨
-let KAKAO_CHANNEL_ID      = '@1DAYECO';
-let _kakaoInfoLoaded      = false;
-
-async function loadKakaoChannelInfo() {
-  if (_kakaoInfoLoaded) return;
-  try {
-    if (!API_BASE) {
-      // API 미연결 - placeholder
-      KAKAO_CHANNEL_ADD_URL = 'http://pf.kakao.com/_xxxxx/friend';
-      _kakaoInfoLoaded = true;
-      return;
-    }
-    const r = await fetch(API_BASE + '/api/kakao-channel-info');
-    const d = await r.json();
-    KAKAO_CHANNEL_ADD_URL = d.channel_add_url || 'http://pf.kakao.com/_xxxxx/friend';
-    KAKAO_CHANNEL_ID      = d.channel_id      || '@1DAYECO';
-    _kakaoInfoLoaded = true;
-  } catch (e) {
-    // 폴백
-    KAKAO_CHANNEL_ADD_URL = 'http://pf.kakao.com/_xxxxx/friend';
-    _kakaoInfoLoaded = true;
-  }
-}
-
-async function setupKakaoChannelLink() {
-  await loadKakaoChannelInfo();
-  // Step3 패널의 카카오 채널 추가 버튼에 링크 설정
-  const btn = document.getElementById('kakaoChannelAddBtn');
-  if (btn) {
-    btn.href = KAKAO_CHANNEL_ADD_URL || '#';
-  }
-}
-
-let _kakaoChannelClicked = false;
-
-function onKakaoChannelClicked() {
-  // 사용자가 카카오톡 채널 추가 버튼을 클릭한 경우 마킹
-  _kakaoChannelClicked = true;
-}
-
-async function completeStep3(action) {
-  // action: 'added' = 친구 추가 완료 / 'later' = 나중에 추가
-  // subscriberId가 있어야 백엔드 업데이트 가능
-  if (!subscriberId) {
-    showStep(4);
+// ── STEP 3: 카카오톡 채널 친구추가 → DB INSERT (진짜 신청 완료) ───
+async function submitStep3() {
+  if (!pendingSignup) {
+    showToast('가입 정보가 없습니다. 처음부터 다시 시도해주세요', 'ng');
+    showStep(1);
     return;
   }
 
+  setLoading('step3Btn', 'step3Spin', 'step3BtnTxt', true);
+
   try {
-    // 백엔드에 채널 친구 추가 상태 업데이트
-    if (API_BASE) {
-      await apiPost('/api/subscriber/channel-status', {
-        subscriber_id:        subscriberId,
-        kakao_channel_added:  action === 'added',
-        clicked_channel_link: _kakaoChannelClicked,
-      }).catch(() => {
-        // 엔드포인트 없으면 그냥 무시 (에러로 가입 흐름 끊지 않음)
-      });
+    // ⭐ 여기서 처음으로 백엔드 INSERT 호출
+    const res = await apiPost('/api/signup', pendingSignup);
+    if (res && res.success === false) {
+      throw new Error(res.message || '신청 처리 중 오류가 발생했습니다');
     }
-  } catch (e) {
-    // 에러 무시
+    subscriberId = res.subscriber_id;
+    customerKey  = res.customer_key;
+    // 완료 화면으로
+    showStep(4);
+    // 완료 후 pendingSignup 초기화 (메모리 정리)
+    pendingSignup = null;
+    paymentRegistered = false;
+  } catch (err) {
+    // 백엔드 에러 (예: 중복 전화번호)
+    showToast(err.message || '오류가 발생했습니다', 'ng');
+  } finally {
+    setLoading('step3Btn', 'step3Spin', 'step3BtnTxt', false);
   }
+}
 
-  // 'later' 선택 시 사용자에게 SMS 안내 발송 안내
-  if (action === 'later') {
-    showToast('가입한 번호로 채널 추가 안내 문자를 보내드릴게요!', 'ok');
-  }
-
-  showStep(4);
+// 카카오톡 채널 추가 버튼 클릭 시 표시 (선택 — 사용 통계용)
+function markChannelAddClicked() {
+  // 사용자가 채널 추가 버튼을 눌렀음을 기록 (분석용, 필수 아님)
+  console.log('[signup] 채널 추가 버튼 클릭됨');
 }
 
 // ── STEP 2: 토스페이먼츠 위젯 ────────────────────────────────
@@ -2166,85 +1929,6 @@ if (urlParams.has('billingSuccess')) {
 }
 
 // ── 관심사(카테고리) 선택 ────────────────────────────────────
-
-// 백엔드에서 카테고리 정보 가져와서 캐시 (랜딩페이지에서 사용할 active/coming_soon 카테고리)
-let _categoriesCache = null;        // { active: [...], coming_soon: [...] }
-let _categoriesCachePromise = null; // 중복 호출 방지
-
-async function loadCategoriesFromAPI() {
-  // 이미 캐시되어 있으면 재사용
-  if (_categoriesCache) return _categoriesCache;
-  if (_categoriesCachePromise) return _categoriesCachePromise;
-
-  _categoriesCachePromise = (async () => {
-    try {
-      if (!API_BASE) {
-        // API 미연결 — 폴백: 정식 4개만 active로
-        return { active: [
-          { id: 'economy',    name: '경제',    emoji: '📊' },
-          { id: 'realestate', name: '부동산', emoji: '🏠' },
-          { id: 'english',    name: '영어',    emoji: '🇬🇧' },
-          { id: 'trivia',     name: '상식',    emoji: '🧠' },
-        ], coming_soon: [] };
-      }
-      const r = await fetch(API_BASE + '/api/categories');
-      const d = await r.json();
-      _categoriesCache = {
-        active:      d.active      || [],
-        coming_soon: d.coming_soon || [],
-      };
-      return _categoriesCache;
-    } catch (e) {
-      console.warn('[카테고리] 로드 실패, 폴백 사용:', e);
-      return { active: [
-        { id: 'economy',    name: '경제',    emoji: '📊' },
-        { id: 'realestate', name: '부동산', emoji: '🏠' },
-        { id: 'english',    name: '영어',    emoji: '🇬🇧' },
-        { id: 'trivia',     name: '상식',    emoji: '🧠' },
-      ], coming_soon: [] };
-    } finally {
-      _categoriesCachePromise = null;
-    }
-  })();
-
-  _categoriesCache = await _categoriesCachePromise;
-  return _categoriesCache;
-}
-
-// 모달의 카테고리 선택 버튼들을 active 카테고리로 동적 렌더
-async function renderModalCategoryButtons() {
-  const sel = document.getElementById('catSelector');
-  if (!sel) return;
-
-  const data = await loadCategoriesFromAPI();
-  const activeCats = data.active || [];
-
-  if (activeCats.length === 0) {
-    sel.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:18px;color:var(--muted);font-size:12px">현재 신청 가능한 카테고리가 없습니다.</div>';
-    return;
-  }
-
-  // 그리드: 카테고리가 1개면 1열, 그 외엔 2열
-  sel.style.gridTemplateColumns = activeCats.length === 1 ? '1fr' : '1fr 1fr';
-
-  sel.innerHTML = activeCats.map(c => {
-    const id    = c.id;
-    const name  = c.name || id;
-    const emoji = c.emoji || '📌';
-    return `<button type="button" class="cat-btn" data-cat="${id}" onclick="toggleCat('${id}')">${emoji} ${name}</button>`;
-  }).join('');
-
-  // 이전에 선택한 카테고리가 active 목록에 없으면 해제
-  if (selectedCategories.length > 0) {
-    const allowedIds = new Set(activeCats.map(c => c.id));
-    selectedCategories = selectedCategories.filter(c => allowedIds.has(c));
-    document.querySelectorAll('.cat-btn').forEach(btn => {
-      btn.classList.toggle('active', selectedCategories.includes(btn.dataset.cat));
-    });
-    updateModalBtn();
-  }
-}
-
 function toggleCat(cat) {
   // 모든 플랜에서 1개만 선택 (라디오 버튼처럼 동작)
   // 1개 콘텐츠에 집중 - 여러 분야 원하면 별도 신청 (독립 구독)
@@ -2265,27 +1949,15 @@ function toggleCat(cat) {
 }
 
 // 카테고리 페이지에서 "이 관심사 신청하기" 클릭 시 호출 — 해당 카테고리를 미리 체크하고 모달 오픈
-async function openModalWithCategory(cat) {
+function openModalWithCategory(cat) {
   openModal('pkg6m');  // 6개월 (가장 인기) 디폴트, 모달 안에서 변경 가능
-
-  // 카테고리 동적 렌더 완료 기다림
-  await loadCategoriesFromAPI();
-  // 한 프레임 더 기다려 DOM 반영 보장
-  await new Promise(r => setTimeout(r, 100));
-
-  // 카테고리가 active 목록에 있는지 확인 후 선택
-  const data = await loadCategoriesFromAPI();
-  const allowedIds = new Set((data.active || []).map(c => c.id));
-  if (!allowedIds.has(cat)) {
-    // 비활성/coming_soon/hidden 카테고리는 선택 불가
-    showToast('현재 신청할 수 없는 카테고리입니다', 'ng');
-    return;
-  }
-  if (!selectedCategories.includes(cat)) selectedCategories.push(cat);
-  document.querySelectorAll('.cat-btn').forEach(btn => {
-    btn.classList.toggle('active', selectedCategories.includes(btn.dataset.cat));
-  });
-  updateModalBtn();
+  // 모달이 열리면서 selectedCategories는 []로 초기화되므로 약간의 지연 후 추가
+  setTimeout(() => {
+    if (!selectedCategories.includes(cat)) selectedCategories.push(cat);
+    document.querySelectorAll('.cat-btn').forEach(btn => {
+      btn.classList.toggle('active', selectedCategories.includes(btn.dataset.cat));
+    });
+  }, 50);
 }
 
 // ── 발송 시간 (8시 고정) ─────────────────────────────────────
@@ -2559,260 +2231,6 @@ function switchPricingTab(tabName) {
 
 // 초기 발송 예정일 계산
 updateFirstSendInfo();
-
-// ── Coming Soon 카테고리 렌더링 (DB 기반) ──────────────────────
-// 카테고리 ID → 그룹 분류 매핑 (display_order로 그룹 자동 결정)
-// 100~109: 금융·투자 / 110~119: 테크·법률 / 120~129: 외국어 / 그 외: 기타
-function _comingSoonGroupOf(c) {
-  const order = c.display_order || 999;
-  if (order >= 100 && order < 110) return { key: 'finance',  title: '📊 금융·투자' };
-  if (order >= 110 && order < 120) return { key: 'tech_law', title: '💻 테크·법률' };
-  if (order >= 120 && order < 130) return { key: 'language', title: '🌏 외국어' };
-  return { key: 'other', title: '🌟 그 외' };
-}
-
-// 카드 1개 HTML
-function _renderComingSoonCard(c) {
-  const desc = c.description || '출시 준비 중입니다.';
-  // tag는 description 첫 줄 또는 짧은 라벨로 — 간단하게 카테고리 이름으로 폴백
-  const tag = c.tag || c.tagline || '출시 예정';
-  return `
-    <div class="cat-card coming-soon">
-      <div class="coming-badge">출시 예정</div>
-      <div class="cat-card-icon">${c.emoji || '📌'}</div>
-      <div class="cat-card-name">${c.name || c.id}</div>
-      <div class="cat-card-tag">${tag}</div>
-      <p class="cat-card-desc">${desc}</p>
-      <div class="cat-card-sample">출시 준비 중 ⏳</div>
-    </div>`;
-}
-
-// 메인 인트로 Coming Soon 미리보기 (최대 3개)
-function _renderComingSoonPreview(cats) {
-  const wrap     = document.getElementById('comingSoonPreview');
-  const viewWrap = document.getElementById('comingSoonViewAllWrap');
-  const viewTxt  = document.getElementById('comingSoonViewAllText');
-  const viewHint = document.getElementById('comingSoonViewAllHint');
-  if (!wrap) return;
-
-  // 카테고리 0개면 미리보기 영역 자체 숨김
-  if (!cats || cats.length === 0) {
-    wrap.style.display = 'none';
-    if (viewWrap) viewWrap.style.display = 'none';
-    // 섹션 헤더(COMING SOON · 출시 예정)도 숨김
-    const headerDivider = wrap.previousElementSibling;
-    if (headerDivider && headerDivider.classList.contains('cat-section-divider')) {
-      headerDivider.style.display = 'none';
-    }
-    return;
-  }
-
-  wrap.style.display = '';
-  if (viewWrap) viewWrap.style.display = '';
-
-  // 미리보기는 display_order 순서대로 최대 3개
-  const sorted = [...cats].sort((a, b) => (a.display_order || 999) - (b.display_order || 999));
-  const preview = sorted.slice(0, 3);
-  wrap.innerHTML = preview.map(_renderComingSoonCard).join('');
-
-  // 더 보기 버튼 텍스트
-  const remaining = cats.length - preview.length;
-  if (viewTxt) {
-    viewTxt.textContent = remaining > 0
-      ? `출시 예정 카테고리 ${remaining}개 더 보기`
-      : `출시 예정 카테고리 전체 보기`;
-  }
-  if (viewHint) {
-    const allNames = sorted.map(c => c.name).join(' · ');
-    viewHint.textContent = `${allNames} (총 ${cats.length}개)`;
-  }
-}
-
-// Coming Soon 페이지 전체 (그룹별 분류)
-function _renderComingSoonFull(cats) {
-  const wrap = document.getElementById('comingSoonFullGrid');
-  if (!wrap) return;
-
-  // 헤더 통계 갱신
-  const heroCount  = document.getElementById('comingSoonHeroCount');
-  const groupCount = document.getElementById('comingSoonGroupCount');
-  const heroDesc   = document.getElementById('comingSoonHeroDesc');
-
-  if (!cats || cats.length === 0) {
-    if (heroCount)  heroCount.textContent = '0';
-    if (groupCount) groupCount.textContent = '0';
-    if (heroDesc)   heroDesc.innerHTML = '현재 출시 예정 카테고리가 없습니다.<br>새로운 소식이 있으면 빠르게 업데이트하겠습니다.';
-    wrap.innerHTML = '<div class="cs-grid"><div class="cat-card coming-soon" style="text-align:center;grid-column:1/-1;padding:40px 20px"><div class="cat-card-name" style="font-size:14px;color:var(--muted)">출시 예정 카테고리가 없습니다.</div></div></div>';
-    return;
-  }
-
-  // 그룹별로 분류
-  const groups = {};
-  const groupOrder = ['finance', 'tech_law', 'language', 'other'];
-  cats.forEach(c => {
-    const g = _comingSoonGroupOf(c);
-    if (!groups[g.key]) groups[g.key] = { title: g.title, items: [] };
-    groups[g.key].items.push(c);
-  });
-
-  // 각 그룹 안에서 display_order 순 정렬
-  Object.values(groups).forEach(g => {
-    g.items.sort((a, b) => (a.display_order || 999) - (b.display_order || 999));
-  });
-
-  const groupKeys = groupOrder.filter(k => groups[k]);
-
-  // 헤더 통계
-  if (heroCount)  heroCount.textContent = String(cats.length);
-  if (groupCount) groupCount.textContent = String(groupKeys.length);
-  if (heroDesc) {
-    heroDesc.innerHTML = `${cats.length}개의 새로운 카테고리가 출시를 준비하고 있습니다.<br>준비가 끝나는 대로 빠르게 선보이겠습니다.`;
-  }
-
-  // 그룹 + 카드 렌더
-  let html = '';
-  groupKeys.forEach(key => {
-    const g = groups[key];
-    html += `<div class="cs-section-title">${g.title}</div>`;
-    html += `<div class="cs-grid">${g.items.map(_renderComingSoonCard).join('')}</div>`;
-  });
-  wrap.innerHTML = html;
-}
-
-// 페이지 로드 시 카테고리 사전 로드 (visibility 정책 적용)
-// - 정식 4개(economy/realestate/english/trivia) 중 active 아니면 탭/카드 숨김
-// - active 카테고리 중 하드코딩 4개에 없는 신규 카테고리는 동적으로 카드 + 페이지 생성
-// - coming_soon 카테고리는 메인 미리보기 + Coming Soon 페이지에 동적 렌더
-// - 네비 COMING SOON 배지 숫자 동적 갱신
-// - 작업 끝나면 html.cat-ready 클래스 추가 (FOUC 방지)
-async function _initCategoryVisibility() {
-  const HARDCODED = ['economy', 'realestate', 'english', 'trivia'];
-  try {
-    const data = await loadCategoriesFromAPI();
-    const active     = data.active || [];
-    const comingSoon = data.coming_soon || [];
-    const activeIds  = new Set(active.map(c => c.id));
-
-    // ── 1) 네비 정식 4개 탭 visibility 처리 ──
-    document.querySelectorAll('.nav-tab[data-cat-check]').forEach(btn => {
-      const cat = btn.dataset.catCheck;
-      btn.style.display = activeIds.has(cat) ? '' : 'none';
-    });
-
-    // ── 2) 메인 정식 4개 카드 visibility 처리 ──
-    document.querySelectorAll('#mainActiveCatGrid .cat-card[data-cat]').forEach(card => {
-      const cat = card.dataset.cat;
-      card.style.display = activeIds.has(cat) ? '' : 'none';
-    });
-
-    // ── 3) 신규 active 카테고리 (하드코딩 4개에 없는) 동적 추가 ──
-    const newActiveCats = active.filter(c => !HARDCODED.includes(c.id));
-    _renderNewActiveCards(newActiveCats);
-    _renderNewActiveNavTabs(newActiveCats);
-    _renderNewActiveCategoryPages(newActiveCats);
-
-    // ── 4) Coming Soon 카테고리 동적 렌더 ──
-    _renderComingSoonPreview(comingSoon);
-    _renderComingSoonFull(comingSoon);
-
-    // ── 5) 네비 COMING SOON 배지 숫자 갱신 ──
-    const badgeEl = document.getElementById('navComingSoonBadge');
-    if (badgeEl) {
-      if (comingSoon.length > 0) {
-        badgeEl.textContent = String(comingSoon.length);
-        badgeEl.style.display = '';
-      } else {
-        // 출시 예정 카테고리 0개면 배지 숨김
-        badgeEl.style.display = 'none';
-      }
-    }
-  } catch (e) {
-    console.warn('[카테고리 visibility 초기화 실패]', e);
-  } finally {
-    // FOUC 방지: 작업 완료 후에만 표시 (성공/실패 무관)
-    document.documentElement.classList.add('cat-ready');
-  }
-}
-
-// 신규 active 카테고리 → 메인 카드 그리드에 동적 추가
-function _renderNewActiveCards(newCats) {
-  const grid = document.getElementById('mainActiveCatGrid');
-  if (!grid) return;
-  // 기존에 추가했던 동적 카드 제거 (재실행 안전)
-  grid.querySelectorAll('.cat-card[data-dynamic="1"]').forEach(el => el.remove());
-  newCats.forEach(c => {
-    const card = document.createElement('div');
-    card.className = 'cat-card';
-    card.dataset.cat = c.id;
-    card.dataset.dynamic = '1';
-    card.setAttribute('onclick', `showCategory('${c.id}')`);
-    card.innerHTML = `
-      <div class="cat-card-icon">${c.emoji || '📌'}</div>
-      <div class="cat-card-name">${c.name || c.id}</div>
-      <div class="cat-card-tag">신규 카테고리</div>
-      <p class="cat-card-desc">${c.description || '매일 1편의 콘텐츠를 받아보세요.'}</p>
-      <div class="cat-card-sample">매일 아침 8시 · 카카오톡 발송</div>
-    `;
-    grid.appendChild(card);
-  });
-}
-
-// 신규 active 카테고리 → 네비 탭 동적 추가
-function _renderNewActiveNavTabs(newCats) {
-  const tabsEl = document.querySelector('.nav-tabs');
-  if (!tabsEl) return;
-  // 기존 동적 탭 제거
-  tabsEl.querySelectorAll('.nav-tab[data-dynamic="1"]').forEach(el => el.remove());
-  // 추가 위치: 정식 4개 다음, COMING SOON 직전
-  const comingTab = tabsEl.querySelector('.nav-tab-soon');
-  newCats.forEach(c => {
-    const btn = document.createElement('button');
-    btn.className = 'nav-tab';
-    btn.dataset.dynamic = '1';
-    btn.dataset.catCheck = c.id;
-    btn.setAttribute('onclick', `showCategory('${c.id}', this)`);
-    btn.textContent = c.name || c.id;
-    if (comingTab) {
-      tabsEl.insertBefore(btn, comingTab);
-    } else {
-      tabsEl.appendChild(btn);
-    }
-  });
-}
-
-// 신규 active 카테고리 → 카테고리 상세 페이지 동적 생성
-function _renderNewActiveCategoryPages(newCats) {
-  // 기존 동적 페이지 제거
-  document.querySelectorAll('.category-page[data-dynamic="1"]').forEach(el => el.remove());
-  newCats.forEach(c => {
-    // 같은 ID의 페이지가 이미 있으면 스킵 (정식 4개 폴백 안전망)
-    if (document.getElementById(c.id + '-page')) return;
-    const page = document.createElement('div');
-    page.className = 'category-page';
-    page.id = c.id + '-page';
-    page.dataset.dynamic = '1';
-    page.innerHTML = `
-      <div class="category-page-bg"></div>
-      <div class="category-icon">${c.emoji || '📌'}</div>
-      <h2 class="category-title">${c.name || c.id}</h2>
-      <p class="category-subtitle">
-        ${c.description || '매일 1편 · 30일 시리즈'}<br>
-        매일 아침 8시 카카오톡으로 받아보세요.
-      </p>
-      <div class="category-coming">매일 1편 · 정기 발송</div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:8px">
-        <button class="category-back" onclick="showCategory('intro', document.querySelector('.nav-tab'))">← 소개로 돌아가기</button>
-        <button class="cta-subscribe-btn" onclick="openModalWithCategory('${c.id}')">📬 ${c.name || c.id} 신청하기 →</button>
-      </div>
-    `;
-    // body 끝(footer 직전)에 추가
-    const footer = document.querySelector('footer');
-    if (footer) footer.parentNode.insertBefore(page, footer);
-    else document.body.appendChild(page);
-  });
-}
-
-_initCategoryVisibility();
 </script>
 </body>
 </html>

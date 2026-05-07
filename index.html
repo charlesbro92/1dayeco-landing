@@ -615,7 +615,10 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 
 <!-- NAV -->
 <nav>
-  <div class="logo">1DAYECO</div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div class="logo">1DAYECO</div>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v23</span>
+  </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
     <button class="nav-tab" onclick="showCategory('economy', this)">경제</button>
@@ -625,6 +628,29 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   </div>
   <button class="nav-cta" onclick="document.querySelector('.pricing-wrap').scrollIntoView({behavior:'smooth'})">지금 시작하기</button>
 </nav>
+<style>
+  .deploy-badge {
+    font-size:9px; color:var(--muted); opacity:.5;
+    padding:2px 6px; border:1px solid rgba(201,168,76,.2); border-radius:3px;
+    font-family:monospace; cursor:pointer; transition:opacity .2s;
+    user-select:none;
+  }
+  .deploy-badge:hover { opacity:1; color:var(--gold); border-color:var(--gold); }
+  @media (max-width:768px) { .deploy-badge { display:none; } }
+</style>
+<script>
+  function showDeployInfo() {
+    const badge = document.getElementById('deployBadge');
+    const v = badge ? badge.textContent : 'unknown';
+    alert(
+      '배포 정보\n' +
+      '버전: ' + v + '\n' +
+      '도메인: ' + location.hostname + '\n' +
+      '경로: ' + location.pathname + '\n' +
+      '캐시 무시 새로고침: Cmd+Shift+R (Mac) / Ctrl+F5 (Win)'
+    );
+  }
+</script>
 
 <!-- ─────────── 소개 페이지 (메인 콘텐츠) ─────────── -->
 <div id="intro-page">

@@ -1341,6 +1341,7 @@ HIDDEN_COMINGSOON_MODAL_END -->
     <div class="steps-ind" id="stepsInd">
       <div class="si done" id="si1"></div>
       <div class="si" id="si2"></div>
+      <div class="si" id="si3"></div>
     </div>
 
     <!-- STEP 1: 회원정보 -->
@@ -1459,6 +1460,53 @@ HIDDEN_COMINGSOON_MODAL_END -->
       <button class="modal-btn" onclick="backToStep1()" style="margin-top:8px;background:transparent;border:1px solid var(--border);color:var(--muted)">
         ← 이전
       </button>
+    </div>
+
+    <!-- STEP 3: 카카오톡 채널 친구 추가 (NEW) -->
+    <div id="step3Panel" style="display:none">
+      <div class="modal-title">💬 카카오톡 채널 친구 추가</div>
+      <p class="modal-desc">
+        매일 아침 카카오톡으로 콘텐츠를 받으시려면<br>
+        <strong style="color:var(--gold)">@1DAYECO 채널을 친구추가</strong>해주세요.
+      </p>
+
+      <!-- 안내 박스 -->
+      <div style="background:rgba(254,229,0,.06);border:1px solid rgba(254,229,0,.25);border-radius:12px;padding:18px 20px;margin:16px 0;text-align:center">
+        <div style="font-size:42px;margin-bottom:8px">💬</div>
+        <div style="font-size:15px;font-weight:700;color:#FEE500;font-family:var(--serif);margin-bottom:4px">@1DAYECO</div>
+        <div style="font-size:11.5px;color:var(--muted);line-height:1.6">아래 버튼을 눌러 카카오톡 앱에서<br>채널을 친구로 추가해주세요</div>
+      </div>
+
+      <!-- 채널 추가 버튼 (카카오톡 채널 URL 환경변수에서 로드) -->
+      <a id="kakaoChannelAddBtn" href="#" target="_blank" class="modal-btn" style="background:#FEE500;color:#000;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px" onclick="onKakaoChannelClicked()">
+        <span style="font-size:18px">💬</span>
+        <span>카카오톡 채널 친구추가하기</span>
+      </a>
+
+      <!-- 진행 안내 -->
+      <div style="background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.25);border-radius:10px;padding:14px 16px;margin:14px 0;font-size:12px;line-height:1.85;color:var(--text)">
+        <div style="font-weight:700;color:#5eea91;margin-bottom:8px">📌 친구추가 후 진행 방법</div>
+        <div style="display:flex;flex-direction:column;gap:5px;color:var(--muted)">
+          <div><span style="display:inline-block;width:18px;color:#5eea91;font-weight:700">1.</span> 위 버튼 눌러 카카오톡 채널 친구추가</div>
+          <div><span style="display:inline-block;width:18px;color:#5eea91;font-weight:700">2.</span> 추가 완료 후 이 화면으로 돌아오기</div>
+          <div><span style="display:inline-block;width:18px;color:#5eea91;font-weight:700">3.</span> "친구 추가 완료" 버튼 눌러 가입 마무리</div>
+        </div>
+      </div>
+
+      <!-- 친구추가 완료 버튼 -->
+      <button class="modal-btn" onclick="completeStep3('added')" style="margin-top:8px">
+        ✅ 친구 추가 완료, 가입 마무리하기
+      </button>
+
+      <!-- 나중에 추가 (옵션) -->
+      <button class="modal-btn" onclick="completeStep3('later')" style="margin-top:8px;background:transparent;border:1px solid var(--border);color:var(--muted);font-weight:500">
+        나중에 추가할게요 (SMS로 안내 받기)
+      </button>
+
+      <p style="font-size:10.5px;color:var(--muted);text-align:center;margin-top:12px;line-height:1.6">
+        ⚠️ 채널 친구추가를 안 하시면 첫 발송이 SMS로 대체될 수 있어요.<br>
+        나중에라도 친구추가하시면 그 다음 발송부터 카카오톡으로 받습니다.
+      </p>
     </div>
 
     <!-- STEP 완료 -->
@@ -1832,12 +1880,16 @@ function closeOut(e) { if (e.target.id==='overlay') closeModal(); }
 document.addEventListener('keydown', e => { if(e.key==='Escape') { closeModal(); if(typeof closeInfo==='function') closeInfo(); if(typeof closeCancelFlow==='function') closeCancelFlow(); } });
 
 function showStep(n) {
-  document.getElementById('step1Panel').style.display  = n===1 ? 'block' : 'none';
-  document.getElementById('step2Panel').style.display  = n===2 ? 'block' : 'none';
-  document.getElementById('donePanel').style.display   = n===3 ? 'block' : 'none';
-  document.getElementById('stepsInd').style.display    = n===3 ? 'none'  : 'flex';
-  document.getElementById('si1').className = 'si done';
-  document.getElementById('si2').className = 'si' + (n===2 ? ' done' : '');
+  // n: 1=정보입력, 2=카드등록, 3=카카오톡채널추가, 4=완료
+  document.getElementById('step1Panel').style.display = n===1 ? 'block' : 'none';
+  document.getElementById('step2Panel').style.display = n===2 ? 'block' : 'none';
+  document.getElementById('step3Panel').style.display = n===3 ? 'block' : 'none';
+  document.getElementById('donePanel').style.display  = n===4 ? 'block' : 'none';
+  document.getElementById('stepsInd').style.display   = n===4 ? 'none'  : 'flex';
+  // 진행 인디케이터 (3개 점)
+  document.getElementById('si1').className = 'si done';                             // Step1은 항상 완료
+  document.getElementById('si2').className = 'si' + (n>=2 ? ' done' : '');           // Step2 진입 시 완료
+  document.getElementById('si3').className = 'si' + (n>=3 ? ' done' : '');           // Step3 진입 시 완료
 }
 
 // ── STEP 1: 회원가입 API ─────────────────────────────────────
@@ -1981,15 +2033,92 @@ async function backToStep1() {
 }
 
 async function submitStep2() {
-  // TOSS_ENABLED 활성 시: 토스 결제 위젯 호출 → 카드 등록 → 완료
-  // 비활성 시: 그냥 완료 화면으로 (이미 Step 1에서 DB 저장됨)
+  // TOSS_ENABLED 활성 시: 토스 결제 위젯 호출 → 카드 등록 → Step3
+  // 비활성 시: 그냥 Step3(채널추가)로 (이미 Step 1에서 DB 저장됨)
   if (TOSS_ENABLED) {
     // TODO: Phase 6에서 토스 결제 처리
     showToast('결제 시스템 연동 작업 중입니다.', 'ng');
     return;
   }
-  // 비활성 모드: 임시 가입 완료
+  // 비활성 모드: 다음 단계 = Step3 (카카오톡 채널 친구 추가)
   showStep(3);
+  // 채널 추가 URL 세팅
+  setupKakaoChannelLink();
+}
+
+// ── STEP 3: 카카오톡 채널 친구 추가 ───────────────────────────
+// 카카오톡 채널 친구 추가 URL은 백엔드에서 동적 로드 (환경변수 KAKAO_CHANNEL_ADD_URL)
+// API 응답이 오기 전엔 placeholder 사용; 응답 후 실제 URL로 교체
+let KAKAO_CHANNEL_ADD_URL = '';        // 백엔드에서 로드됨
+let KAKAO_CHANNEL_ID      = '@1DAYECO';
+let _kakaoInfoLoaded      = false;
+
+async function loadKakaoChannelInfo() {
+  if (_kakaoInfoLoaded) return;
+  try {
+    if (!API_BASE) {
+      // API 미연결 - placeholder
+      KAKAO_CHANNEL_ADD_URL = 'http://pf.kakao.com/_xxxxx/friend';
+      _kakaoInfoLoaded = true;
+      return;
+    }
+    const r = await fetch(API_BASE + '/api/kakao-channel-info');
+    const d = await r.json();
+    KAKAO_CHANNEL_ADD_URL = d.channel_add_url || 'http://pf.kakao.com/_xxxxx/friend';
+    KAKAO_CHANNEL_ID      = d.channel_id      || '@1DAYECO';
+    _kakaoInfoLoaded = true;
+  } catch (e) {
+    // 폴백
+    KAKAO_CHANNEL_ADD_URL = 'http://pf.kakao.com/_xxxxx/friend';
+    _kakaoInfoLoaded = true;
+  }
+}
+
+async function setupKakaoChannelLink() {
+  await loadKakaoChannelInfo();
+  // Step3 패널의 카카오 채널 추가 버튼에 링크 설정
+  const btn = document.getElementById('kakaoChannelAddBtn');
+  if (btn) {
+    btn.href = KAKAO_CHANNEL_ADD_URL || '#';
+  }
+}
+
+let _kakaoChannelClicked = false;
+
+function onKakaoChannelClicked() {
+  // 사용자가 카카오톡 채널 추가 버튼을 클릭한 경우 마킹
+  _kakaoChannelClicked = true;
+}
+
+async function completeStep3(action) {
+  // action: 'added' = 친구 추가 완료 / 'later' = 나중에 추가
+  // subscriberId가 있어야 백엔드 업데이트 가능
+  if (!subscriberId) {
+    showStep(4);
+    return;
+  }
+
+  try {
+    // 백엔드에 채널 친구 추가 상태 업데이트
+    if (API_BASE) {
+      await apiPost('/api/subscriber/channel-status', {
+        subscriber_id:        subscriberId,
+        kakao_channel_added:  action === 'added',
+        clicked_channel_link: _kakaoChannelClicked,
+      }).catch(() => {
+        // 엔드포인트 없으면 그냥 무시 (에러로 가입 흐름 끊지 않음)
+      });
+    }
+  } catch (e) {
+    // 에러 무시
+  }
+
+  // 'later' 선택 시 사용자에게 SMS 안내 발송 안내
+  if (action === 'later') {
+    showToast('가입한 번호로 채널 추가 안내 문자를 보내드릴게요!', 'ok');
+  }
+
+  showStep(4);
 }
 
 // ── STEP 2: 토스페이먼츠 위젯 ────────────────────────────────

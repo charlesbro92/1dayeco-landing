@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>1DAYECO — 매일 아침 카카오톡으로 받는 1분 인사이트</title>
-<script src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
+<script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 
 /* ── 설정: 여기만 수정하세요 ── */
 :root {
   --API_BASE: '';           /* 배포 후: https://your-api.railway.app */
-  --PORTONE_MERCHANT_CODE: '';  /* 포트원 가맹점 식별코드 (imp_xxx) */
+  --PORTONE_STORE_ID: '';   /* 포트원 V2 Store ID */
 }
 
 /* ── 디자인 토큰 ── */
@@ -959,7 +959,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v32</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v34</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2311,25 +2311,22 @@ HIDDEN_COMINGSOON_MODAL_END -->
 <script>
 // ── 설정 ─────────────────────────────────────────────────────
 const API_BASE        = 'https://web-production-761cd.up.railway.app';
-const PORTONE_MERCHANT_CODE = 'imp07247578';     // 포트원 가맹점 식별코드 (imp_xxx) — 포트원 콘솔에서 복사
-const PORTONE_CHANNEL_KEY   = 'channel-key-1b5b28b1-300c-4bbb-a725-4229bcded50c';     // 포트원 채널키 (테스트 또는 라이브)
-                                       // - 테스트: KG이니시스 테스트 채널 등 (실제 결제 X)
-                                       // - 라이브: 네이버페이 채널 (실제 결제 O)
-                                       // 포트원 콘솔 > 결제연동 > 채널 관리에서 확인
-const PAYMENT_TEST_MODE     = true;    // true: 테스트 안내 배너 표시, false: 숨김
+
+// 포트원 V2 설정 (포트원 콘솔 > 결제연동 > 연동 정보)
+const PORTONE_STORE_ID    = '';     // Store ID (예: 'store-aaaa-bbbb-cccc-dddd-eeee')
+const PORTONE_CHANNEL_KEY = '';     // 채널키 (예: 'channel-key-aaaa-bbbb-cccc-dddd-eeee')
+                                     // KG이니시스 테스트 채널 또는 라이브 네이버페이 채널
+const PAYMENT_TEST_MODE   = true;   // true: 테스트 안내 배너 표시, false: 숨김
 
 // ── 상태 ─────────────────────────────────────────────────────
 let currentPlan = 'pkg6m';     // 디폴트 6개월
 let subscriberId = null;
-let merchantUid  = null;
+let paymentIdRef = null;        // V2 paymentId (백엔드 prepare에서 발급)
 let paymentReady = false;       // payment_prepare 완료 여부
 let selectedCategories = [];    // 신청 시 선택한 관심사
 const FIXED_SEND_HOUR = 8;      // 발송 시간 고정
 
-// 포트원 SDK 초기화 (PORTONE_MERCHANT_CODE 설정되었을 때만)
-if (typeof IMP !== 'undefined' && PORTONE_MERCHANT_CODE) {
-  IMP.init(PORTONE_MERCHANT_CODE);
-}
+// 포트원 V2 SDK는 별도 init 필요 없음 (PortOne.requestPayment 호출 시 storeId 전달)
 
 // ── 카테고리 탭 전환 ─────────────────────────────────────────
 async function showCategory(category, btnEl) {
@@ -2871,7 +2868,7 @@ async function submitStep1() {
       throw new Error(res.message || '신청 처리 중 오류가 발생했습니다');
     }
     subscriberId  = res.subscriber_id;
-    merchantUid   = res.merchant_uid;
+    paymentIdRef  = res.payment_id;       // V2 paymentId
     paymentReady  = true;
 
     // Step 2로 이동 (결제창 안내)
@@ -2885,7 +2882,7 @@ async function submitStep1() {
 }
 
 // ── STEP 2: 결제 안내 화면 ──────────────────────────────────────
-const PAYMENT_ENABLED = !!(PORTONE_MERCHANT_CODE && PORTONE_CHANNEL_KEY);  // 키 설정되면 자동 활성화
+const PAYMENT_ENABLED = !!(PORTONE_STORE_ID && PORTONE_CHANNEL_KEY);  // 키 설정되면 자동 활성화
 
 function updateStep2Display(prepareRes) {
   // prepareRes는 payment_prepare 응답 객체 (subscriber_id, amount, plan_name, total_send_days 등)
@@ -2962,7 +2959,7 @@ async function backToStep1() {
     }
   }
   subscriberId = null;
-  merchantUid  = null;
+  paymentIdRef = null;
   paymentReady = false;
   showStep(1);
 }
@@ -2973,18 +2970,18 @@ async function submitStep2() {
     showStep(3);
     return;
   }
-  if (!paymentReady || !merchantUid || !subscriberId) {
+  if (!paymentReady || !paymentIdRef || !subscriberId) {
     showToast('결제 준비 중입니다. 잠시만 기다려주세요.', 'ng');
     return;
   }
-  if (typeof IMP === 'undefined') {
+  if (typeof PortOne === 'undefined') {
     showToast('결제 SDK 로딩 실패. 새로고침 후 다시 시도해주세요.', 'ng');
     return;
   }
 
   setLoading('step2Btn','step2Spin','step2BtnTxt', true);
 
-  // 포트원 결제 요청
+  // 포트원 V2 결제 요청
   const planAmounts = {
     monthly: 9900, pkg3m: 14900, pkg6m: 24900, pkg1y: 41900,
   };
@@ -2993,63 +2990,90 @@ async function submitStep2() {
     pkg6m: '1DAYECO 6개월', pkg1y: '1DAYECO 1년',
   };
   const amount = planAmounts[currentPlan] || 24900;
-  const name   = planLabels[currentPlan] || '1DAYECO 구독';
+  const orderName = planLabels[currentPlan] || '1DAYECO 구독';
 
-  const buyerName  = document.getElementById('mName').value.trim();
-  const buyerTel   = document.getElementById('mPhone').value.replace(/-/g, '');
+  const buyerName = document.getElementById('mName').value.trim();
+  const buyerTel  = document.getElementById('mPhone').value.replace(/-/g, '');
 
-  IMP.request_pay({
-    channelKey:    PORTONE_CHANNEL_KEY,
-    pay_method:    'card',     // 네이버페이 결제형은 EASY_PAY로 가능, 일단 card로 (포트원 콘솔에서 PG 자동 라우팅)
-    merchant_uid:  merchantUid,
-    name:          name,
-    amount:        amount,
-    buyer_name:    buyerName,
-    buyer_tel:     buyerTel,
-    buyer_email:   '',
-    m_redirect_url: location.origin + location.pathname + '?payment_complete=1',
-  }, async function(rsp) {
-    if (rsp.success) {
-      // 결제 성공 → 백엔드 검증
-      try {
-        const verify = await apiPost('/api/payment/verify', {
-          imp_uid:      rsp.imp_uid,
-          merchant_uid: rsp.merchant_uid,
-        });
-        if (verify && verify.success) {
-          showStep(3);
-        } else {
-          showToast(verify?.message || '결제 검증 실패', 'ng');
-        }
-      } catch(e) {
-        showToast('결제 검증 중 오류가 발생했습니다. 고객센터로 문의해주세요.', 'ng');
-        console.error('verify error:', e);
-      }
-    } else {
+  try {
+    // 포트원 V2 SDK: PortOne.requestPayment() 사용
+    // - storeId / channelKey: 포트원 콘솔에서 발급
+    // - paymentId: 백엔드 prepare에서 발급한 고유 주문번호
+    // - 모바일: redirectUrl 자동 처리
+    const response = await PortOne.requestPayment({
+      storeId:     PORTONE_STORE_ID,
+      channelKey:  PORTONE_CHANNEL_KEY,
+      paymentId:   paymentIdRef,
+      orderName:   orderName,
+      totalAmount: amount,
+      currency:    'CURRENCY_KRW',
+      payMethod:   'CARD',
+      customer: {
+        fullName:    buyerName,
+        phoneNumber: buyerTel,
+      },
+      // 모바일 redirect 시 돌아올 URL
+      redirectUrl: location.origin + location.pathname + '?payment_complete=1',
+    });
+
+    // V2 응답: 오류 시 response.code 존재 / 성공 시 paymentId 등 포함
+    if (response && response.code !== undefined) {
       // 결제 실패/취소
-      if (rsp.error_code !== 'USER_CANCEL') {
-        showToast(rsp.error_msg || '결제가 취소되었습니다', 'ng');
+      const userCancelled = response.code === 'PORTONE_FAILED_TO_PROCESS' ||
+                           (response.message && response.message.includes('취소'));
+      if (!userCancelled) {
+        showToast(response.message || '결제가 취소되었습니다', 'ng');
       }
+      setLoading('step2Btn','step2Spin','step2BtnTxt', false);
+      return;
     }
+
+    // 결제 성공 → 백엔드 V2 검증
+    try {
+      const verify = await apiPost('/api/payment/verify', {
+        payment_id: paymentIdRef,
+      });
+      if (verify && verify.success) {
+        showStep(3);
+      } else {
+        showToast(verify?.message || '결제 검증 실패', 'ng');
+      }
+    } catch(e) {
+      showToast('결제 검증 중 오류가 발생했습니다. 고객센터로 문의해주세요.', 'ng');
+      console.error('verify error:', e);
+    }
+  } catch(e) {
+    console.error('PortOne.requestPayment error:', e);
+    showToast(e.message || '결제 처리 중 오류가 발생했습니다', 'ng');
+  } finally {
     setLoading('step2Btn','step2Spin','step2BtnTxt', false);
-  });
+  }
 }
 
-// ── 모바일 redirect 콜백 처리 (m_redirect_url로 돌아왔을 때) ──
+// ── 모바일 redirect 콜백 처리 V2 (redirectUrl로 돌아왔을 때) ──
 (async function handlePaymentRedirect() {
   const urlParams = new URLSearchParams(location.search);
   if (!urlParams.has('payment_complete')) return;
 
-  const imp_uid      = urlParams.get('imp_uid');
-  const merchant_uid = urlParams.get('merchant_uid');
-  const imp_success  = urlParams.get('imp_success');
+  // V2 redirect 시 paymentId가 query로 돌아옴
+  const paymentId      = urlParams.get('paymentId');
+  const transactionType = urlParams.get('transactionType'); // 'PAYMENT' | 'ISSUE_BILLING_KEY'
+  const txId           = urlParams.get('txId');             // PG 측 거래번호 (참고용)
+  const code           = urlParams.get('code');             // 오류 코드 (실패 시)
+  const message        = urlParams.get('message');          // 오류 메시지 (실패 시)
 
   // URL 정리
   history.replaceState(null, '', location.pathname);
 
-  if (imp_success === 'true' && imp_uid && merchant_uid) {
+  if (code) {
+    // 결제 실패
+    showToast(message || '결제가 완료되지 않았습니다.', 'ng');
+    return;
+  }
+
+  if (paymentId) {
     try {
-      const verify = await apiPost('/api/payment/verify', { imp_uid, merchant_uid });
+      const verify = await apiPost('/api/payment/verify', { payment_id: paymentId });
       if (verify && verify.success) {
         showToast('결제 완료! 내일 아침 첫 콘텐츠를 보내드릴게요 🎉', 'ok');
       } else {
@@ -3059,7 +3083,7 @@ async function submitStep2() {
       showToast('결제 검증 중 오류가 발생했습니다.', 'ng');
     }
   } else {
-    showToast('결제가 완료되지 않았습니다.', 'ng');
+    showToast('결제 정보를 확인할 수 없습니다.', 'ng');
   }
 })();
 

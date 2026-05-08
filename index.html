@@ -959,7 +959,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v37</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v38</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2991,6 +2991,22 @@ async function submitStep2() {
   const buyerName = document.getElementById('mName').value.trim();
   const buyerTel  = document.getElementById('mPhone').value.replace(/-/g, '');
 
+  // ── 모바일 redirect 복귀 대비: 결제 컨텍스트 저장 ──
+  // 모바일은 결제창에서 돌아올 때 페이지가 새로고침되어 모든 JS 상태가 사라짐.
+  // 복귀 후 완료화면을 띄우려면 plan/이름/카테고리/시간 등을 sessionStorage에 보관.
+  try {
+    sessionStorage.setItem('payment_ctx', JSON.stringify({
+      paymentId:    paymentIdRef,
+      plan:         currentPlan,
+      name:         buyerName,
+      phone:        buyerTel,
+      categories:   selectedCategories,
+      hour:         (typeof FIXED_SEND_HOUR !== 'undefined') ? FIXED_SEND_HOUR : 8,
+      subscriberId: subscriberId,
+      ts:           Date.now(),
+    }));
+  } catch(e) { /* sessionStorage 차단된 경우 무시 (PC에서는 어차피 같은 페이지에서 처리됨) */ }
+
   try {
     // 포트원 V2 SDK: PortOne.requestPayment() 사용
     // - storeId / channelKey: 포트원 콘솔에서 발급
@@ -3030,6 +3046,8 @@ async function submitStep2() {
         payment_id: paymentIdRef,
       });
       if (verify && verify.success) {
+        // PC 결제 성공: sessionStorage 정리 (모바일 복귀용 데이터 불필요)
+        try { sessionStorage.removeItem('payment_ctx'); } catch(e) {}
         showStep(3);
       } else {
         showToast(verify?.message || '결제 검증 실패', 'ng');
@@ -3047,6 +3065,10 @@ async function submitStep2() {
 }
 
 // ── 모바일 redirect 콜백 처리 V2 (redirectUrl로 돌아왔을 때) ──
+// 모바일에서 결제창 → 본 페이지 redirect 복귀 시:
+//  1) 페이지 새로고침되어 JS 상태가 모두 초기화됨
+//  2) sessionStorage에 저장된 결제 컨텍스트로 모달을 다시 열고 완료화면(donePanel) 표시
+//  3) PC와 동일한 UX 보장
 (async function handlePaymentRedirect() {
   const urlParams = new URLSearchParams(location.search);
   if (!urlParams.has('payment_complete')) return;
@@ -3061,25 +3083,87 @@ async function submitStep2() {
   // URL 정리
   history.replaceState(null, '', location.pathname);
 
+  // sessionStorage에서 결제 컨텍스트 복원
+  let ctx = null;
+  try {
+    const raw = sessionStorage.getItem('payment_ctx');
+    if (raw) ctx = JSON.parse(raw);
+  } catch(e) { /* 파싱 실패 시 ctx=null로 진행 */ }
+
+  // 결제 실패/취소
   if (code) {
-    // 결제 실패
+    try { sessionStorage.removeItem('payment_ctx'); } catch(e) {}
+    // ctx가 있으면 모달 다시 열고 사용자가 재결제 가능하게 안내
+    if (ctx && ctx.plan) {
+      try {
+        openModal(ctx.plan);
+        // 입력값 복원
+        const nameEl  = document.getElementById('mName');
+        const phoneEl = document.getElementById('mPhone');
+        if (nameEl  && ctx.name)  nameEl.value  = ctx.name;
+        if (phoneEl && ctx.phone) {
+          // phone은 숫자만 저장됨 → 하이픈 표기로 복원
+          phoneEl.value = ctx.phone;
+          if (typeof fmtPhone === 'function') fmtPhone(phoneEl);
+        }
+      } catch(e) { console.warn('모달 복원 실패:', e); }
+    }
     showToast(message || '결제가 완료되지 않았습니다.', 'ng');
     return;
   }
 
-  if (paymentId) {
-    try {
-      const verify = await apiPost('/api/payment/verify', { payment_id: paymentId });
-      if (verify && verify.success) {
-        showToast('결제 완료! 내일 아침 첫 콘텐츠를 보내드릴게요 🎉', 'ok');
-      } else {
-        showToast(verify?.message || '결제 검증 실패', 'ng');
-      }
-    } catch(e) {
-      showToast('결제 검증 중 오류가 발생했습니다.', 'ng');
-    }
-  } else {
+  if (!paymentId) {
     showToast('결제 정보를 확인할 수 없습니다.', 'ng');
+    return;
+  }
+
+  // 결제 성공: 백엔드 verify
+  try {
+    const verify = await apiPost('/api/payment/verify', { payment_id: paymentId });
+    if (verify && verify.success) {
+      // verify 성공 → sessionStorage 정리하고 완료화면 표시
+      try { sessionStorage.removeItem('payment_ctx'); } catch(e) {}
+
+      if (ctx && ctx.plan) {
+        // 모달 다시 열기 (Step 3로 바로 점프)
+        try {
+          // 1) 글로벌 상태 일부 복원 (closeModal에서 입력값 비우는 로직과 충돌 방지)
+          if (typeof currentPlan        !== 'undefined') currentPlan        = ctx.plan;
+          if (typeof selectedCategories !== 'undefined' && Array.isArray(ctx.categories)) {
+            selectedCategories = ctx.categories;
+          }
+          if (typeof subscriberId !== 'undefined' && ctx.subscriberId) {
+            subscriberId = ctx.subscriberId;
+          }
+
+          // 2) 모달 열기
+          openModal(ctx.plan);
+
+          // 3) 입력값 복원 (openModal이 입력값 자동 비울 수 있어 다시 채움)
+          const nameEl  = document.getElementById('mName');
+          const phoneEl = document.getElementById('mPhone');
+          if (nameEl  && ctx.name)  nameEl.value  = ctx.name;
+          if (phoneEl && ctx.phone) {
+            phoneEl.value = ctx.phone;
+            if (typeof fmtPhone === 'function') fmtPhone(phoneEl);
+          }
+
+          // 4) 완료화면(Step 3)으로 이동
+          showStep(3);
+        } catch(e) {
+          console.warn('완료화면 복원 실패, 토스트로 폴백:', e);
+          showToast('결제 완료! 내일 아침 첫 콘텐츠를 보내드릴게요 🎉', 'ok');
+        }
+      } else {
+        // ctx 없음 (sessionStorage 차단/만료/다른 브라우저 등) → 토스트만
+        showToast('결제 완료! 내일 아침 첫 콘텐츠를 보내드릴게요 🎉', 'ok');
+      }
+    } else {
+      showToast(verify?.message || '결제 검증 실패', 'ng');
+    }
+  } catch(e) {
+    console.error('payment verify error:', e);
+    showToast('결제 검증 중 오류가 발생했습니다.', 'ng');
   }
 })();
 

@@ -959,7 +959,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v38</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v39</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -3117,54 +3117,59 @@ async function submitStep2() {
     return;
   }
 
-  // 결제 성공: 백엔드 verify
-  try {
-    const verify = await apiPost('/api/payment/verify', { payment_id: paymentId });
-    if (verify && verify.success) {
-      // verify 성공 → sessionStorage 정리하고 완료화면 표시
-      try { sessionStorage.removeItem('payment_ctx'); } catch(e) {}
-
-      if (ctx && ctx.plan) {
-        // 모달 다시 열기 (Step 3로 바로 점프)
-        try {
-          // 1) 글로벌 상태 일부 복원 (closeModal에서 입력값 비우는 로직과 충돌 방지)
-          if (typeof currentPlan        !== 'undefined') currentPlan        = ctx.plan;
-          if (typeof selectedCategories !== 'undefined' && Array.isArray(ctx.categories)) {
-            selectedCategories = ctx.categories;
-          }
-          if (typeof subscriberId !== 'undefined' && ctx.subscriberId) {
-            subscriberId = ctx.subscriberId;
-          }
-
-          // 2) 모달 열기
-          openModal(ctx.plan);
-
-          // 3) 입력값 복원 (openModal이 입력값 자동 비울 수 있어 다시 채움)
-          const nameEl  = document.getElementById('mName');
-          const phoneEl = document.getElementById('mPhone');
-          if (nameEl  && ctx.name)  nameEl.value  = ctx.name;
-          if (phoneEl && ctx.phone) {
-            phoneEl.value = ctx.phone;
-            if (typeof fmtPhone === 'function') fmtPhone(phoneEl);
-          }
-
-          // 4) 완료화면(Step 3)으로 이동
-          showStep(3);
-        } catch(e) {
-          console.warn('완료화면 복원 실패, 토스트로 폴백:', e);
-          showToast('결제 완료! 내일 아침 첫 콘텐츠를 보내드릴게요 🎉', 'ok');
-        }
-      } else {
-        // ctx 없음 (sessionStorage 차단/만료/다른 브라우저 등) → 토스트만
-        showToast('결제 완료! 내일 아침 첫 콘텐츠를 보내드릴게요 🎉', 'ok');
+  // 결제 성공: 모달 먼저 띄우고 verify는 백그라운드 처리 (지연 최소화)
+  if (ctx && ctx.plan) {
+    // 모달 즉시 열기 (Step 3로 바로 점프)
+    try {
+      // 1) 글로벌 상태 일부 복원 (closeModal에서 입력값 비우는 로직과 충돌 방지)
+      if (typeof currentPlan        !== 'undefined') currentPlan        = ctx.plan;
+      if (typeof selectedCategories !== 'undefined' && Array.isArray(ctx.categories)) {
+        selectedCategories = ctx.categories;
       }
-    } else {
-      showToast(verify?.message || '결제 검증 실패', 'ng');
+      if (typeof subscriberId !== 'undefined' && ctx.subscriberId) {
+        subscriberId = ctx.subscriberId;
+      }
+
+      // 2) 모달 열기
+      openModal(ctx.plan);
+
+      // 3) 입력값 복원 (openModal이 입력값 자동 비울 수 있어 다시 채움)
+      const nameEl  = document.getElementById('mName');
+      const phoneEl = document.getElementById('mPhone');
+      if (nameEl  && ctx.name)  nameEl.value  = ctx.name;
+      if (phoneEl && ctx.phone) {
+        phoneEl.value = ctx.phone;
+        if (typeof fmtPhone === 'function') fmtPhone(phoneEl);
+      }
+
+      // 4) 완료화면(Step 3)으로 즉시 이동
+      showStep(3);
+    } catch(e) {
+      console.warn('완료화면 복원 실패, 토스트로 폴백:', e);
+      showToast('결제 완료! 내일 아침 첫 콘텐츠를 보내드릴게요 🎉', 'ok');
     }
-  } catch(e) {
-    console.error('payment verify error:', e);
-    showToast('결제 검증 중 오류가 발생했습니다.', 'ng');
+  } else {
+    // ctx 없음 (sessionStorage 차단/만료/다른 브라우저 등) → 토스트만
+    showToast('결제 완료! 내일 아침 첫 콘텐츠를 보내드릴게요 🎉', 'ok');
   }
+
+  // verify는 백그라운드로 처리 (UX 지연 없음)
+  // 실패 시에만 토스트 표시 (성공은 이미 모달에서 보여줌)
+  apiPost('/api/payment/verify', { payment_id: paymentId })
+    .then(verify => {
+      if (verify && verify.success) {
+        // 성공 → sessionStorage 정리 (정상 흐름)
+        try { sessionStorage.removeItem('payment_ctx'); } catch(e) {}
+      } else {
+        // verify 실패 → 사용자에게 알림
+        console.error('verify 실패:', verify);
+        showToast(verify?.message || '결제 검증에 실패했습니다. 고객센터로 문의해주세요.', 'ng');
+      }
+    })
+    .catch(e => {
+      console.error('payment verify error:', e);
+      showToast('결제 검증 중 오류가 발생했습니다. 고객센터로 문의해주세요.', 'ng');
+    });
 })();
 
 // ── 관심사(카테고리) 선택 ────────────────────────────────────

@@ -374,25 +374,25 @@ nav {
 .kk-chat { padding:10px 8px 16px; background:#9fb5cb; max-height:540px; overflow-y:auto; }
 .kk-date-div { text-align:center; margin-bottom:10px; }
 .kk-date-pill { background:rgba(0,0,0,.2); color:#fff; font-size:10px; padding:3px 10px; border-radius:20px; }
-.kk-row { display:flex; gap:6px; align-items:flex-end; }
+.kk-row { display:flex; flex-direction:column; gap:4px; }
+.kk-row-head { display:flex; align-items:center; gap:6px; padding:0 4px; }
 .kk-avatar {
-  width:36px; height:36px; border-radius:50%; background:#FEE500;
-  flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:18px;
-  align-self:flex-start;
+  width:28px; height:28px; border-radius:50%; background:#FEE500;
+  flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:14px;
 }
-.kk-msg-wrap { flex:1; min-width:0; }
-.kk-sender { font-size:10px; font-weight:700; color:#fff; margin-bottom:4px; }
+.kk-msg-wrap { display:block; }
+.kk-sender { font-size:10px; font-weight:700; color:#fff; flex:1; }
 .kk-bubble {
-  background:#fff; border-radius:0 12px 12px 12px; padding:11px 13px;
-  font-size:11px; color:#222; line-height:1.8; box-shadow:0 1px 4px rgba(0,0,0,.12);
-  word-break:break-word;
+  background:#fff; border-radius:4px 12px 12px 12px; padding:12px 14px;
+  font-size:11.5px; color:#222; line-height:1.75; box-shadow:0 1px 4px rgba(0,0,0,.12);
+  word-break:break-word; margin-left:34px;
 }
 .kk-bubble b { color:#111; }
 .kk-chip {
   display:inline-block; background:#FEE500; color:#333;
   font-size:10px; font-weight:700; padding:2px 8px; border-radius:20px; margin-top:6px;
 }
-.kk-time-label { font-size:9px; color:rgba(255,255,255,.7); flex-shrink:0; padding-bottom:4px; white-space:nowrap; }
+.kk-time-label { font-size:9px; color:rgba(255,255,255,.7); flex-shrink:0; white-space:nowrap; }
 
 /* 오른쪽 설명 */
 .mockup-desc { animation:fadeUp .7s .5s ease both; }
@@ -961,7 +961,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v40</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v41</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1051,9 +1051,12 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
           <div class="kk-chat">
             <div class="kk-date-div"><span class="kk-date-pill">예시: 경제 카테고리 발송 화면</span></div>
             <div class="kk-row">
-              <div class="kk-avatar">📈</div>
-              <div class="kk-msg-wrap">
+              <div class="kk-row-head">
+                <div class="kk-avatar">📈</div>
                 <div class="kk-sender">1DAYECO</div>
+                <div class="kk-time-label">오전 8:02</div>
+              </div>
+              <div class="kk-msg-wrap">
                 <div class="kk-bubble">
                   📊 2026년 05월 09일 토요일<br>
                   경제 | 기준금리 0.25%p 내려도 예금 금리는 더 떨어진다<br><br>
@@ -1070,7 +1073,6 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
                   <span class="kk-chip">#기준금리 #예적금금리 #금리인하</span>
                 </div>
               </div>
-              <div class="kk-time-label">오전 8:02</div>
             </div>
           </div>
         </div>
@@ -3571,6 +3573,7 @@ function switchPricingTab(tabName) {
 updateFirstSendInfo();
 
 // 페이지 로드 시 active nav-tab을 가시 영역으로 스크롤 (모바일에서 첫 탭 보이도록)
+// 브라우저는 새로고침 시 스크롤 위치를 복원할 수 있어서 여러 시점에서 강제 적용
 (function ensureActiveNavTabVisible() {
   function scrollIntoView() {
     try {
@@ -3581,11 +3584,17 @@ updateFirstSendInfo();
       tabsWrap.scrollLeft = Math.max(0, active.offsetLeft - 8);
     } catch(e) { /* noop */ }
   }
+  // 다단계 적용: DOMContentLoaded → load → 짧은 지연 (브라우저 스크롤 복원 덮어쓰기)
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', scrollIntoView);
   } else {
     scrollIntoView();
   }
+  window.addEventListener('load', scrollIntoView);
+  setTimeout(scrollIntoView, 100);
+  setTimeout(scrollIntoView, 500);
+  // pageshow: 뒤로가기/앞으로가기로 돌아왔을 때
+  window.addEventListener('pageshow', scrollIntoView);
 })();
 </script>
 </body>

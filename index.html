@@ -740,7 +740,10 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 
 <!-- NAV -->
 <nav>
-  <div class="logo">1DAYECO</div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div class="logo">1DAYECO</div>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v28</span>
+  </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
     <button class="nav-tab" onclick="showCategory('economy', this)">경제</button>
@@ -748,11 +751,34 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     <button class="nav-tab" onclick="showCategory('english', this)">영어</button>
     <button class="nav-tab" onclick="showCategory('trivia', this)">상식</button>
     <button class="nav-tab nav-tab-soon" onclick="showCategory('comingsoon', this)">
-      COMING SOON <span class="nav-tab-badge">7</span>
+      COMING SOON <span class="nav-tab-badge" id="navComingSoonBadge">7</span>
     </button>
   </div>
   <button class="nav-cta" onclick="document.querySelector('.pricing-wrap').scrollIntoView({behavior:'smooth'})">지금 시작하기</button>
 </nav>
+<style>
+  .deploy-badge {
+    font-size:9px; color:var(--muted); opacity:.5;
+    padding:2px 6px; border:1px solid rgba(201,168,76,.2); border-radius:3px;
+    font-family:monospace; cursor:pointer; transition:opacity .2s;
+    user-select:none;
+  }
+  .deploy-badge:hover { opacity:1; color:var(--gold); border-color:var(--gold); }
+  @media (max-width:768px) { .deploy-badge { display:none; } }
+</style>
+<script>
+  function showDeployInfo() {
+    const badge = document.getElementById('deployBadge');
+    const v = badge ? badge.textContent : 'unknown';
+    alert(
+      '배포 정보\n' +
+      '버전: ' + v + '\n' +
+      '도메인: ' + location.hostname + '\n' +
+      '경로: ' + location.pathname + '\n' +
+      '캐시 무시 새로고침: Cmd+Shift+R (Mac) / Ctrl+F5 (Win)'
+    );
+  }
+</script>
 
 <!-- ─────────── 소개 페이지 (메인 콘텐츠) ─────────── -->
 <div id="intro-page">
@@ -1246,19 +1272,25 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
       </div>
       <h2 class="category-title">곧 만나볼<br><span style="color:var(--text)">새로운 카테고리</span></h2>
       <p class="category-subtitle" style="margin-left:auto;margin-right:auto;text-align:center">
-        7개의 새로운 카테고리가 출시를 준비하고 있습니다.<br>
+        <span id="csHeroCount">7</span>개의 새로운 카테고리가 출시를 준비하고 있습니다.<br>
         준비가 끝나는 대로 빠르게 선보이겠습니다.
       </p>
       <div class="cs-hero-stats">
-        <div class="cs-stat"><span class="cs-stat-num">7</span><span class="cs-stat-label">출시 예정</span></div>
+        <div class="cs-stat"><span class="cs-stat-num" id="csStatCount">7</span><span class="cs-stat-label">출시 예정</span></div>
         <div class="cs-stat-divider"></div>
-        <div class="cs-stat"><span class="cs-stat-num">3</span><span class="cs-stat-label">분야 그룹</span></div>
+        <div class="cs-stat"><span class="cs-stat-num" id="csStatGroups">3</span><span class="cs-stat-label">분야 그룹</span></div>
         <div class="cs-stat-divider"></div>
         <div class="cs-stat"><span class="cs-stat-num">⏳</span><span class="cs-stat-label">준비 중</span></div>
       </div>
     </div>
 
-    <!-- 7개 카드: 3개 그룹 -->
+    <!-- ⭐ 어드민에서 coming_soon으로 추가한 카테고리 (동적 렌더 영역) -->
+    <div id="csDynamicSection" style="display:none">
+      <div class="cs-section-title">✨ 신규 추가</div>
+      <div class="cs-grid" id="csDynamicGrid"></div>
+    </div>
+
+    <!-- 정적 7개 카드: 3개 그룹 (랜딩 자체 카탈로그) -->
     <div class="cs-section-title">📊 금융·투자</div>
     <div class="cs-grid">
       <div class="cat-card coming-soon">
@@ -1633,18 +1665,25 @@ const FIXED_SEND_HOUR = 8;     // 발송 시간 고정
 
 // ── 카테고리 탭 전환 ─────────────────────────────────────────
 async function showCategory(category, btnEl) {
-  // 정식 4개 카테고리에 대해 어드민 active=false (비활성) 체크 → 자동 redirect
+  // 정식 4개 카테고리에 대해 어드민 visibility 체크 → 자동 redirect
   // (intro, comingsoon은 시스템 페이지라 항상 접근 가능)
   if (['economy', 'realestate', 'english', 'trivia'].includes(category)) {
     try {
       const data = await loadCategoriesFromAPI();
-      const activeIds = new Set((data.active || []).map(c => c.id));
+      const activeIds     = new Set((data.active      || []).map(c => c.id));
+      const comingSoonIds = new Set((data.coming_soon || []).map(c => c.id));
+
       if (!activeIds.has(category)) {
-        // 어드민에서 비활성 처리됨 → intro로 redirect
-        category = 'intro';
+        if (comingSoonIds.has(category)) {
+          // 어드민에서 coming_soon으로 설정 → 통합 Coming Soon 페이지로
+          category = 'comingsoon';
+        } else {
+          // hidden 또는 알 수 없는 상태 → intro로
+          category = 'intro';
+        }
       }
     } catch (e) {
-      // API 실패 시 그냥 진행 (기본 4개는 active로 가정)
+      // API 실패 시 그냥 진행
     }
   }
 
@@ -1666,7 +1705,6 @@ async function showCategory(category, btnEl) {
   if (btnEl && btnEl.classList.contains('nav-tab')) {
     btnEl.classList.add('active');
   } else {
-    // "소개로 돌아가기" 버튼에서 호출 시 — comingsoon 포함
     const tabs = document.querySelectorAll('.nav-tab');
     const idx = ['intro','economy','realestate','english','trivia','comingsoon'].indexOf(category);
     if (tabs[idx]) tabs[idx].classList.add('active');
@@ -1685,7 +1723,7 @@ async function loadCategoriesFromAPI() {
   if (_categoriesCachePromise) return _categoriesCachePromise;
 
   _categoriesCachePromise = (async () => {
-    // 폴백 (API 실패 시 또는 API_BASE 미설정): 정식 4개를 active로 가정
+    // 폴백 (API 실패 시): 정식 4개를 active로 가정, coming_soon 7개 하드코딩
     const fallback = {
       active: [
         { id: 'economy',    name: '경제',    emoji: '📊' },
@@ -1693,14 +1731,17 @@ async function loadCategoriesFromAPI() {
         { id: 'english',    name: '영어',    emoji: '🇬🇧' },
         { id: 'trivia',     name: '상식',    emoji: '🧠' },
       ],
+      coming_soon: [],  // 백엔드 응답 없으면 빈 배열 (랜딩의 정적 7개 카드는 별개)
+      hidden: [],
     };
 
     try {
       if (!API_BASE) return fallback;
 
       // 백엔드 실제 엔드포인트: /admin/categories
-      // 응답: { data: [{id, name, emoji, active, ...}], categories: [legacy 호환] }
-      // 어드민에서 active=false 처리한 카테고리는 active=false로 옴
+      // 응답: { data: [{id, name, emoji, active, visibility, ...}] }
+      // visibility 값: 'active' | 'coming_soon' | 'hidden'
+      // (visibility가 없는 옛 row는 active 필드로 폴백: active=true → 'active', false → 'hidden')
       const r = await fetch(API_BASE + '/admin/categories');
       if (!r.ok) {
         console.warn('[카테고리] /admin/categories HTTP', r.status, '- 폴백 사용');
@@ -1711,16 +1752,24 @@ async function loadCategoriesFromAPI() {
       if (rows.length === 0) {
         return fallback;
       }
-      // active=true 인 카테고리만 추출 (필드명: id / name / emoji)
-      const activeCats = rows
-        .filter(c => c && c.active === true)
-        .map(c => ({
+
+      const buckets = { active: [], coming_soon: [], hidden: [] };
+      rows.forEach(c => {
+        if (!c || !c.id) return;
+        // visibility 우선, 없으면 active 폴백
+        let vis = c.visibility;
+        if (!vis || !['active','coming_soon','hidden'].includes(vis)) {
+          vis = (c.active === false) ? 'hidden' : 'active';
+        }
+        buckets[vis].push({
           id:    c.id,
           name:  c.name  || c.id,
           emoji: c.emoji || '📌',
-        }));
+          description: c.description || '',
+        });
+      });
 
-      _categoriesCache = { active: activeCats };
+      _categoriesCache = buckets;
       return _categoriesCache;
     } catch (e) {
       console.warn('[카테고리] 로드 실패, 폴백 사용:', e);
@@ -1734,33 +1783,99 @@ async function loadCategoriesFromAPI() {
   return _categoriesCache;
 }
 
-// 페이지 로드 시 카테고리 visibility 적용 — hidden된 정식 카테고리 nav 탭 자동 숨김
+// 페이지 로드 시 카테고리 visibility 적용
+//   1) hidden 정식 카테고리 → nav 탭 + 메인 카드 숨김
+//   2) coming_soon 카테고리 → Coming Soon 페이지에 동적 추가, nav 배지 / 통계 숫자 갱신
 async function _initCategoryVisibility() {
   try {
     const data = await loadCategoriesFromAPI();
-    const activeIds = new Set((data.active || []).map(c => c.id));
+    const activeIds     = new Set((data.active      || []).map(c => c.id));
+    const comingSoonCats = (data.coming_soon || []);
     const NAV_CATS  = ['economy', 'realestate', 'english', 'trivia'];
 
+    // === 1) nav 탭 / 메인 카드: hidden된 정식 카테고리 숨김 ===
     document.querySelectorAll('.nav-tab').forEach(btn => {
       const onclick = btn.getAttribute('onclick') || '';
       const m = onclick.match(/showCategory\('([^']+)'/);
       if (!m) return;
       const cat = m[1];
       if (NAV_CATS.includes(cat)) {
-        if (!activeIds.has(cat)) {
-          btn.style.display = 'none';
-        }
+        btn.style.display = activeIds.has(cat) ? '' : 'none';
       }
     });
 
-    // 메인 소개 페이지의 정식 카테고리 카드도 hidden 처리
     document.querySelectorAll('.cat-grid .cat-card').forEach(card => {
       const onclick = card.getAttribute('onclick') || '';
       const m = onclick.match(/showCategory\('([^']+)'/);
       if (!m) return;
       const cat = m[1];
-      if (NAV_CATS.includes(cat) && !activeIds.has(cat)) {
-        card.style.display = 'none';
+      if (NAV_CATS.includes(cat)) {
+        card.style.display = activeIds.has(cat) ? '' : 'none';
+      }
+    });
+
+    // === 2) Coming Soon 동적 영역 렌더 + nav 배지 / 통계 갱신 ===
+    //
+    // 정적 카드는 랜딩 자체 카탈로그(7개)로 유지하고,
+    // 어드민에서 coming_soon으로 추가한 카테고리는 "✨ 신규 추가" 그룹에 동적 삽입.
+    // 정적 카드와 ID가 겹치면 정적은 숨기고 동적만 표시 (어드민 편집이 우선).
+    const STATIC_COMING_SOON_IDS = new Set([
+      // 랜딩 자체 7개 카탈로그 (이건 어드민 카테고리와 별개의 "마케팅용" 카드들)
+      // id 충돌 방지용 — 어드민에서 같은 id를 coming_soon으로 등록하면 동적이 우선
+    ]);
+
+    const csDynamicSection = document.getElementById('csDynamicSection');
+    const csDynamicGrid    = document.getElementById('csDynamicGrid');
+
+    if (csDynamicGrid) {
+      if (comingSoonCats.length > 0) {
+        csDynamicGrid.innerHTML = comingSoonCats.map(c => {
+          const id    = c.id;
+          const name  = c.name  || id;
+          const emoji = c.emoji || '📌';
+          const desc  = c.description || '곧 만나볼 카테고리입니다.';
+          return `
+            <div class="cat-card coming-soon" data-cat-id="${id}">
+              <div class="coming-badge">출시 예정</div>
+              <div class="cat-card-icon">${emoji}</div>
+              <div class="cat-card-name">${name}</div>
+              <div class="cat-card-tag">출시 예정 카테고리</div>
+              <p class="cat-card-desc">${desc}</p>
+              <div class="cat-card-sample">출시 준비 중 ⏳</div>
+            </div>`;
+        }).join('');
+        if (csDynamicSection) csDynamicSection.style.display = '';
+      } else {
+        csDynamicGrid.innerHTML = '';
+        if (csDynamicSection) csDynamicSection.style.display = 'none';
+      }
+    }
+
+    // === 3) 카운터 갱신: nav 배지 + Hero 통계 ===
+    // 총 출시 예정 = 정적 7개 + 어드민 coming_soon 등록분
+    const STATIC_CATALOG_COUNT = 7;
+    const dynamicCount = comingSoonCats.length;
+    const totalComing  = STATIC_CATALOG_COUNT + dynamicCount;
+
+    const navBadge = document.getElementById('navComingSoonBadge');
+    if (navBadge) navBadge.textContent = String(totalComing);
+
+    const csHeroCount = document.getElementById('csHeroCount');
+    if (csHeroCount) csHeroCount.textContent = String(totalComing);
+
+    const csStatCount = document.getElementById('csStatCount');
+    if (csStatCount) csStatCount.textContent = String(totalComing);
+
+    // 그룹 수: 정적 3 그룹 + 동적이 있으면 +1 (✨ 신규 추가 그룹)
+    const groupCount = 3 + (dynamicCount > 0 ? 1 : 0);
+    const csStatGroups = document.getElementById('csStatGroups');
+    if (csStatGroups) csStatGroups.textContent = String(groupCount);
+
+    // 메인 페이지 "X개 더 보기" 힌트 텍스트도 갱신 (가능하면)
+    const remainCount = Math.max(0, totalComing - 3); // 메인 미리보기 3개 제외
+    document.querySelectorAll('.cat-viewall-btn span').forEach(span => {
+      if (span.textContent && span.textContent.includes('더 보기')) {
+        span.textContent = `출시 예정 카테고리 ${remainCount}개 더 보기`;
       }
     });
   } catch (e) {

@@ -1422,10 +1422,10 @@ HIDDEN_COMINGSOON_MODAL_END -->
       <div class="field">
         <label>💡 받아볼 관심사 선택 <span id="catLabelHint" style="font-size:11px;color:var(--gold);font-weight:500">(1개 선택 필수)</span></label>
         <div id="catSelector" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
-          <button type="button" class="cat-btn" data-cat="economy" onclick="toggleCat('economy')">📊 경제</button>
-          <button type="button" class="cat-btn" data-cat="realestate" onclick="toggleCat('realestate')">🏠 부동산</button>
-          <button type="button" class="cat-btn" data-cat="english" onclick="toggleCat('english')">🇬🇧 영어</button>
-          <button type="button" class="cat-btn" data-cat="trivia" onclick="toggleCat('trivia')">🧠 상식</button>
+          <!-- 동적 렌더링: renderModalCategoryButtons() — visibility='active'만 표시 -->
+          <div style="grid-column:1/-1;text-align:center;padding:18px;color:var(--muted);font-size:12px">
+            카테고리 목록을 불러오는 중...
+          </div>
         </div>
         <div id="catGuide" style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">
           관심 있는 카테고리를 1개 선택하면 매일 그 카테고리 콘텐츠를 받아볼 수 있습니다.
@@ -1633,20 +1633,15 @@ const FIXED_SEND_HOUR = 8;     // 발송 시간 고정
 
 // ── 카테고리 탭 전환 ─────────────────────────────────────────
 async function showCategory(category, btnEl) {
-  // 정식 4개 카테고리에 대해 hidden 상태 체크 → 자동 redirect
+  // 정식 4개 카테고리에 대해 어드민 active=false (비활성) 체크 → 자동 redirect
   // (intro, comingsoon은 시스템 페이지라 항상 접근 가능)
   if (['economy', 'realestate', 'english', 'trivia'].includes(category)) {
     try {
       const data = await loadCategoriesFromAPI();
-      const allActive     = (data.active || []).map(c => c.id);
-      const allComingSoon = (data.coming_soon || []).map(c => c.id);
-
-      if (!allActive.includes(category)) {
-        if (allComingSoon.includes(category)) {
-          category = 'comingsoon';
-        } else {
-          category = 'intro';
-        }
+      const activeIds = new Set((data.active || []).map(c => c.id));
+      if (!activeIds.has(category)) {
+        // 어드민에서 비활성 처리됨 → intro로 redirect
+        category = 'intro';
       }
     } catch (e) {
       // API 실패 시 그냥 진행 (기본 4개는 active로 가정)
@@ -1690,30 +1685,46 @@ async function loadCategoriesFromAPI() {
   if (_categoriesCachePromise) return _categoriesCachePromise;
 
   _categoriesCachePromise = (async () => {
-    try {
-      if (!API_BASE) {
-        return { active: [
-          { id: 'economy',    name: '경제',    emoji: '📊' },
-          { id: 'realestate', name: '부동산', emoji: '🏠' },
-          { id: 'english',    name: '영어',    emoji: '🇬🇧' },
-          { id: 'trivia',     name: '상식',    emoji: '🧠' },
-        ], coming_soon: [] };
-      }
-      const r = await fetch(API_BASE + '/api/categories');
-      const d = await r.json();
-      _categoriesCache = {
-        active:      d.active      || [],
-        coming_soon: d.coming_soon || [],
-      };
-      return _categoriesCache;
-    } catch (e) {
-      console.warn('[카테고리] 로드 실패, 폴백 사용:', e);
-      return { active: [
+    // 폴백 (API 실패 시 또는 API_BASE 미설정): 정식 4개를 active로 가정
+    const fallback = {
+      active: [
         { id: 'economy',    name: '경제',    emoji: '📊' },
         { id: 'realestate', name: '부동산', emoji: '🏠' },
         { id: 'english',    name: '영어',    emoji: '🇬🇧' },
         { id: 'trivia',     name: '상식',    emoji: '🧠' },
-      ], coming_soon: [] };
+      ],
+    };
+
+    try {
+      if (!API_BASE) return fallback;
+
+      // 백엔드 실제 엔드포인트: /admin/categories
+      // 응답: { data: [{id, name, emoji, active, ...}], categories: [legacy 호환] }
+      // 어드민에서 active=false 처리한 카테고리는 active=false로 옴
+      const r = await fetch(API_BASE + '/admin/categories');
+      if (!r.ok) {
+        console.warn('[카테고리] /admin/categories HTTP', r.status, '- 폴백 사용');
+        return fallback;
+      }
+      const d = await r.json();
+      const rows = (d && Array.isArray(d.data)) ? d.data : [];
+      if (rows.length === 0) {
+        return fallback;
+      }
+      // active=true 인 카테고리만 추출 (필드명: id / name / emoji)
+      const activeCats = rows
+        .filter(c => c && c.active === true)
+        .map(c => ({
+          id:    c.id,
+          name:  c.name  || c.id,
+          emoji: c.emoji || '📌',
+        }));
+
+      _categoriesCache = { active: activeCats };
+      return _categoriesCache;
+    } catch (e) {
+      console.warn('[카테고리] 로드 실패, 폴백 사용:', e);
+      return fallback;
     } finally {
       _categoriesCachePromise = null;
     }
@@ -1940,6 +1951,9 @@ function openModal(plan) {
   updateFirstSendInfo();
   updateModalBtn(); // 카테고리 0개 → 버튼 disabled
 
+  // ⭐ 어드민 visibility 정책 적용된 카테고리 버튼 동적 렌더 (active만 표시)
+  renderModalCategoryButtons();
+
   // 스텝 초기화
   showStep(1);
   document.getElementById('overlay').classList.add('open');
@@ -2164,6 +2178,42 @@ if (urlParams.has('billingSuccess')) {
 }
 
 // ── 관심사(카테고리) 선택 ────────────────────────────────────
+
+// 모달의 카테고리 선택 버튼들을 active 카테고리로 동적 렌더
+// 어드민에서 hidden 처리한 카테고리는 자동으로 안 보임
+async function renderModalCategoryButtons() {
+  const sel = document.getElementById('catSelector');
+  if (!sel) return;
+
+  const data = await loadCategoriesFromAPI();
+  const activeCats = data.active || [];
+
+  if (activeCats.length === 0) {
+    sel.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:18px;color:var(--muted);font-size:12px">현재 신청 가능한 카테고리가 없습니다.</div>';
+    return;
+  }
+
+  // 그리드: 카테고리가 1개면 1열, 그 외엔 2열
+  sel.style.gridTemplateColumns = activeCats.length === 1 ? '1fr' : '1fr 1fr';
+
+  sel.innerHTML = activeCats.map(c => {
+    const id    = c.id;
+    const name  = c.name || id;
+    const emoji = c.emoji || '📌';
+    return `<button type="button" class="cat-btn" data-cat="${id}" onclick="toggleCat('${id}')">${emoji} ${name}</button>`;
+  }).join('');
+
+  // 이전에 선택한 카테고리가 active 목록에 없으면 해제
+  if (selectedCategories.length > 0) {
+    const allowedIds = new Set(activeCats.map(c => c.id));
+    selectedCategories = selectedCategories.filter(c => allowedIds.has(c));
+    document.querySelectorAll('.cat-btn').forEach(btn => {
+      btn.classList.toggle('active', selectedCategories.includes(btn.dataset.cat));
+    });
+    updateModalBtn();
+  }
+}
+
 function toggleCat(cat) {
   // 모든 플랜에서 1개만 선택 (라디오 버튼처럼 동작)
   // 1개 콘텐츠에 집중 - 여러 분야 원하면 별도 신청 (독립 구독)
@@ -2183,16 +2233,29 @@ function toggleCat(cat) {
   updateModalBtn();
 }
 
-// 카테고리 페이지에서 "이 관심사 신청하기" 클릭 시 호출 — 해당 카테고리를 미리 체크하고 모달 오픈
-function openModalWithCategory(cat) {
+// 카테고리 페이지에서 "이 관심사 신청하기" 클릭 시 호출
+// → active 카테고리만 진행, hidden/coming_soon이면 거부
+async function openModalWithCategory(cat) {
   openModal('pkg6m');  // 6개월 (가장 인기) 디폴트, 모달 안에서 변경 가능
-  // 모달이 열리면서 selectedCategories는 []로 초기화되므로 약간의 지연 후 추가
-  setTimeout(() => {
-    if (!selectedCategories.includes(cat)) selectedCategories.push(cat);
-    document.querySelectorAll('.cat-btn').forEach(btn => {
-      btn.classList.toggle('active', selectedCategories.includes(btn.dataset.cat));
-    });
-  }, 50);
+
+  // 카테고리 동적 렌더 완료 기다림
+  await loadCategoriesFromAPI();
+  // DOM 반영 보장
+  await new Promise(r => setTimeout(r, 100));
+
+  // active 목록에 있는지 확인
+  const data = await loadCategoriesFromAPI();
+  const allowedIds = new Set((data.active || []).map(c => c.id));
+  if (!allowedIds.has(cat)) {
+    // 비활성/coming_soon/hidden은 선택 불가
+    showToast('현재 신청할 수 없는 카테고리입니다', 'ng');
+    return;
+  }
+  if (!selectedCategories.includes(cat)) selectedCategories.push(cat);
+  document.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.classList.toggle('active', selectedCategories.includes(btn.dataset.cat));
+  });
+  updateModalBtn();
 }
 
 // ── 발송 시간 (8시 고정) ─────────────────────────────────────

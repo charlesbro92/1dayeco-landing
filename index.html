@@ -1006,7 +1006,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v78</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v79</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2180,15 +2180,23 @@ HIDDEN_COMINGSOON_MODAL_END -->
       <div class="modal-title" id="modalTitle">무료 체험 시작</div>
       <p class="modal-desc" id="modalDesc">전화번호를 등록하면 <strong>내일 아침 첫 메시지</strong>를 보내드립니다.</p>
 
-      <!-- 구독 플랜 선택 (상단) -->
+      <!-- 구독 플랜 선택 + 결제 금액 한 줄 -->
       <div class="field" id="planField">
         <label>구독 플랜 선택 <span style="font-size:11px;color:var(--muted);font-weight:400">(카테고리 1개당)</span></label>
-        <select id="mPlan" onchange="onPlanChange()">
-          <option value="monthly">월간 정기결제</option>
-          <option value="pkg3m">3개월 일시불</option>
-          <option value="pkg6m">6개월 일시불 ⭐ 인기</option>
-          <option value="pkg1y">12개월 일시불</option>
-        </select>
+        <div style="display:flex;gap:10px;align-items:stretch">
+          <div style="flex:7">
+            <select id="mPlan" onchange="onPlanChange()" style="width:100%;height:100%">
+              <option value="monthly">월간 정기결제</option>
+              <option value="pkg3m">3개월 일시불</option>
+              <option value="pkg6m">6개월 일시불 ⭐ 인기</option>
+              <option value="pkg1y">12개월 일시불</option>
+            </select>
+          </div>
+          <div id="planAmountBox" style="flex:3;background:rgba(201,168,76,.08);border:1.5px solid rgba(201,168,76,.35);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 6px;min-width:76px">
+            <div id="planAmountVal" style="color:var(--gold);font-weight:800;font-size:16px;line-height:1.2">—</div>
+            <div id="planAmountSub" style="color:var(--muted);font-size:9px;margin-top:2px;text-align:center">플랜 선택</div>
+          </div>
+        </div>
         <!-- 할인 요약 줄 -->
         <div id="planPriceSummary" style="margin-top:8px;padding:10px 14px;background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.2);border-radius:8px;font-size:13px;line-height:1.7;display:none">
           <span id="planOriginalLine" style="color:var(--muted);text-decoration:line-through;font-size:12px"></span>
@@ -2197,17 +2205,19 @@ HIDDEN_COMINGSOON_MODAL_END -->
         </div>
       </div>
 
-      <!-- 이름 + 전화번호 한 줄 5:5 -->
+      <!-- 이름 + 전화번호 한 줄 5:5 (골드 라인) -->
       <div style="display:flex;gap:10px;margin-bottom:14px">
         <div style="flex:1">
           <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">이름</label>
           <input type="text" id="mName" placeholder="홍길동"
-            style="width:100%;background:var(--s3);border:1px solid var(--b);color:var(--text);padding:11px 14px;border-radius:8px;font-size:14px;outline:none;font-family:var(--sans);box-sizing:border-box">
+            style="width:100%;background:var(--s3);border:1.5px solid rgba(201,168,76,.4);color:var(--text);padding:11px 14px;border-radius:8px;font-size:14px;outline:none;font-family:var(--sans);box-sizing:border-box;transition:border-color .15s"
+            onfocus="this.style.borderColor='rgba(201,168,76,.9)'" onblur="this.style.borderColor='rgba(201,168,76,.4)'">
         </div>
         <div style="flex:1">
           <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">카카오톡 전화번호</label>
           <input type="tel" id="mPhone" placeholder="010-0000-0000" maxlength="13" oninput="fmtPhone(this)"
-            style="width:100%;background:var(--s3);border:1px solid var(--b);color:var(--text);padding:11px 14px;border-radius:8px;font-size:14px;outline:none;font-family:var(--sans);box-sizing:border-box">
+            style="width:100%;background:var(--s3);border:1.5px solid rgba(201,168,76,.4);color:var(--text);padding:11px 14px;border-radius:8px;font-size:14px;outline:none;font-family:var(--sans);box-sizing:border-box;transition:border-color .15s"
+            onfocus="this.style.borderColor='rgba(201,168,76,.9)'" onblur="this.style.borderColor='rgba(201,168,76,.4)'">
         </div>
       </div>
 
@@ -2930,28 +2940,44 @@ async function _updatePlanPrices() {
 
 // 플랜 선택 시 할인 요약 업데이트
 function updatePlanSummary(plan) {
-  const summary = document.getElementById('planPriceSummary');
-  const origEl  = document.getElementById('planOriginalLine');
-  const discEl  = document.getElementById('planDiscountLine');
-  const finalEl = document.getElementById('planFinalPrice');
+  const summary  = document.getElementById('planPriceSummary');
+  const origEl   = document.getElementById('planOriginalLine');
+  const discEl   = document.getElementById('planDiscountLine');
+  const finalEl  = document.getElementById('planFinalPrice');
+  const amountVal = document.getElementById('planAmountVal');
+  const amountSub = document.getElementById('planAmountSub');
   if (!summary) return;
 
   const prices = window._PLAN_PRICES;
-  if (!prices || !prices[plan]) { summary.style.display = 'none'; return; }
+  const fmt = v => Number(v).toLocaleString('ko-KR');
+
+  if (!prices || !prices[plan]) {
+    summary.style.display = 'none';
+    if (amountVal) amountVal.textContent = '—';
+    if (amountSub) amountSub.textContent = '플랜 선택';
+    return;
+  }
 
   const { price, orig, months } = prices[plan];
-  const fmt = v => Number(v).toLocaleString('ko-KR');
-  const pct = orig > 0 ? Math.round((1 - price/orig) * 1000) / 10 : 0;
+  const pct = orig > 0 && orig > price ? Math.round((1 - price/orig) * 1000) / 10 : 0;
 
+  // 금액 박스 업데이트
+  if (amountVal) amountVal.textContent = `₩${fmt(price)}`;
+  if (amountSub) {
+    if (plan === 'monthly') amountSub.textContent = '/ 월';
+    else amountSub.textContent = `${pct > 0 ? pct + '% 할인' : '일시불'}`;
+  }
+
+  // 할인 요약줄
   if (plan === 'monthly') {
-    summary.style.display = 'none'; // 월정액은 할인 없음
+    summary.style.display = 'none';
     return;
   }
   const saved = orig - price;
   summary.style.display = 'block';
-  origEl.textContent  = `정가 ₩${fmt(orig)}`;
-  discEl.textContent  = `${pct}% 할인 (₩${fmt(saved)} 절약)`;
-  finalEl.textContent = `₩${fmt(price)}`;
+  if (origEl) origEl.textContent  = `정가 ₩${fmt(orig)}`;
+  if (discEl) discEl.textContent  = `${pct}% 할인 (₩${fmt(saved)} 절약)`;
+  if (finalEl) finalEl.textContent = `₩${fmt(price)}`;
 }
 
 // ── 유틸 ─────────────────────────────────────────────────────
@@ -3537,22 +3563,19 @@ async function renderModalCategoryButtons() {
 }
 
 function toggleCat(cat) {
-  // 모든 플랜에서 1개만 선택 (라디오 버튼처럼 동작)
-  // 1개 콘텐츠에 집중 - 여러 분야 원하면 별도 신청 (독립 구독)
   if (selectedCategories.length === 1 && selectedCategories[0] === cat) {
-    // 이미 선택된 걸 다시 누르면 해제
     selectedCategories = [];
   } else {
-    // 다른 걸 선택하면 기존 해제하고 새로 선택
     selectedCategories = [cat];
   }
-  // UI 갱신
   document.querySelectorAll('.cat-btn').forEach(btn => {
     const c = btn.dataset.cat;
     btn.classList.toggle('active', selectedCategories.includes(c));
   });
-  // 신청 버튼 활성화 상태 갱신
   updateModalBtn();
+  // 카테고리 선택 시 금액 박스 업데이트 (플랜 기준)
+  const plan = document.getElementById('mPlan')?.value;
+  if (plan) updatePlanSummary(plan);
 }
 
 // 카테고리 페이지에서 "이 관심사 신청하기" 클릭 시 호출

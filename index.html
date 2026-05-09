@@ -1006,7 +1006,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v69</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v70</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2431,8 +2431,8 @@ HIDDEN_COMINGSOON_MODAL_END -->
             <div style="font-size:12px;color:var(--muted);margin-top:8px">환불액 계산 중...</div>
           </div>
           <!-- 계산 실패 시 -->
-          <div id="refundCalcFail" style="display:none;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:12px;font-size:12px;color:var(--muted);margin-bottom:14px">
-            환불액은 고객센터 확인 후 안내드립니다.
+          <div id="refundCalcFail" style="display:none;background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2);border-radius:8px;padding:12px;font-size:12px;color:var(--muted);margin-bottom:14px">
+            환불액 계산에 실패했습니다. 카카오톡 <strong>@1DAYECO</strong>로 문의해 주세요.
           </div>
           <div style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:13px;font-size:12px;color:var(--text);line-height:1.85;margin-bottom:16px">
             <div style="font-weight:700;color:var(--gold);margin-bottom:6px">⚠️ 환불 요청 전 확인해 주세요</div>
@@ -3759,7 +3759,7 @@ function renderSubList(rows, totalSteps) {
       ? '<span style="background:rgba(251,191,36,.15);color:#F59E0B;border:1px solid rgba(251,191,36,.3);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700">무료 체험 중</span>'
       : '<span style="background:rgba(16,185,129,.12);color:#10B981;border:1px solid rgba(16,185,129,.3);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700">유료 구독 중</span>';
     const endLabel = isTrial ? `체험 종료일: ${endStr}` : `만료일: ${endStr}`;
-    const catLine  = cats ? `<div style="font-size:11px;color:var(--muted);margin-top:3px">카테고리: ${cats}</div>` : '';
+    const catLine  = cats ? `<div style="font-size:13px;font-weight:600;color:var(--text);margin-top:5px">📌 ${cats}</div>` : '';
     return `
       <button onclick="selectCancelSub(cancelFoundList[${i}], ${totalSteps}, false)"
         style="width:100%;background:rgba(255,255,255,.03);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;text-align:left;cursor:pointer;transition:all .2s;font-family:var(--sans)"
@@ -3790,7 +3790,7 @@ async function selectCancelSub(sub, totalSteps, skipStep2) {
     const endStr = fmtDate(sub.trial_end || sub.trialEnd);
     document.getElementById('cancelSubDetail').innerHTML =
       '플랜: <strong>' + planLabel(sub.plan) + '</strong>' +
-      (cats ? ' &nbsp;|&nbsp; 카테고리: <strong>' + cats + '</strong>' : '') +
+      (cats ? '<br><span style="font-size:14px;font-weight:600;color:var(--text)">📌 ' + cats + '</span>' : '') +
       ' &nbsp;|&nbsp; 체험 종료일: <strong>' + endStr + '</strong>';
   } else {
     document.getElementById('cancelStep3Trial').style.display  = 'none';
@@ -3799,7 +3799,7 @@ async function selectCancelSub(sub, totalSteps, skipStep2) {
     const endStr = fmtDate(sub.end_date);
     document.getElementById('refundSubDetail').innerHTML =
       '플랜: <strong>' + planLabel(sub.plan) + '</strong>' +
-      (cats ? ' &nbsp;|&nbsp; 카테고리: <strong>' + cats + '</strong>' : '') +
+      (cats ? '<br><span style="font-size:14px;font-weight:600;color:var(--text)">📌 ' + cats + '</span>' : '') +
       ' &nbsp;|&nbsp; 만료일: <strong>' + endStr + '</strong>';
 
     // 환불액 계산 UI 초기화
@@ -3826,10 +3826,15 @@ async function selectCancelSub(sub, totalSteps, skipStep2) {
         calcData = { success: true, paid_amount: 24900, sent_days: 30, remaining_days: 153, total_send_days: 183, refund_amount: 20779 };
       }
       if (calcData && calcData.success) {
+        const isFullRefund = calcData.refund_amount >= calcData.paid_amount;
         document.getElementById('refundOrigAmt').textContent  = '₩' + (calcData.paid_amount || 0).toLocaleString('ko-KR');
         document.getElementById('refundSentDays').textContent = (calcData.sent_days || 0) + '일 발송 완료';
         document.getElementById('refundRemDays').textContent  = (calcData.remaining_days || 0) + '일 남음';
-        document.getElementById('refundEstAmt').textContent   = '₩' + (calcData.refund_amount || 0).toLocaleString('ko-KR');
+        const estAmtEl = document.getElementById('refundEstAmt');
+        estAmtEl.textContent = '₩' + (calcData.refund_amount || 0).toLocaleString('ko-KR');
+        if (isFullRefund) {
+          estAmtEl.innerHTML += ' <span style="font-size:11px;background:rgba(16,185,129,.15);color:#10B981;border:1px solid rgba(16,185,129,.3);padding:2px 7px;border-radius:20px;font-weight:700;vertical-align:middle">전액환불</span>';
+        }
         document.getElementById('refundCalcBox').style.display     = 'block';
         document.getElementById('refundCalcLoading').style.display = 'none';
       } else {

@@ -1006,15 +1006,15 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v84</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v85</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
     <button class="nav-tab" onclick="showCategory('list-all', this)">전체</button>
-    <button class="nav-tab" onclick="showCategory('list-finance', this)">💼 경제·금융</button>
-    <button class="nav-tab" onclick="showCategory('list-lifestyle', this)">🏠 생활·실용</button>
-    <button class="nav-tab" onclick="showCategory('list-language', this)">🌐 글로벌·언어</button>
-    <button class="nav-tab" onclick="showCategory('list-tech', this)">💻 테크·트렌드</button>
+    <button class="nav-tab" onclick="showCategory('list-finance', this)">경제·금융</button>
+    <button class="nav-tab" onclick="showCategory('list-lifestyle', this)">생활·실용</button>
+    <button class="nav-tab" onclick="showCategory('list-language', this)">글로벌·언어</button>
+    <button class="nav-tab" onclick="showCategory('list-tech', this)">테크·트렌드</button>
     <button class="nav-tab nav-tab-soon" onclick="showCategory('comingsoon', this)" style="display:none">
       COMING SOON <span class="nav-tab-badge" id="navComingSoonBadge" style="display:none">0</span>
     </button>
@@ -2149,114 +2149,154 @@ const CATEGORY_CONTENT = {
     ],
     finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능<br>매일 1분, 대화의 양념이 되는 지식.',
   },
-  // ─── 신규 4개 (간소 버전) ───
+  // ─── 신규 4개 (정식 4개와 동일한 풍부 버전) ───
   kr_stock: {
     title: '한국증시',
-    subtitle: '매일 아침 1분, 코스피·코스닥 시황을 짧게.<br>오늘 시장이 어떻게 움직였고, 무엇이 중요한지.',
-    delivery: '매일 1편 · 평일 시황 중심',
-    painSub: '뉴스가 너무 많고, 핵심만 짚어주는 곳은 적습니다.',
+    subtitle: '매일 아침 1분, 코스피·코스닥 시황을 한눈에.<br>외국인·기관 매매부터 업종 흐름까지, 오늘 시장의 모든 것.',
+    delivery: '매일 1편 · 평일 시황 + 주말 주간 정리',
+    painSub: '매일 시장은 움직이지만, 핵심을 짚어주는 곳은 적습니다.',
     pains: [
-      { e: '📊', t: '코스피가 어디까지 올랐는지, 무엇 때문에 움직였는지 매일 따라가기 힘들어요.' },
-      { e: '🔔', t: '증권사 리포트는 너무 길고, 유튜브는 광고가 많아서 결론이 잘 안 보여요.' },
+      { e: '📊', t: '코스피가 어디까지 올랐는지 매일 확인하지만, 왜 움직였는지는 잘 모르겠어요.' },
+      { e: '📰', t: '증권사 리포트는 너무 길고, 유튜브는 광고가 많아 정작 중요한 건 안 나와요.' },
+      { e: '💸', t: '주식 보유 중인데 외국인·기관 수급이 어떻게 되고 있는지 매일 챙기기 어려워요.' },
+      { e: '🤔', t: '환율, 금리, 미국 시장 — 다 시장에 영향 준다는데 어떻게 연결되는지 모르겠어요.' },
     ],
     previews: [
       {
-        day: '평일 아침 8시',
-        title: '📌 오늘의 코스피 — 시장은 어디로?',
-        body: '<b>[오늘의 핵심]</b> 코스피 / 코스닥 전일 종가, 외국인·기관 매매 동향, 주요 이슈를 한눈에<br><br><b>📌 오늘의 포인트</b><br>• 지수 변동 요인 1줄 정리<br>• 외국인·기관 매매 동향<br>• 주요 업종/테마 흐름<br><br>#코스피 #코스닥 #시황',
+        day: '월요일 아침 8시',
+        title: '📌 코스피 7,500선 안착, 외국인 5거래일 연속 매수',
+        body: '<b>[오늘의 핵심]</b> 외국인 매수세 지속, 박스권 상단 돌파 시도<br><br><b>📌 오늘의 포인트</b><br>• 코스피는 7,498p로 0.11% 상승, 코스닥은 1,207p로 0.71% 강세.<br>• 외국인 5거래일 연속 순매수 누적 1.2조원, 기관은 차익실현으로 매도 우위.<br>• 반도체·자동차 강세 지속, 2차전지·바이오는 약세.<br><br><b>💡 왜 중요한가?</b><br>박스권 상단인 7,500p 돌파 시 추가 상승 여력. 외국인 매수 지속 여부가 단기 방향성 결정.<br><br><b>📊 오늘의 숫자</b><br>• 7,498p: 코스피 종가 (+0.11%)<br>• 1.2조원: 외국인 5거래일 누적 순매수<br><br>#코스피 #외국인수급 #박스권돌파',
+      },
+      {
+        day: '화요일 아침 8시',
+        title: '📌 반도체주 강세 지속, 삼성·하이닉스 신고가',
+        body: '<b>[오늘의 핵심]</b> AI 반도체 수요 호조로 메모리 가격 상승, 실적 기대감<br><br><b>📌 오늘의 포인트</b><br>• 삼성전자 +2.3%, SK하이닉스 +3.5% 동반 강세.<br>• HBM 매출 비중 확대로 실적 추정치 상향 조정 잇따름.<br>• 외국인 반도체 업종에 5,800억원 순매수 집중.<br><br><b>💡 왜 중요한가?</b><br>코스피 시총 비중이 큰 반도체 강세는 지수 상승의 핵심. AI 사이클 지속 여부가 관건.<br><br><b>📊 오늘의 숫자</b><br>• +3.5%: SK하이닉스 등락률<br>• 5,800억원: 외국인 반도체 순매수<br><br>#반도체 #HBM #AI사이클',
       },
     ],
-    topicsTitle: '매일 새로운 시황',
+    topicsTitle: '매일 새로운 시황 인사이트',
     topics: [
-      '오늘의 코스피·코스닥', '외국인 수급 동향', '기관 매매 흐름',
-      '주요 업종 등락', '테마주 점검', '환율·금리와 시장',
+      '오늘의 코스피·코스닥', '외국인·기관 수급 동향', '주요 업종 등락',
+      '테마주 점검', '환율과 시장', '미국 영향 분석',
+      '경제지표 발표 영향', '주요 종목 신고가/신저가', '공매도 동향',
+      '거래대금·거래량 분석', '주간 시장 전망', '... 매일 새로운 주제',
     ],
     personas: [
-      { i: '📈', t: '주식 투자자', d: '매일 시황을 짧게 정리해서 받고 싶은 분.' },
-      { i: '⏰', t: '바쁜 직장인', d: '뉴스 다 못 보지만 시장 흐름은 놓치고 싶지 않은 분.' },
+      { i: '📈', t: '국내 주식 투자자', d: '매일 시황을 짧고 정확하게 정리해서 받고 싶은 분. 핵심만 빠르게.' },
+      { i: '⏰', t: '바쁜 직장인 투자자', d: '리포트 읽을 시간은 없지만 시장 흐름은 놓치고 싶지 않은 분.' },
+      { i: '🎯', t: '투자 입문자', d: '시장 용어와 흐름을 매일 익히면서 감을 키우고 싶은 분.' },
     ],
-    finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능',
+    finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능<br>매일 1분, 한국 시장의 흐름을 놓치지 마세요.',
   },
   us_stock: {
     title: '미국증시',
-    subtitle: '매일 아침 1분, S&P 500·나스닥 시황을 짧게.<br>밤사이 무슨 일이 있었는지, 한국 시장에 어떤 영향이 있는지.',
-    delivery: '매일 1편 · 평일 시황 중심',
-    painSub: '미국 시장은 한국 시장에 영향을 주지만, 매일 따라가기 어렵습니다.',
+    subtitle: '매일 아침 1분, 밤사이 미국 시장 정리.<br>다우·S&P 500·나스닥부터 빅테크 동향까지, 한국 시장에 미칠 영향까지.',
+    delivery: '매일 1편 · 미 증시 마감 후 다음날 아침',
+    painSub: '미국 시장은 한국에 큰 영향을 주지만, 시차 때문에 매일 따라가기 힘듭니다.',
     pains: [
-      { e: '🌙', t: '밤사이 미국 시장이 어떻게 움직였는지 아침에 빠르게 알고 싶어요.' },
+      { e: '🌙', t: '밤사이 미국 시장이 어떻게 끝났는지 출근 전에 빠르게 알고 싶어요.' },
       { e: '💱', t: '환율, 금리, 빅테크 실적 — 모두 중요하지만 한 번에 정리해줬으면 해요.' },
+      { e: '📊', t: '미국 주식 들고 있는데 매일 미국 뉴스 직접 보기는 부담스러워요.' },
+      { e: '🇰🇷', t: '미국 시장이 한국 시장에 어떤 영향을 줄지 매일 예측이 어려워요.' },
     ],
     previews: [
       {
-        day: '평일 아침 8시',
-        title: '📌 밤사이 미국 시장 — 한 줄 정리',
-        body: '<b>[오늘의 핵심]</b> 다우, S&P 500, 나스닥 종가와 주요 빅테크 동향<br><br><b>📌 오늘의 포인트</b><br>• 밤사이 지수 변동 요인<br>• 빅테크(애플·MS·엔비디아 등) 등락<br>• 한국 시장에 미칠 영향<br><br>#미국증시 #나스닥 #S&P500',
+        day: '월요일 아침 8시',
+        title: '📌 나스닥 사상 최고치 경신, 엔비디아 +4.2%',
+        body: '<b>[오늘의 핵심]</b> AI 반도체 강세로 빅테크 일제 상승, 한국 반도체에도 호재<br><br><b>📌 오늘의 포인트</b><br>• 다우 +0.5%, S&P 500 +0.8%, 나스닥 +1.4% 동반 상승.<br>• 엔비디아 +4.2%, 마이크로소프트 +1.8%, 애플 +0.9% — 빅테크 7개사 시총 200조원 증가.<br>• 10년물 금리 4.32%로 안정, 달러인덱스 105.2 약세.<br><br><b>💡 한국 시장에 미칠 영향</b><br>나스닥 강세 → 한국 반도체·IT 동반 상승 가능성. 환율 안정으로 외국인 매수 우호적.<br><br><b>📊 오늘의 숫자</b><br>• +1.4%: 나스닥 등락률<br>• 200조원: 빅테크 7개사 시총 증가분<br><br>#나스닥 #엔비디아 #빅테크',
+      },
+      {
+        day: '화요일 아침 8시',
+        title: '📌 연준 6월 금리인하 가능성 70% 부각',
+        body: '<b>[오늘의 핵심]</b> 고용지표 둔화로 인하 기대감 커짐, 시장 환호<br><br><b>📌 오늘의 포인트</b><br>• 5월 비농업 고용 17.5만명 (예상 22만명 하회), 실업률 4.0%로 상승.<br>• CME FedWatch 기준 6월 25bp 인하 확률 70%로 급등.<br>• S&P 500 신고가 경신, 채권금리는 4.20%로 하락.<br><br><b>💡 한국 시장에 미칠 영향</b><br>금리인하 기대 → 글로벌 위험자산 선호 강화 → 한국 코스피 외국인 매수 우호적.<br><br><b>📊 오늘의 숫자</b><br>• 17.5만명: 5월 신규 고용 (둔화)<br>• 70%: 6월 인하 확률<br><br>#연준 #금리인하 #FedWatch',
       },
     ],
-    topicsTitle: '매일 새로운 시황',
+    topicsTitle: '매일 새로운 미국 시장 인사이트',
     topics: [
-      '다우/S&P/나스닥', '빅테크 동향', '연준·금리 이슈',
-      '환율과 시장', '경제지표 발표', '한국 시장 영향',
+      '다우/S&P/나스닥 종가', '빅테크 7개사 동향', '연준·금리 이슈',
+      '경제지표 발표 (CPI, 고용)', '환율·달러 인덱스', '한국 시장 영향',
+      'AI·반도체 사이클', '실적 시즌 정리', '국채 금리 흐름',
+      '원자재·유가 동향', '주간 시장 전망', '... 매일 새로운 주제',
     ],
     personas: [
-      { i: '🇺🇸', t: '미국 주식 투자자', d: '한국에서 미국 주식 들고 있는 분. 시황을 빠르게.' },
-      { i: '📊', t: '거시 흐름이 궁금한 분', d: '미국 → 한국 영향까지 짧게 정리해서 보고 싶은 분.' },
+      { i: '🇺🇸', t: '미국 주식 투자자', d: '한국에서 미국 주식 보유 중인 분. 시황을 빠르고 정확하게.' },
+      { i: '📊', t: '거시 흐름 파악자', d: '미국 → 한국 영향까지 한 번에 정리해서 보고 싶은 분.' },
+      { i: '🌐', t: '글로벌 자산 운용자', d: '환율·금리·주식 동향을 종합적으로 파악하고 싶은 분.' },
     ],
-    finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능',
+    finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능<br>매일 아침, 밤사이 미국 시장이 1분 안에 정리됩니다.',
   },
   it_news: {
     title: 'IT뉴스',
-    subtitle: '매일 아침 1분, IT·테크 핵심 뉴스.<br>AI, 빅테크, 스타트업 — 산업의 흐름을 짧게.',
-    delivery: '매일 1편',
-    painSub: 'IT 뉴스는 너무 많고 빠르게 변해서 따라가기 어렵습니다.',
+    subtitle: '매일 아침 1분, 테크 산업의 핵심.<br>AI, 빅테크, 스타트업, 신기술 — 오늘 가장 중요한 한 가지만 짚어드려요.',
+    delivery: '매일 1편 · 산업 핵심 이슈 중심',
+    painSub: 'IT 뉴스는 매일 쏟아지지만, 정작 중요한 게 뭔지 짚기 어렵습니다.',
     pains: [
-      { e: '🤖', t: 'AI, 반도체, 빅테크 뉴스가 매일 쏟아지는데 핵심을 짚기 힘들어요.' },
+      { e: '🤖', t: 'AI, 반도체, 빅테크 뉴스가 쏟아지는데 어디서부터 봐야 할지 모르겠어요.' },
       { e: '📱', t: '신제품·서비스 출시 정보, 스타트업 동향 — 한 번에 정리됐으면 해요.' },
+      { e: '🚀', t: '업계에서 일하는데 매일 트렌드 따라가기가 너무 빡빡해요.' },
+      { e: '💼', t: '기획·투자 의사결정에 참고할 IT 흐름을 짧고 정확하게 받고 싶어요.' },
     ],
     previews: [
       {
         day: '월요일 아침 8시',
-        title: '📌 오늘의 IT — 한 가지만 짚어드려요',
-        body: '<b>[오늘의 핵심]</b> AI / 빅테크 / 스타트업 / 신기술 중 가장 중요한 한 가지<br><br><b>📌 오늘의 포인트</b><br>• 어떤 일이 있었는지<br>• 왜 중요한지<br>• 시장에 미칠 영향<br><br>#IT #AI #빅테크',
+        title: '📌 OpenAI GPT-5 공식 발표, 컨텍스트 100만 토큰',
+        body: '<b>[오늘의 핵심]</b> 추론 능력 대폭 향상, B2B 시장 본격 공략<br><br><b>📌 오늘의 포인트</b><br>• OpenAI가 GPT-5를 공식 발표, 컨텍스트 윈도우 100만 토큰으로 확대.<br>• HumanEval 95%, GPQA 78% — 박사급 추론 능력 입증.<br>• B2B 가격 GPT-4 대비 30% 인하, 기업 시장 공략 본격화.<br><br><b>💡 시장에 미칠 영향</b><br>구글·앤트로픽 경쟁 가속, 한국 AI 서비스 기업도 모델 재검토 필요. 반도체 수요는 지속 증가 전망.<br><br><b>📊 오늘의 숫자</b><br>• 100만 토큰: 컨텍스트 윈도우 (책 8권 분량)<br>• -30%: B2B 가격 인하<br><br>#GPT5 #OpenAI #LLM',
+      },
+      {
+        day: '화요일 아침 8시',
+        title: '📌 애플, 폴더블 아이폰 2027년 출시 확정',
+        body: '<b>[오늘의 핵심]</b> 삼성 OLED 독점 공급, 한국 부품주 수혜 기대<br><br><b>📌 오늘의 포인트</b><br>• 애플이 2027년 폴더블 아이폰 출시 공식 확인, 가격 2,000달러대 예상.<br>• 7.8인치 폴더블 OLED는 삼성디스플레이 독점 공급 (3년 계약).<br>• 한국 부품사들도 카메라·배터리·힌지 공급망 진입.<br><br><b>💡 시장에 미칠 영향</b><br>삼성디스플레이 매출 연 2조원 추가, 폴더블 시장 본격 개화. 갤럭시 폴드와의 경쟁 격화 예상.<br><br><b>📊 오늘의 숫자</b><br>• 2027년: 출시 시점<br>• 2조원: 삼성디스플레이 추가 매출<br><br>#애플 #폴더블 #삼성디스플레이',
       },
     ],
-    topicsTitle: '매일 새로운 IT 인사이트',
+    topicsTitle: '매일 새로운 테크 인사이트',
     topics: [
-      'AI 모델 동향', '반도체 산업', '빅테크 신제품',
-      '스타트업 투자', '클라우드 트렌드', '보안·프라이버시',
+      'AI 모델·서비스 동향', '반도체 산업 뉴스', '빅테크 신제품',
+      '스타트업 투자 동향', '클라우드 트렌드', '보안·프라이버시 이슈',
+      'M&A·IPO 소식', '신기술(VR/AR/Web3)', '국내 IT 기업 동향',
+      '글로벌 규제 변화', '주간 테크 정리', '... 매일 새로운 주제',
     ],
     personas: [
-      { i: '💻', t: 'IT 종사자', d: '업계 흐름을 매일 짧게 받아보고 싶은 분.' },
-      { i: '🚀', t: '테크 트렌드에 관심 있는 분', d: 'IT가 직업은 아니지만 흐름은 따라가고 싶은 분.' },
+      { i: '💻', t: 'IT 종사자', d: '업계 핵심 흐름을 매일 짧게 받아보고 싶은 분.' },
+      { i: '🚀', t: '스타트업 종사자', d: '시장 동향과 경쟁사 움직임을 빠르게 파악하고 싶은 분.' },
+      { i: '📊', t: '테크 투자자', d: 'IT 산업 변화를 자산 운용에 반영하고 싶은 분.' },
     ],
-    finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능',
+    finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능<br>매일 1분, 가장 중요한 IT 한 가지를 콕 짚어드려요.',
   },
   vietnamese: {
     title: '베트남어',
-    subtitle: '매일 아침 1분, 기초 베트남어 한 표현.<br>여행·비즈니스에서 바로 쓸 수 있는 짧은 회화.',
-    delivery: '매일 1편',
-    painSub: '베트남에 자주 가지만 인사·주문·길 묻기 정도만 하고 있죠.',
+    subtitle: '매일 아침 1분, 기초 베트남어 한 표현.<br>여행·비즈니스·일상 — 오늘 바로 쓸 수 있는 진짜 회화.',
+    delivery: '매일 1편 · 발음 + 예문 + 응용',
+    painSub: '베트남에 자주 가지만 인사·주문 정도만 하고 있죠. 한 단계 올라가고 싶어요.',
     pains: [
       { e: '✈️', t: '베트남 여행·출장 자주 가는데 매번 영어로만 소통해요.' },
       { e: '📖', t: '베트남어 책은 두껍고, 매일 한 표현씩 가볍게 시작하고 싶어요.' },
+      { e: '🤝', t: '베트남 비즈니스 파트너에게 짧게라도 베트남어로 인사하고 싶어요.' },
+      { e: '🍜', t: '식당·시장에서 메뉴 보면서 주문하고 흥정도 해보고 싶어요.' },
     ],
     previews: [
       {
         day: '월요일 아침 8시',
-        title: '📌 오늘의 한 표현 — 인사부터',
-        body: '<b>[오늘의 표현]</b> Xin chào (씬 짜오) — 안녕하세요<br><br><b>📌 사용 상황</b><br>• 처음 만났을 때, 가게 들어갈 때<br>• 시간대 상관없이 사용 가능<br><br><b>응용</b><br>Xin chào, em! (씬 짜오, 엠) — 안녕, 동생/후배에게<br><br>#베트남어 #기초회화',
+        title: '📌 Xin chào! — 베트남어 기본 인사',
+        body: '<b>[오늘의 표현]</b> Xin chào (씬 짜오) — 안녕하세요<br><br><b>📌 사용 상황</b><br>• 처음 만났을 때, 가게 들어갈 때<br>• 시간대 상관없이 사용 가능 (아침/점심/저녁 모두)<br>• 격식 있게 인사할 때 가장 안전한 표현<br><br><b>💡 응용 표현</b><br>• Xin chào, anh! (씬 짜오, 아잉) — 안녕, 형/오빠에게<br>• Xin chào, em! (씬 짜오, 엠) — 안녕, 동생/후배에게<br>• Chào! (짜오) — 친근하게 "안녕!"<br><br><b>📊 발음 팁</b><br>• Xin = "씬"이지만 끝을 살짝 올림<br>• chào = "짜오"의 짜는 영어 "ch"보다 부드럽게<br><br>#베트남어 #기초회화 #인사',
+      },
+      {
+        day: '화요일 아침 8시',
+        title: '📌 Cảm ơn! — 감사 표현',
+        body: '<b>[오늘의 표현]</b> Cảm ơn (깜 언) — 감사합니다<br><br><b>📌 사용 상황</b><br>• 식당에서 음식 받을 때<br>• 가게에서 거스름돈 받을 때<br>• 도움 받았을 때<br><br><b>💡 응용 표현</b><br>• Cảm ơn anh / chị / em — 형/누나/동생에게 감사<br>• Cảm ơn rất nhiều (깜 언 젇 니에우) — 정말 감사합니다 (강조)<br>• Không có gì (콩 꼬 지) — 천만에요, 별것 아닙니다<br><br><b>📊 발음 팁</b><br>• Cảm = "깜"의 ả는 살짝 떨어지는 톤<br>• ơn = "언"이지만 입을 더 둥글게<br><br>#베트남어 #감사 #일상회화',
       },
     ],
-    topicsTitle: '매일 한 표현',
+    topicsTitle: '매일 한 표현, 1년이면 365개',
     topics: [
       '인사·자기소개', '식당 주문', '시장에서 흥정',
-      '길 묻기·교통', '숙소·예약', '비즈니스 인사',
+      '길 묻기·교통', '숙소 체크인·예약', '비즈니스 첫 인사',
+      '숫자·가격 표현', '시간·날짜', '날씨·계절',
+      '감정 표현', '응급 상황 표현', '... 매일 새로운 표현',
     ],
     personas: [
-      { i: '✈️', t: '베트남 여행·출장 가는 분', d: '현지에서 한 마디라도 베트남어로 해보고 싶은 분.' },
-      { i: '🤝', t: '베트남 비즈니스 관계자', d: '베트남 파트너와 인사·간단한 대화를 시도하고 싶은 분.' },
+      { i: '✈️', t: '베트남 여행 자주 가는 분', d: '현지에서 한 마디라도 베트남어로 소통하고 싶은 분.' },
+      { i: '🤝', t: '베트남 비즈니스 관계자', d: '베트남 파트너에게 친근감을 표현하고 싶은 분.' },
+      { i: '📚', t: '동남아 언어 입문자', d: '베트남어를 가볍게 시작해서 매일 쌓아가고 싶은 분.' },
     ],
-    finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능',
+    finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능<br>매일 한 표현, 1년이면 365개의 표현이 쌓입니다.',
   },
 };
 
@@ -2516,7 +2556,8 @@ async function loadCategoriesFromAPI() {
           id:    c.id,
           name:  c.name  || c.id,
           emoji: c.emoji || '📌',
-          description: c.description || '',
+          description:    c.description || '',
+          super_category: c.super_category || 'finance',
         });
       });
 
@@ -2644,7 +2685,7 @@ async function _initCategoryVisibility() {
       }
     }
 
-    // === 4) Coming Soon 페이지 전체 (어드민 coming_soon 카테고리 모두) ===
+    // === 4) Coming Soon 페이지 전체 — 대분류별 그룹핑 ===
     const csMainGrid   = document.getElementById('csMainGrid');
     const csEmptyState = document.getElementById('csEmptyState');
     if (csMainGrid && csEmptyState) {
@@ -2655,7 +2696,23 @@ async function _initCategoryVisibility() {
       } else {
         csMainGrid.style.display = '';
         csEmptyState.style.display = 'none';
-        csMainGrid.innerHTML = comingSoonCats.map(c => {
+
+        const SUPER_CATS_CS = [
+          { id: 'finance',   emoji: '💼', label: '경제·금융' },
+          { id: 'lifestyle', emoji: '🏠', label: '생활·실용' },
+          { id: 'language',  emoji: '🌐', label: '글로벌·언어' },
+          { id: 'tech',      emoji: '💻', label: '테크·트렌드' },
+        ];
+        const groupedCS = {};
+        SUPER_CATS_CS.forEach(s => { groupedCS[s.id] = []; });
+        const ungroupedCS = [];
+        comingSoonCats.forEach(c => {
+          const sc = c.super_category || 'finance';
+          if (groupedCS[sc]) groupedCS[sc].push(c);
+          else ungroupedCS.push(c);
+        });
+
+        const buildCsCard = (c) => {
           const name  = c.name || c.id;
           const emoji = c.emoji || '📌';
           const desc  = c.description || '곧 만나볼 카테고리입니다.';
@@ -2667,7 +2724,26 @@ async function _initCategoryVisibility() {
               <p class="cat-card-desc">${desc}</p>
               <div class="cat-card-sample">출시 준비 중 ⏳</div>
             </div>`;
+        };
+
+        const csHtml = SUPER_CATS_CS.map(s => {
+          const cats = groupedCS[s.id];
+          if (!cats || cats.length === 0) return '';
+          const header = `<div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:18px 0 6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.15)">
+            <span style="font-size:18px">${s.emoji}</span>
+            <span style="font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px">${s.label}</span>
+            <span style="font-size:11px;color:var(--muted);margin-left:auto">${cats.length}개</span>
+          </div>`;
+          return header + cats.map(buildCsCard).join('');
         }).join('');
+        const csUngroupedHtml = ungroupedCS.length > 0
+          ? `<div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:18px 0 6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.15)">
+              <span style="font-size:18px">📌</span>
+              <span style="font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px">기타</span>
+              <span style="font-size:11px;color:var(--muted);margin-left:auto">${ungroupedCS.length}개</span>
+            </div>` + ungroupedCS.map(buildCsCard).join('')
+          : '';
+        csMainGrid.innerHTML = csHtml + csUngroupedHtml;
       }
     }
 

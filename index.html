@@ -1006,7 +1006,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v82</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v83</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2731,30 +2731,63 @@ async function _initCategoryVisibility() {
         });
     }
 
-    // === 2) 소개 페이지 active 카드 그리드 — 어드민에 등록된 active 카테고리 ===
-    // (기본 4개와 추가 카테고리 모두 동적 렌더)
+    // === 2) 소개 페이지 active 카드 그리드 — 대분류별 그룹핑 ===
     const introActiveGrid = document.getElementById('introActiveGrid');
     if (introActiveGrid) {
       if (activeCats.length === 0) {
         introActiveGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:13px">현재 운영 중인 카테고리가 없습니다.</div>';
       } else {
-        introActiveGrid.innerHTML = activeCats.map(c => {
+        // 대분류 정의 (하드코딩 + 순서)
+        const SUPER_CATS = [
+          { id: 'finance',   emoji: '💼', label: '경제·금융' },
+          { id: 'lifestyle', emoji: '🏠', label: '생활·실용' },
+          { id: 'language',  emoji: '🌐', label: '글로벌·언어' },
+          { id: 'tech',      emoji: '💻', label: '테크·트렌드' },
+        ];
+        // 대분류별로 카테고리 그룹핑
+        const grouped = {};
+        SUPER_CATS.forEach(s => { grouped[s.id] = []; });
+        const ungrouped = [];
+        activeCats.forEach(c => {
+          const sc = c.super_category || 'finance';
+          if (grouped[sc]) grouped[sc].push(c);
+          else ungrouped.push(c);
+        });
+
+        const buildCardHtml = (c) => {
           const id    = c.id;
           const name  = c.name || id;
           const emoji = c.emoji || '📌';
           const desc  = c.description || '매일 새로운 콘텐츠를 만나보세요.';
-          // 정식 4개는 카테고리 페이지 보유 → showCategory로 이동
-          // 그 외(어드민 추가)는 모달 직접 열기
-          const onclick = NAV_CATS.includes(id)
-            ? `openModalWithCategory('${id}')`
-            : `openModalWithCategory('${id}')`;
           return `
-            <div class="cat-card" onclick="${onclick}">
+            <div class="cat-card" onclick="openModalWithCategory('${id}')">
               <div class="cat-card-icon">${emoji}</div>
               <div class="cat-card-name">${name}</div>
               <p class="cat-card-desc">${desc}</p>
             </div>`;
+        };
+
+        // 그리드를 그룹별로 렌더 (각 그룹: 헤더 + 카드 묶음)
+        // introActiveGrid는 grid-column 레이아웃이므로 grid-column:1/-1 헤더 + 카드 순으로
+        const html = SUPER_CATS.map(s => {
+          const cats = grouped[s.id];
+          if (!cats || cats.length === 0) return '';
+          const header = `<div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:18px 0 6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.15)">
+            <span style="font-size:18px">${s.emoji}</span>
+            <span style="font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px">${s.label}</span>
+            <span style="font-size:11px;color:var(--muted);margin-left:auto">${cats.length}개</span>
+          </div>`;
+          return header + cats.map(buildCardHtml).join('');
         }).join('');
+        // 미분류 카테고리 (혹시 super_category가 없는 신규)
+        const ungroupedHtml = ungrouped.length > 0
+          ? `<div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:18px 0 6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.15)">
+              <span style="font-size:18px">📌</span>
+              <span style="font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px">기타</span>
+              <span style="font-size:11px;color:var(--muted);margin-left:auto">${ungrouped.length}개</span>
+            </div>` + ungrouped.map(buildCardHtml).join('')
+          : '';
+        introActiveGrid.innerHTML = html + ungroupedHtml;
       }
     }
 

@@ -1006,7 +1006,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v75</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v77</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1319,9 +1319,9 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
       <div class="plan">
         <div class="plan-name">3개월</div>
         <div class="plan-trial-badge">🎁 3일 무료 체험</div>
-        <div class="plan-price-original">정가 ₩29,700</div>
-        <div class="plan-price"><span class="w">₩</span>14,900</div>
-        <div class="plan-mo">월 환산 약 ₩4,967 · <span style="color:#ff7676;font-weight:700">49.8% 할인</span></div>
+        <div class="plan-price-original" id="price-pkg3m-original">정가 ₩29,700</div>
+        <div class="plan-price"><span class="w">₩</span><span id="price-pkg3m">14,900</span></div>
+        <div class="plan-mo" id="price-pkg3m-mo">월 환산 약 ₩4,967 · <span style="color:#ff7676;font-weight:700">49.8% 할인</span></div>
         <ul class="plan-feats">
           <li>매일 1편 카테고리 콘텐츠</li>
           <li>선택한 카테고리 집중 발송</li>
@@ -1337,9 +1337,9 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
         <div class="plan-badge">🔥 가장 인기</div>
         <div class="plan-name">6개월</div>
         <div class="plan-trial-badge">🎁 3일 무료 체험</div>
-        <div class="plan-price-original">정가 ₩59,400</div>
-        <div class="plan-price"><span class="w">₩</span>24,900</div>
-        <div class="plan-mo">월 환산 ₩4,150 · <span style="color:#ff7676;font-weight:700">58.1% 할인</span></div>
+        <div class="plan-price-original" id="price-pkg6m-original">정가 ₩59,400</div>
+        <div class="plan-price"><span class="w">₩</span><span id="price-pkg6m">24,900</span></div>
+        <div class="plan-mo" id="price-pkg6m-mo">월 환산 ₩4,150 · <span style="color:#ff7676;font-weight:700">58.1% 할인</span></div>
         <ul class="plan-feats">
           <li>매일 1편 카테고리 콘텐츠</li>
           <li>선택한 카테고리 집중 발송</li>
@@ -1354,9 +1354,9 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
       <div class="plan">
         <div class="plan-name">1년</div>
         <div class="plan-trial-badge">🎁 3일 무료 체험</div>
-        <div class="plan-price-original">정가 ₩118,800</div>
-        <div class="plan-price"><span class="w">₩</span>41,900</div>
-        <div class="plan-mo">월 환산 약 ₩3,492 · <span style="color:#ff7676;font-weight:700">64.7% 할인</span></div>
+        <div class="plan-price-original" id="price-pkg1y-original">정가 ₩118,800</div>
+        <div class="plan-price"><span class="w">₩</span><span id="price-pkg1y">41,900</span></div>
+        <div class="plan-mo" id="price-pkg1y-mo">월 환산 약 ₩3,492 · <span style="color:#ff7676;font-weight:700">64.7% 할인</span></div>
         <ul class="plan-feats">
           <li>매일 1편 카테고리 콘텐츠</li>
           <li>선택한 카테고리 집중 발송</li>
@@ -1377,7 +1377,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
         <div class="plan-name">월정액</div>
         <div class="plan-trial-badge">🎁 3일 무료 체험</div>
         <div class="plan-price-original">&nbsp;</div>
-        <div class="plan-price"><span class="w">₩</span>9,900</div>
+        <div class="plan-price"><span class="w">₩</span><span id="price-monthly">9,900</span></div>
         <div class="plan-mo">/ 월 · 자동 결제</div>
         <ul class="plan-feats">
           <li>매일 1편 카테고리 콘텐츠</li>
@@ -2690,7 +2690,7 @@ async function _initCategoryVisibility() {
         .forEach(c => {
           const btn = document.createElement('button');
           btn.className = 'nav-tab nav-tab-dynamic';
-          btn.textContent = `${c.emoji || '📌'} ${c.name}`;
+          btn.textContent = c.name;
           btn.onclick = () => openModalWithCategory(c.id);
           // COMING SOON 버튼 앞에 삽입
           if (comingSoonBtn) {
@@ -2826,6 +2826,70 @@ async function _initCategoryVisibility() {
 }
 // 페이지 로드 시 자동 실행
 document.addEventListener('DOMContentLoaded', _initCategoryVisibility);
+document.addEventListener('DOMContentLoaded', _updatePlanPrices);
+
+async function _updatePlanPrices() {
+  try {
+    if (!API_BASE) return;
+    const r = await fetch(API_BASE + '/admin/categories');
+    if (!r.ok) return;
+    const d = await r.json();
+    const rows = (d && Array.isArray(d.data)) ? d.data : [];
+    // 첫 번째 active 카테고리의 가격 사용 (공통 가격 구조)
+    const active = rows.find(c => (c.visibility || (c.active ? 'active' : 'hidden')) === 'active');
+    if (!active) return;
+
+    const fmt = v => Number(v).toLocaleString('ko-KR');
+    const pct = (orig, price) => orig > 0 ? Math.round((1 - price/orig) * 1000) / 10 : 0;
+
+    // 3개월
+    if (active.pkg3m_price) {
+      const el = document.getElementById('price-pkg3m');
+      const orig = document.getElementById('price-pkg3m-original');
+      const mo = document.getElementById('price-pkg3m-mo');
+      if (el) el.textContent = fmt(active.pkg3m_price);
+      if (orig) orig.textContent = `정가 ₩${fmt(active.pkg3m_original || active.pkg3m_price * 2)}`;
+      if (mo) {
+        const monthly = Math.round(active.pkg3m_price / 3);
+        const discount = pct(active.pkg3m_original, active.pkg3m_price);
+        mo.innerHTML = `월 환산 약 ₩${fmt(monthly)} · <span style="color:#ff7676;font-weight:700">${discount}% 할인</span>`;
+      }
+    }
+    // 6개월
+    if (active.pkg6m_price) {
+      const el = document.getElementById('price-pkg6m');
+      const orig = document.getElementById('price-pkg6m-original');
+      const mo = document.getElementById('price-pkg6m-mo');
+      if (el) el.textContent = fmt(active.pkg6m_price);
+      if (orig) orig.textContent = `정가 ₩${fmt(active.pkg6m_original || active.pkg6m_price * 2)}`;
+      if (mo) {
+        const monthly = Math.round(active.pkg6m_price / 6);
+        const discount = pct(active.pkg6m_original, active.pkg6m_price);
+        mo.innerHTML = `월 환산 ₩${fmt(monthly)} · <span style="color:#ff7676;font-weight:700">${discount}% 할인</span>`;
+      }
+    }
+    // 1년
+    if (active.pkg1y_price) {
+      const el = document.getElementById('price-pkg1y');
+      const orig = document.getElementById('price-pkg1y-original');
+      const mo = document.getElementById('price-pkg1y-mo');
+      if (el) el.textContent = fmt(active.pkg1y_price);
+      if (orig) orig.textContent = `정가 ₩${fmt(active.pkg1y_original || active.pkg1y_price * 2)}`;
+      if (mo) {
+        const monthly = Math.round(active.pkg1y_price / 12);
+        const discount = pct(active.pkg1y_original, active.pkg1y_price);
+        mo.innerHTML = `월 환산 약 ₩${fmt(monthly)} · <span style="color:#ff7676;font-weight:700">${discount}% 할인</span>`;
+      }
+    }
+    // 월정액
+    if (active.monthly_price) {
+      const el = document.getElementById('price-monthly');
+      if (el) el.textContent = fmt(active.monthly_price);
+    }
+  } catch(e) {
+    console.warn('[가격업데이트] 실패:', e);
+  }
+}
 
 // ── 유틸 ─────────────────────────────────────────────────────
 function fmtPhone(el) {

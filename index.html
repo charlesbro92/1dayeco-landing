@@ -1006,7 +1006,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v52</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v53</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -3575,8 +3575,13 @@ async function cancelVerifyPhone() {
         // 백엔드 통신 자체 실패 (404, 500, 네트워크 등)
         console.error('lookup API error:', apiErr);
         // 404 (미등록 또는 이름 불일치) vs 다른 에러 구분
-        const msg = String(apiErr.message || '');
-        if (msg.includes('404') || msg.toLowerCase().includes('not found')) {
+        // apiPost는 응답의 detail 필드를 throw하므로 'not_found'도 미등록 케이스
+        const msg = String(apiErr.message || '').toLowerCase();
+        const isNotFound =
+          msg.includes('404') ||
+          msg.includes('not found') ||
+          msg.includes('not_found');
+        if (isNotFound) {
           errEl.textContent = '입력하신 정보로 가입자를 찾을 수 없습니다. 이름과 전화번호를 다시 확인해 주세요';
         } else {
           errEl.textContent = '서버 연결에 일시적인 문제가 있습니다. 잠시 후 다시 시도하거나 카카오톡 @1DAYECO로 문의해 주세요';

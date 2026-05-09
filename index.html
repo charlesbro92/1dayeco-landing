@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>1DAYECO — 매일 아침 카카오톡으로 받는 1분 인사이트</title>
-<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+<script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
 
@@ -1006,7 +1006,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v60</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v61</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2392,7 +2392,7 @@ const API_BASE        = 'https://web-production-761cd.up.railway.app';
 // 포트원 V2 설정 (포트원 콘솔 > 결제연동 > 연동 정보)
 const PORTONE_STORE_ID    = 'store-3a0615b4-5d94-46c6-9e1b-45da9a7436d7';     // Store ID (V2용)
 const PORTONE_IMP_CODE    = 'imp07247578';     // 가맹점 식별코드 (V1 IMP.init용, imp_xxx 형식 — 포트원 콘솔 > 연동정보 확인)
-const PORTONE_CHANNEL_KEY = 'channel-key-478634ea-2409-42a7-992e-e3f8600d7480';     // 채널키 (예: 'channel-key-aaaa-bbbb-cccc-dddd-eeee')
+const PORTONE_CHANNEL_KEY = 'channel-key-d42d33ea-8ddd-4437-8a5a-f0db5c44c823';     // 채널키 (예: 'channel-key-aaaa-bbbb-cccc-dddd-eeee')
                                      // KG이니시스 테스트 채널 또는 라이브 네이버페이 채널
 const PAYMENT_TEST_MODE   = true;   // true: 테스트 안내 배너 표시, false: 숨김
 
@@ -3045,7 +3045,7 @@ async function submitStep2() {
     showToast('카드 등록 준비 중입니다. 잠시만 기다려주세요.', 'ng');
     return;
   }
-  if (typeof IMP === 'undefined') {
+  if (typeof PortOne === 'undefined') {
     showToast('결제 SDK 로딩 실패. 새로고침 후 다시 시도해주세요.', 'ng');
     return;
   }
@@ -3073,36 +3073,45 @@ async function submitStep2() {
 
   setLoading('step2Btn', 'step2Spin', 'step2BtnTxt', true);
 
-  // [v59] V1 SDK IMP.request_pay로 KG이니시스 빌링키 발급
-  // V2 SDK는 KG이니시스 빌링 미지원 → V1 SDK 사용
-  IMP.init(PORTONE_IMP_CODE);  // V1 SDK: 가맹점 식별코드 (imp_xxx)
+  try {
+    // [v61] 카카오페이 V2 requestIssueBillingKey (간편결제 빌링)
+    const response = await PortOne.requestIssueBillingKey({
+      storeId:          PORTONE_STORE_ID,
+      channelKey:       PORTONE_CHANNEL_KEY,
+      billingKeyMethod: 'EASY_PAY',
+      issueId:          customerUidRef,
+      issueName:        '1DAYECO 카드 등록',
+      customer: {
+        customerId:  customerUidRef,
+        fullName:    buyerName,
+        phoneNumber: buyerTel,
+      },
+      redirectUrl: location.origin + location.pathname + '?billing_complete=1',
+    });
 
-  IMP.request_pay({
-    channelKey:   PORTONE_CHANNEL_KEY,  // UUID 채널키 (V1 최신 SDK 지원)
-    pay_method:   'card',
-    merchant_uid: customerUidRef,
-    customer_uid: customerUidRef,       // 빌링키 발급 필수
-    name:         '1DAYECO 카드 등록',
-    amount:       0,                    // 0원: 카드 등록만, 실결제 없음
-    buyer_name:   buyerName,
-    buyer_tel:    buyerTel,
-    m_redirect_url: location.origin + location.pathname + '?billing_complete=1',
-  }, async function(rsp) {
-    setLoading('step2Btn', 'step2Spin', 'step2BtnTxt', false);
-
-    if (!rsp.success) {
-      const userCancelled = rsp.error_code === 'F0000' ||
-                           (rsp.error_msg && rsp.error_msg.includes('취소'));
+    // 오류/취소
+    if (response && response.code !== undefined) {
+      const userCancelled = response.code === 'PORTONE_FAILED_TO_PROCESS' ||
+                           (response.message && response.message.includes('취소'));
       if (!userCancelled) {
-        showToast(rsp.error_msg || '카드 등록이 취소되었습니다', 'ng');
+        showToast(response.message || '카드 등록이 취소되었습니다', 'ng');
       }
+      setLoading('step2Btn', 'step2Spin', 'step2BtnTxt', false);
       return;
     }
 
-    // 성공: customer_uid가 빌링키 역할
+    // BillingKey 발급 성공
+    const billingKey = response?.billingKey || '';
+    if (!billingKey) {
+      showToast('카드 등록 정보를 가져오지 못했습니다. 다시 시도해주세요.', 'ng');
+      setLoading('step2Btn', 'step2Spin', 'step2BtnTxt', false);
+      return;
+    }
+
+    // 백엔드 verify: BillingKey 저장 + trial 전환
     try {
       const verify = await apiPost('/api/payment/verify', {
-        billing_key:      rsp.customer_uid || customerUidRef,
+        billing_key:      billingKey,
         subscriber_id:    subscriberId,
         customer_uid:     customerUidRef,
         billing_register: false,
@@ -3117,7 +3126,12 @@ async function submitStep2() {
       showToast('카드 등록 검증 중 오류가 발생했습니다. 고객센터로 문의해주세요.', 'ng');
       console.error('verify error:', e);
     }
-  });
+  } catch(e) {
+    console.error('PortOne.requestIssueBillingKey error:', e);
+    showToast(e.message || '카드 등록 처리 중 오류가 발생했습니다', 'ng');
+  } finally {
+    setLoading('step2Btn', 'step2Spin', 'step2BtnTxt', false);
+  }
 }
 
 // ── 모바일 redirect 콜백 처리 V2 (BillingKey 발급 완료 후 복귀) ──

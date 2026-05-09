@@ -267,24 +267,39 @@ nav {
 
 /* 모바일 반응형 */
 @media (max-width: 768px) {
-  nav { padding:12px 16px; gap:8px; }
+  nav {
+    padding:12px 16px;
+    gap:8px;
+    /* 모바일에서 nav 배경 강화 (스크롤 시 콘텐츠 비치지 않도록) */
+    background:rgba(10,10,8,.92);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(201,168,76,.12);
+    /* 좌측: 햄버거, 가운데: 로고, 우측: 빈공간 */
+    justify-content:flex-start;
+    position:fixed;
+  }
   .logo { font-size:16px; letter-spacing:.5px; }
   /* 모바일에서는 가로 스크롤 탭/CTA 숨기고 햄버거만 표시 */
   .nav-tabs { display:none; }
   .nav-cta  { display:none; }
-  .mobile-hamburger { display:flex !important; }
-  /* 로고 가운데 정렬: 좌측 햄버거 영역과 같은 너비를 확보해 정확히 중앙 */
+  /* 햄버거: 좌측 (order로 순서 강제) */
+  .mobile-hamburger {
+    display:flex !important;
+    order:1;
+    margin-left:0;
+  }
+  /* 로고 가운데 정렬 */
   .nav-logo-wrap {
     position:absolute;
     left:50%;
     transform:translateX(-50%);
     pointer-events:none;
+    order:2;
   }
   .nav-logo-wrap .logo,
   .nav-logo-wrap .deploy-badge {
     pointer-events:auto;
   }
-  nav { position:relative; justify-content:flex-end; }
   .category-title { font-size:36px; }
   .category-subtitle { font-size:15px; }
 }
@@ -1164,7 +1179,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap" style="display:flex;align-items:center;gap:8px">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v90</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v91</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>

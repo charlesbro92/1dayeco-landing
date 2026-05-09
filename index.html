@@ -1006,7 +1006,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v67</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v68</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2407,6 +2407,33 @@ HIDDEN_COMINGSOON_MODAL_END -->
             <div id="refundSubName" style="font-size:15px;font-weight:700;margin-bottom:3px"></div>
             <div id="refundSubDetail" style="font-size:12px;color:var(--muted)"></div>
           </div>
+          <!-- 환불액 계산 결과 (API 응답 후 표시) -->
+          <div id="refundCalcBox" style="display:none;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:14px;margin-bottom:14px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:8px">일할 환불액 계산</div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:4px">
+              <span>결제금액</span><span id="refundOrigAmt">—</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:4px">
+              <span>발송 완료</span><span id="refundSentDays">—</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:10px">
+              <span>잔여 발송일</span><span id="refundRemDays">—</span>
+            </div>
+            <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:13px;font-weight:700;color:var(--text)">예상 환불액</span>
+              <span id="refundEstAmt" style="font-size:18px;font-weight:900;color:var(--gold)">—</span>
+            </div>
+            <div style="font-size:10px;color:var(--muted);margin-top:6px">※ 실제 환불액은 고객센터 확인 후 확정됩니다</div>
+          </div>
+          <!-- 계산 로딩 중 -->
+          <div id="refundCalcLoading" style="text-align:center;padding:16px 0;margin-bottom:14px">
+            <span class="spinner" style="border-top-color:var(--gold);width:20px;height:20px"></span>
+            <div style="font-size:12px;color:var(--muted);margin-top:8px">환불액 계산 중...</div>
+          </div>
+          <!-- 계산 실패 시 -->
+          <div id="refundCalcFail" style="display:none;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:12px;font-size:12px;color:var(--muted);margin-bottom:14px">
+            환불액은 고객센터 확인 후 안내드립니다.
+          </div>
           <div style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:13px;font-size:12px;color:var(--text);line-height:1.85;margin-bottom:16px">
             <div style="font-weight:700;color:var(--gold);margin-bottom:6px">⚠️ 환불 요청 전 확인해 주세요</div>
             <div>• 요청 즉시 콘텐츠 발송이 <strong>중단</strong>됩니다</div>
@@ -2416,8 +2443,8 @@ HIDDEN_COMINGSOON_MODAL_END -->
           </div>
           <div style="display:flex;gap:8px">
             <button onclick="cancelGoToStep2()" style="flex:1;background:none;border:1px solid var(--border);color:var(--muted);padding:11px;border-radius:8px;font-size:13px;font-weight:600;font-family:var(--sans);cursor:pointer">돌아가기</button>
-            <button onclick="refundRequest()" id="refundRequestBtn"
-              style="flex:2;background:var(--error);color:#fff;border:none;padding:11px;border-radius:8px;font-size:13px;font-weight:700;font-family:var(--sans);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+            <button onclick="refundRequest()" id="refundRequestBtn" disabled
+              style="flex:2;background:var(--error);color:#fff;border:none;padding:11px;border-radius:8px;font-size:13px;font-weight:700;font-family:var(--sans);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;opacity:.5">
               <span id="refundRequestTxt">환불 요청 접수하기</span>
               <span id="refundRequestSpin" style="display:none"><span class="spinner" style="border-top-color:#fff"></span></span>
             </button>
@@ -3561,23 +3588,32 @@ function switchInfo(tab) {
 // ── Mock DB (개발용) ─────────────────────────────────────────
 const MOCK_SUBS_DB = [
   { id:'sub_mock1', phone:'010-1234-5678', name:'홍길동', plan:'free', status:'trial',
-    trial_end: new Date(Date.now()+3*86400000).toISOString() },
+    trial_end: new Date(Date.now()+3*86400000).toISOString(), categories:['economy'] },
   { id:'sub_mock2', phone:'010-1234-5678', name:'홍길동', plan:'pkg3m', status:'active',
-    end_date: new Date(Date.now()+60*86400000).toISOString() },
+    end_date: new Date(Date.now()+60*86400000).toISOString(), categories:['realestate','english'] },
   { id:'sub_mock3', phone:'010-9876-5432', name:'김테스트', plan:'monthly', status:'trial',
-    trial_end: new Date(Date.now()+4*86400000).toISOString() },
+    trial_end: new Date(Date.now()+4*86400000).toISOString(), categories:['trivia'] },
 ];
 
 // ── 상태 변수 ─────────────────────────────────────────────────
-let cancelCurrentSub  = null;   // 선택된 단일 구독 row
-let cancelFoundList   = [];     // lookup 결과 배열 (다중 구독 대응)
-let _cancelInputName  = '';     // 본인 확인에 입력한 이름
+let cancelCurrentSub  = null;
+let cancelFoundList   = [];
+let _cancelInputName  = '';
 
 // ── 플랜 한글 ─────────────────────────────────────────────────
 const PLAN_MAP = {
   free:'무료 체험', monthly:'1개월', pkg3m:'3개월', pkg6m:'6개월', pkg1y:'1년', yearly:'연간'
 };
 function planLabel(p) { return PLAN_MAP[p] || p || '—'; }
+
+// ── 카테고리 한글 ─────────────────────────────────────────────
+const CAT_MAP = {
+  economy:'경제', realestate:'부동산', english:'영어', trivia:'상식'
+};
+function catLabels(cats) {
+  if (!cats || !cats.length) return '';
+  return cats.map(c => CAT_MAP[c] || c).join(' · ');
+}
 
 // ── 날짜 포맷 ─────────────────────────────────────────────────
 function fmtDate(iso) {
@@ -3586,27 +3622,23 @@ function fmtDate(iso) {
   return isNaN(d.getTime()) ? '—' : d.toLocaleDateString('ko-KR');
 }
 
-// ── 스텝 인디케이터 (최대 4스텝, 유료는 4스텝 / 체험은 3스텝) ──
+// ── 스텝 인디케이터 ───────────────────────────────────────────
 function showCancelStep(step, totalSteps) {
   const total = totalSteps || 3;
-  // 패널 표시/숨김
   [1,2,3,4].forEach(n => {
     const panel = document.getElementById('cancelStep' + n);
     if (panel) panel.style.display = (n === step) ? 'block' : 'none';
   });
-  // 4스텝 라인/dot 표시 제어
   const line34 = document.getElementById('csLine34');
   const dot4   = document.getElementById('csDot4');
   if (line34) line34.style.display = total >= 4 ? '' : 'none';
   if (dot4)   dot4.style.display   = total >= 4 ? '' : 'none';
-
-  // dot 상태 업데이트
   for (let n = 1; n <= total; n++) {
     const dot = document.getElementById('csDot' + n);
     if (!dot) continue;
-    if (n < step)       { dot.className = 'cancel-step-dot done';   dot.textContent = '✓'; }
-    else if (n === step){ dot.className = 'cancel-step-dot active';  dot.textContent = String(n); }
-    else                { dot.className = 'cancel-step-dot';         dot.textContent = String(n); }
+    if (n < step)        { dot.className = 'cancel-step-dot done';   dot.textContent = '✓'; }
+    else if (n === step) { dot.className = 'cancel-step-dot active';  dot.textContent = String(n); }
+    else                 { dot.className = 'cancel-step-dot';         dot.textContent = String(n); }
   }
 }
 
@@ -3635,8 +3667,8 @@ function cancelGoToStep2() {
   if (cancelFoundList.length <= 1) {
     showCancelStep(1, 3);
   } else {
-    showCancelStep(2, cancelFoundList.length > 0 &&
-      cancelFoundList.some(s => s.status === 'active') ? 4 : 3);
+    const hasActive  = cancelFoundList.some(s => s.status === 'active');
+    showCancelStep(2, hasActive ? 4 : 3);
   }
 }
 function cancelGoBack() { showCancelStep(1, 3); }
@@ -3664,10 +3696,7 @@ async function cancelVerifyPhone() {
 
   try {
     let rows = [];
-
     if (API_BASE) {
-      // 백엔드 v53부터 subscriptions 배열 반환
-      // 이전 v52(단일 객체) 응답과 하위 호환 처리
       let res;
       try {
         res = await apiPost('/api/lookup', { phone, name: nameRaw });
@@ -3680,10 +3709,8 @@ async function cancelVerifyPhone() {
         errEl.style.display = 'block';
         return;
       }
-      // v53: { subscriptions: [...] } / v52 호환: { id, status, ... }
       rows = Array.isArray(res.subscriptions) ? res.subscriptions : [res];
     } else {
-      // mock
       await new Promise(r => setTimeout(r, 500));
       rows = MOCK_SUBS_DB.filter(s =>
         s.phone.replace(/-/g, '') === phone &&
@@ -3691,7 +3718,6 @@ async function cancelVerifyPhone() {
       );
     }
 
-    // 처리 가능한 상태만 필터 (cancelled/expired 제외)
     const actionable = rows.filter(s => !['cancelled','expired'].includes(s.status));
     if (!actionable.length) {
       errEl.textContent = rows.length
@@ -3702,18 +3728,15 @@ async function cancelVerifyPhone() {
     }
 
     cancelFoundList = actionable;
-    const hasActive = actionable.some(s => s.status === 'active');
+    const hasActive  = actionable.some(s => s.status === 'active');
     const totalSteps = hasActive ? 4 : 3;
 
     if (actionable.length === 1) {
-      // 구독 1개 → 바로 스텝3으로
-      selectCancelSub(actionable[0], totalSteps, /* skipStep2 */ true);
+      await selectCancelSub(actionable[0], totalSteps, true);
     } else {
-      // 구독 여러 개 → 스텝2에서 선택
       renderSubList(actionable, totalSteps);
       showCancelStep(2, totalSteps);
     }
-
   } catch(e) {
     console.error('cancelVerifyPhone error:', e);
     errEl.textContent = '오류가 발생했습니다. 다시 시도해 주세요';
@@ -3728,14 +3751,15 @@ async function cancelVerifyPhone() {
 function renderSubList(rows, totalSteps) {
   const listEl = document.getElementById('cancelSubList');
   listEl.innerHTML = rows.map((sub, i) => {
-    const isTrial  = sub.status === 'trial';
-    const isActive = sub.status === 'active';
-    const endKey   = isTrial ? (sub.trial_end || sub.trialEnd) : sub.end_date;
-    const endStr   = fmtDate(endKey);
+    const isTrial = sub.status === 'trial';
+    const endKey  = isTrial ? (sub.trial_end || sub.trialEnd) : sub.end_date;
+    const endStr  = fmtDate(endKey);
+    const cats    = catLabels(sub.categories);
     const statusBadge = isTrial
       ? '<span style="background:rgba(251,191,36,.15);color:#F59E0B;border:1px solid rgba(251,191,36,.3);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700">무료 체험 중</span>'
       : '<span style="background:rgba(16,185,129,.12);color:#10B981;border:1px solid rgba(16,185,129,.3);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700">유료 구독 중</span>';
-    const label = isTrial ? `체험 종료일: ${endStr}` : `만료일: ${endStr}`;
+    const endLabel = isTrial ? `체험 종료일: ${endStr}` : `만료일: ${endStr}`;
+    const catLine  = cats ? `<div style="font-size:11px;color:var(--muted);margin-top:3px">카테고리: ${cats}</div>` : '';
     return `
       <button onclick="selectCancelSub(cancelFoundList[${i}], ${totalSteps}, false)"
         style="width:100%;background:rgba(255,255,255,.03);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;text-align:left;cursor:pointer;transition:all .2s;font-family:var(--sans)"
@@ -3745,36 +3769,82 @@ function renderSubList(rows, totalSteps) {
           <span style="font-size:14px;font-weight:700;color:var(--text)">${planLabel(sub.plan)} 플랜</span>
           ${statusBadge}
         </div>
-        <div style="font-size:12px;color:var(--muted)">${label}</div>
+        <div style="font-size:12px;color:var(--muted)">${endLabel}</div>
+        ${catLine}
       </button>`;
   }).join('');
 }
 
-// ── 구독 선택 → 스텝3으로 ────────────────────────────────────
-function selectCancelSub(sub, totalSteps, skipStep2) {
+// ── 구독 선택 → 스텝3 + 환불액 계산 ─────────────────────────
+async function selectCancelSub(sub, totalSteps, skipStep2) {
   cancelCurrentSub = sub;
   cancelCurrentSub._inputName = _cancelInputName;
-  const isTrial  = sub.status === 'trial';
+  const isTrial = sub.status === 'trial';
   const ts = totalSteps || (isTrial ? 3 : 4);
+  const cats = catLabels(sub.categories);
 
   if (isTrial) {
-    // 체험 취소 UI
     document.getElementById('cancelStep3Trial').style.display  = 'block';
     document.getElementById('cancelStep3Refund').style.display = 'none';
     document.getElementById('cancelSubName').textContent = (sub.name || '고객') + ' 님';
     const endStr = fmtDate(sub.trial_end || sub.trialEnd);
     document.getElementById('cancelSubDetail').innerHTML =
-      '플랜: <strong>' + planLabel(sub.plan) + '</strong> &nbsp;|&nbsp; 체험 종료일: <strong>' + endStr + '</strong>';
+      '플랜: <strong>' + planLabel(sub.plan) + '</strong>' +
+      (cats ? ' &nbsp;|&nbsp; 카테고리: <strong>' + cats + '</strong>' : '') +
+      ' &nbsp;|&nbsp; 체험 종료일: <strong>' + endStr + '</strong>';
   } else {
-    // 유료 환불 안내 UI
     document.getElementById('cancelStep3Trial').style.display  = 'none';
     document.getElementById('cancelStep3Refund').style.display = 'block';
     document.getElementById('refundSubName').textContent = (sub.name || '고객') + ' 님';
     const endStr = fmtDate(sub.end_date);
     document.getElementById('refundSubDetail').innerHTML =
-      '플랜: <strong>' + planLabel(sub.plan) + '</strong> &nbsp;|&nbsp; 만료일: <strong>' + endStr + '</strong>';
+      '플랜: <strong>' + planLabel(sub.plan) + '</strong>' +
+      (cats ? ' &nbsp;|&nbsp; 카테고리: <strong>' + cats + '</strong>' : '') +
+      ' &nbsp;|&nbsp; 만료일: <strong>' + endStr + '</strong>';
+
+    // 환불액 계산 UI 초기화
+    document.getElementById('refundCalcBox').style.display     = 'none';
+    document.getElementById('refundCalcLoading').style.display = 'block';
+    document.getElementById('refundCalcFail').style.display    = 'none';
+    const refundBtn = document.getElementById('refundRequestBtn');
+    refundBtn.disabled = true;
+    refundBtn.style.opacity = '.5';
   }
-  showCancelStep(skipStep2 ? 3 : 3, ts);
+  showCancelStep(3, ts);
+
+  // 유료 구독이면 환불액 계산 API 호출
+  if (!isTrial && sub.id) {
+    try {
+      let calcData = null;
+      if (API_BASE) {
+        const r = await fetch(API_BASE + '/api/payment/calculate-refund/' + sub.id,
+          { signal: AbortSignal.timeout(8000) });
+        calcData = r.ok ? await r.json() : null;
+      } else {
+        // mock
+        await new Promise(r => setTimeout(r, 800));
+        calcData = { success: true, paid_amount: 24900, sent_days: 30, remaining_days: 153, total_send_days: 183, refund_amount: 20779 };
+      }
+      if (calcData && calcData.success) {
+        document.getElementById('refundOrigAmt').textContent  = '₩' + (calcData.paid_amount || 0).toLocaleString('ko-KR');
+        document.getElementById('refundSentDays').textContent = (calcData.sent_days || 0) + '일 발송 완료';
+        document.getElementById('refundRemDays').textContent  = (calcData.remaining_days || 0) + '일 남음';
+        document.getElementById('refundEstAmt').textContent   = '₩' + (calcData.refund_amount || 0).toLocaleString('ko-KR');
+        document.getElementById('refundCalcBox').style.display     = 'block';
+        document.getElementById('refundCalcLoading').style.display = 'none';
+      } else {
+        throw new Error('calc failed');
+      }
+    } catch(e) {
+      document.getElementById('refundCalcLoading').style.display = 'none';
+      document.getElementById('refundCalcFail').style.display    = 'block';
+    } finally {
+      // 계산 성공/실패 무관하게 버튼 활성화
+      const refundBtn = document.getElementById('refundRequestBtn');
+      refundBtn.disabled = false;
+      refundBtn.style.opacity = '1';
+    }
+  }
 }
 
 // ── 체험 취소 실행 ────────────────────────────────────────────
@@ -3793,20 +3863,16 @@ async function cancelConfirm() {
     } else {
       await new Promise(r => setTimeout(r, 700));
     }
-    // 완료 화면
     document.getElementById('cancelDoneEmoji').textContent = '✅';
     document.getElementById('cancelDoneTitle').textContent = '체험 취소 완료';
     document.getElementById('cancelDoneMsg').innerHTML =
       '무료 체험이 취소되었습니다.<br>요금은 청구되지 않습니다.<br>언제든지 다시 신청하실 수 있습니다.';
-    showCancelStep(4, 3);  // 체험은 3스텝이지만 완료는 4번 패널
-    // 실제로는 step3이 완료이므로 step4 대신 step3 UI에 완료 결과 표시
-    // → cancelStep4 패널 재사용 (step 번호는 편의상 4로 처리)
-    // 아래 라인에서 실제 패널을 강제로 표시
     document.getElementById('cancelStep3').style.display = 'none';
     document.getElementById('cancelStep4').style.display = 'block';
   } catch(e) {
     console.error('cancelConfirm error:', e);
     showToast((e && e.message) || '취소 처리 중 오류. 카카오톡 @1DAYECO로 문의해 주세요', 'ng');
+  } finally {
     btn.disabled = false;
     spin.style.display = 'none';
   }
@@ -3818,6 +3884,7 @@ async function refundRequest() {
   const btn  = document.getElementById('refundRequestBtn');
   const spin = document.getElementById('refundRequestSpin');
   btn.disabled = true;
+  btn.style.opacity = '.7';
   spin.style.display = 'inline-flex';
   try {
     if (API_BASE) {
@@ -3828,7 +3895,6 @@ async function refundRequest() {
     } else {
       await new Promise(r => setTimeout(r, 700));
     }
-    // 완료 화면
     document.getElementById('cancelDoneEmoji').textContent = '📩';
     document.getElementById('cancelDoneTitle').textContent = '환불 요청 접수 완료';
     document.getElementById('cancelDoneMsg').innerHTML =
@@ -3837,7 +3903,6 @@ async function refundRequest() {
       '문의: <a href="mailto:onedayeco@naver.com" style="color:var(--gold)">onedayeco@naver.com</a>';
     document.getElementById('cancelStep3').style.display = 'none';
     document.getElementById('cancelStep4').style.display = 'block';
-    // 인디케이터 완료 표시
     for (let n = 1; n <= 4; n++) {
       const dot = document.getElementById('csDot' + n);
       if (dot && dot.style.display !== 'none') {
@@ -3848,7 +3913,9 @@ async function refundRequest() {
   } catch(e) {
     console.error('refundRequest error:', e);
     showToast((e && e.message) || '요청 처리 중 오류. 카카오톡 @1DAYECO로 문의해 주세요', 'ng');
+  } finally {
     btn.disabled = false;
+    btn.style.opacity = '1';
     spin.style.display = 'none';
   }
 }

@@ -272,16 +272,19 @@ nav {
   .nav-tabs {
     gap:2px;
     overflow-x:auto;
+    overflow-y:hidden;
     -webkit-overflow-scrolling:touch;
     flex:1 1 auto;
     min-width:0;
     /* 좌측 정렬 강제 (모바일에서 active 탭이 보이도록) */
     justify-content:flex-start;
-    scroll-snap-type:x proximity;
-    scroll-padding-left:8px;
+    /* 가로 스크롤만 허용 (세로 스크롤로 페이지 흔들림 방지) */
+    touch-action:pan-x;
+    /* 스크롤 이벤트가 부모로 전파되지 않도록 격리 */
+    overscroll-behavior:contain;
   }
   .nav-tabs::-webkit-scrollbar { display:none; }
-  .nav-tab { padding:8px 10px; font-size:12px; white-space:nowrap; scroll-snap-align:start; }
+  .nav-tab { padding:8px 10px; font-size:12px; white-space:nowrap; }
   .nav-cta { padding:8px 14px; font-size:12px; }
   .category-title { font-size:36px; }
   .category-subtitle { font-size:15px; }
@@ -971,7 +974,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v42</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v43</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -3582,43 +3585,37 @@ function switchPricingTab(tabName) {
 // 초기 발송 예정일 계산
 updateFirstSendInfo();
 
-// 페이지 로드 시 active nav-tab을 가시 영역으로 스크롤 (모바일에서 첫 탭 보이도록)
-// iOS Safari는 scrollLeft 강제 적용을 무시할 수 있어서 다단계 + RAF로 덮어쓰기
+// 페이지 로드 시 nav-tabs를 좌측(scrollLeft=0)으로 강제 리셋
+// "소개"가 첫 탭이고 디폴트 active이므로 항상 좌측이 정답
 (function ensureActiveNavTabVisible() {
-  function scrollIntoView() {
+  function resetNav() {
     try {
       const tabsWrap = document.querySelector('.nav-tabs');
-      const active   = document.querySelector('.nav-tab.active');
-      if (!tabsWrap || !active) return;
-      // 가로 스크롤 컨테이너에서 active 탭이 시작 위치(왼쪽)에 오도록
-      const target = Math.max(0, active.offsetLeft - 8);
-      tabsWrap.scrollLeft = target;
-      // 한 번 더 보장 (모멘텀 스크롤 / 브라우저 복원 덮어쓰기)
-      requestAnimationFrame(() => {
-        try { tabsWrap.scrollLeft = target; } catch(e) {}
-        requestAnimationFrame(() => {
-          try { tabsWrap.scrollLeft = target; } catch(e) {}
-        });
-      });
+      if (!tabsWrap) return;
+      tabsWrap.scrollLeft = 0;
     } catch(e) { /* noop */ }
   }
   // 브라우저의 자동 스크롤 복원 비활성화
   try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch(e) {}
   // 다단계 적용
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', scrollIntoView);
+    document.addEventListener('DOMContentLoaded', resetNav);
   } else {
-    scrollIntoView();
+    resetNav();
   }
-  window.addEventListener('load', scrollIntoView);
-  setTimeout(scrollIntoView, 50);
-  setTimeout(scrollIntoView, 200);
-  setTimeout(scrollIntoView, 600);
-  setTimeout(scrollIntoView, 1200);
+  window.addEventListener('load', resetNav);
+  // RAF로 다음 프레임에 한 번 더
+  requestAnimationFrame(() => {
+    resetNav();
+    requestAnimationFrame(resetNav);
+  });
+  setTimeout(resetNav, 100);
+  setTimeout(resetNav, 500);
+  setTimeout(resetNav, 1500);
   // pageshow: 뒤로가기/앞으로가기로 돌아왔을 때
   window.addEventListener('pageshow', () => {
-    scrollIntoView();
-    setTimeout(scrollIntoView, 100);
+    resetNav();
+    setTimeout(resetNav, 100);
   });
 })();
 </script>

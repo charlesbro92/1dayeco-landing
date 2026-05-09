@@ -1006,7 +1006,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v63</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v54</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1361,11 +1361,11 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     </div>
   </div>
 
-  <!-- 탭 2: 월 정액 (구독형) -->
+  <!-- 탭 2: 월정액 (구독형) -->
   <div class="plan-panel" id="panel-subscribe">
     <div class="plans-mono">
       <div class="plan">
-        <div class="plan-name">월 정액</div>
+        <div class="plan-name">월정액</div>
         <div class="plan-trial-badge">🎁 3일 무료 체험</div>
         <div class="plan-price-original">&nbsp;</div>
         <div class="plan-price"><span class="w">₩</span>9,900</div>
@@ -2412,7 +2412,8 @@ const PAYMENT_TEST_MODE   = true;   // true: 테스트 안내 배너 표시, fal
 // ── 상태 ─────────────────────────────────────────────────────
 let currentPlan = 'pkg6m';     // 디폴트 6개월
 let subscriberId = null;
-let customerUidRef = null;      // [v54 BillingKey] customer_uid (백엔드 prepare에서 발급)
+let customerUidRef = null;
+let prepareMeta = null;      // [v54 BillingKey] customer_uid (백엔드 prepare에서 발급)
 let paymentReady = false;       // payment_prepare 완료 여부
 let selectedCategories = [];    // 신청 시 선택한 관심사
 const FIXED_SEND_HOUR = 8;      // 발송 시간 고정
@@ -2812,7 +2813,7 @@ function openModal(plan) {
 
   const titles = {
     free:    '무료 체험 시작',  // legacy 호환 (헤더에서 안 쓰지만 안전망)
-    monthly: '월 정액 시작',
+    monthly: '월정액 시작',
     yearly:  '연간 구독 시작',
     pkg3m:   '3개월 일시불 시작',
     pkg6m:   '6개월 일시불 시작',
@@ -2886,7 +2887,7 @@ function closeModal() {
   ['mName','mPhone'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; el&&el.classList.remove('err'); });
   const mAgreeEl = document.getElementById('modalAgree');
   if (mAgreeEl) { mAgreeEl.checked = false; updateModalBtn(); }
-  subscriberId = null; customerKey = null;
+  subscriberId = null; customerKey = null; prepareMeta = null;
 }
 function closeOut(e) { if (e.target.id==='overlay') closeModal(); }
 document.addEventListener('keydown', e => { if(e.key==='Escape') { closeModal(); if(typeof closeInfo==='function') closeInfo(); if(typeof closeCancelFlow==='function') closeCancelFlow(); } });
@@ -2958,8 +2959,9 @@ async function submitStep1() {
     if (res && res.success === false) {
       throw new Error(res.message || '신청 처리 중 오류가 발생했습니다');
     }
-    subscriberId   = res.subscriber_id;
-    customerUidRef = res.customer_uid;    // [v54] BillingKey 발급용 customer_uid
+    subscriberId   = res.subscriber_id || res.temp_id;
+    customerUidRef = res.customer_uid;
+    prepareMeta    = res._meta || null;   // [v51] verify 시 DB INSERT용 가입정보
     paymentReady   = true;
 
     // Step 2로 이동 (결제창 안내)
@@ -3042,9 +3044,10 @@ async function backToStep1() {
       console.warn('signup-cancel 실패 (무시):', e);
     }
   }
-  subscriberId = null;
+  subscriberId   = null;
   customerUidRef = null;
-  paymentReady = false;
+  prepareMeta    = null;
+  paymentReady   = false;
   showStep(1);
 }
 
@@ -3075,6 +3078,7 @@ async function submitStep2() {
     sessionStorage.setItem('billing_ctx', JSON.stringify({
       customerUid:  customerUidRef,
       subscriberId: subscriberId,
+      prepareMeta:  prepareMeta,
       plan:         currentPlan,
       name:         buyerName,
       phone:        buyerTel,
@@ -3128,6 +3132,7 @@ async function submitStep2() {
         subscriber_id:    subscriberId,
         customer_uid:     customerUidRef,
         billing_register: false,
+        _meta:            prepareMeta,   // [v51] DB INSERT용 가입정보 (prepare에서 DB 미저장)
       });
       if (verify && verify.success) {
         try { sessionStorage.removeItem('billing_ctx'); } catch(e) {}
@@ -3213,6 +3218,7 @@ async function submitStep2() {
   apiPost('/api/payment/verify', {
     billing_key:   billingKey,
     subscriber_id: ctx?.subscriberId || '',
+    _meta:         ctx?.prepareMeta || null,
     customer_uid:  ctx?.customerUid  || '',
   })
     .then(verify => {
@@ -3373,7 +3379,7 @@ function onPlanChange() {
 
   // 제목도 갱신
   const titles = {
-    monthly: '월 정액 시작',
+    monthly: '월정액 시작',
     pkg3m:   '3개월 일시불 시작',
     pkg6m:   '6개월 일시불 시작',
     pkg1y:   '12개월 일시불 시작',

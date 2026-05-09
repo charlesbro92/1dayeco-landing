@@ -1006,7 +1006,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v77</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v78</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2184,15 +2184,32 @@ HIDDEN_COMINGSOON_MODAL_END -->
       <div class="field" id="planField">
         <label>구독 플랜 선택 <span style="font-size:11px;color:var(--muted);font-weight:400">(카테고리 1개당)</span></label>
         <select id="mPlan" onchange="onPlanChange()">
-          <option value="monthly">월간 정기결제 — ₩9,900/월</option>
-          <option value="pkg3m">3개월 일시불 — ₩14,900 (49.8% 할인)</option>
-          <option value="pkg6m">6개월 일시불 — ₩24,900 (58.1% 할인) ⭐ 인기</option>
-          <option value="pkg1y">12개월 일시불 — ₩41,900 (64.7% 할인)</option>
+          <option value="monthly">월간 정기결제</option>
+          <option value="pkg3m">3개월 일시불</option>
+          <option value="pkg6m">6개월 일시불 ⭐ 인기</option>
+          <option value="pkg1y">12개월 일시불</option>
         </select>
+        <!-- 할인 요약 줄 -->
+        <div id="planPriceSummary" style="margin-top:8px;padding:10px 14px;background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.2);border-radius:8px;font-size:13px;line-height:1.7;display:none">
+          <span id="planOriginalLine" style="color:var(--muted);text-decoration:line-through;font-size:12px"></span>
+          <span id="planDiscountLine" style="color:#ff7676;font-weight:700;font-size:12px;margin-left:6px"></span><br>
+          <span style="color:var(--text)">최종 결제 </span><span id="planFinalPrice" style="color:var(--gold);font-weight:700;font-size:15px"></span>
+        </div>
       </div>
 
-      <div class="field"><label>이름</label><input type="text" id="mName" placeholder="홍길동"></div>
-      <div class="field"><label>카카오톡 전화번호</label><input type="tel" id="mPhone" placeholder="010-0000-0000" maxlength="13" oninput="fmtPhone(this)"></div>
+      <!-- 이름 + 전화번호 한 줄 5:5 -->
+      <div style="display:flex;gap:10px;margin-bottom:14px">
+        <div style="flex:1">
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">이름</label>
+          <input type="text" id="mName" placeholder="홍길동"
+            style="width:100%;background:var(--s3);border:1px solid var(--b);color:var(--text);padding:11px 14px;border-radius:8px;font-size:14px;outline:none;font-family:var(--sans);box-sizing:border-box">
+        </div>
+        <div style="flex:1">
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">카카오톡 전화번호</label>
+          <input type="tel" id="mPhone" placeholder="010-0000-0000" maxlength="13" oninput="fmtPhone(this)"
+            style="width:100%;background:var(--s3);border:1px solid var(--b);color:var(--text);padding:11px 14px;border-radius:8px;font-size:14px;outline:none;font-family:var(--sans);box-sizing:border-box">
+        </div>
+      </div>
 
       <!-- 관심사 선택 -->
       <div class="field">
@@ -2835,14 +2852,37 @@ async function _updatePlanPrices() {
     if (!r.ok) return;
     const d = await r.json();
     const rows = (d && Array.isArray(d.data)) ? d.data : [];
-    // 첫 번째 active 카테고리의 가격 사용 (공통 가격 구조)
     const active = rows.find(c => (c.visibility || (c.active ? 'active' : 'hidden')) === 'active');
     if (!active) return;
 
     const fmt = v => Number(v).toLocaleString('ko-KR');
     const pct = (orig, price) => orig > 0 ? Math.round((1 - price/orig) * 1000) / 10 : 0;
 
-    // 3개월
+    // 가격 캐시 (모달 플랜 요약에 사용)
+    window._PLAN_PRICES = {
+      monthly: { price: active.monthly_price || 9900,  orig: active.monthly_price || 9900,  months: 1  },
+      pkg3m:   { price: active.pkg3m_price   || 14900, orig: active.pkg3m_original || 29700, months: 3  },
+      pkg6m:   { price: active.pkg6m_price   || 24900, orig: active.pkg6m_original || 59400, months: 6  },
+      pkg1y:   { price: active.pkg1y_price   || 41900, orig: active.pkg1y_original || 118800, months: 12 },
+    };
+
+    // 모달 플랜 select 옵션 텍스트 업데이트
+    const mPlan = document.getElementById('mPlan');
+    if (mPlan) {
+      const labels = {
+        monthly: `월간 정기결제 — ₩${fmt(window._PLAN_PRICES.monthly.price)}/월`,
+        pkg3m:   `3개월 일시불 — ₩${fmt(window._PLAN_PRICES.pkg3m.price)} (${pct(window._PLAN_PRICES.pkg3m.orig, window._PLAN_PRICES.pkg3m.price)}% 할인)`,
+        pkg6m:   `6개월 일시불 — ₩${fmt(window._PLAN_PRICES.pkg6m.price)} (${pct(window._PLAN_PRICES.pkg6m.orig, window._PLAN_PRICES.pkg6m.price)}% 할인) ⭐ 인기`,
+        pkg1y:   `12개월 일시불 — ₩${fmt(window._PLAN_PRICES.pkg1y.price)} (${pct(window._PLAN_PRICES.pkg1y.orig, window._PLAN_PRICES.pkg1y.price)}% 할인)`,
+      };
+      mPlan.querySelectorAll('option').forEach(opt => {
+        if (labels[opt.value]) opt.textContent = labels[opt.value];
+      });
+      // 현재 선택된 플랜 요약 업데이트
+      updatePlanSummary(mPlan.value);
+    }
+
+    // 랜딩 가격표 업데이트
     if (active.pkg3m_price) {
       const el = document.getElementById('price-pkg3m');
       const orig = document.getElementById('price-pkg3m-original');
@@ -2855,7 +2895,6 @@ async function _updatePlanPrices() {
         mo.innerHTML = `월 환산 약 ₩${fmt(monthly)} · <span style="color:#ff7676;font-weight:700">${discount}% 할인</span>`;
       }
     }
-    // 6개월
     if (active.pkg6m_price) {
       const el = document.getElementById('price-pkg6m');
       const orig = document.getElementById('price-pkg6m-original');
@@ -2868,7 +2907,6 @@ async function _updatePlanPrices() {
         mo.innerHTML = `월 환산 ₩${fmt(monthly)} · <span style="color:#ff7676;font-weight:700">${discount}% 할인</span>`;
       }
     }
-    // 1년
     if (active.pkg1y_price) {
       const el = document.getElementById('price-pkg1y');
       const orig = document.getElementById('price-pkg1y-original');
@@ -2881,7 +2919,6 @@ async function _updatePlanPrices() {
         mo.innerHTML = `월 환산 약 ₩${fmt(monthly)} · <span style="color:#ff7676;font-weight:700">${discount}% 할인</span>`;
       }
     }
-    // 월정액
     if (active.monthly_price) {
       const el = document.getElementById('price-monthly');
       if (el) el.textContent = fmt(active.monthly_price);
@@ -2889,6 +2926,32 @@ async function _updatePlanPrices() {
   } catch(e) {
     console.warn('[가격업데이트] 실패:', e);
   }
+}
+
+// 플랜 선택 시 할인 요약 업데이트
+function updatePlanSummary(plan) {
+  const summary = document.getElementById('planPriceSummary');
+  const origEl  = document.getElementById('planOriginalLine');
+  const discEl  = document.getElementById('planDiscountLine');
+  const finalEl = document.getElementById('planFinalPrice');
+  if (!summary) return;
+
+  const prices = window._PLAN_PRICES;
+  if (!prices || !prices[plan]) { summary.style.display = 'none'; return; }
+
+  const { price, orig, months } = prices[plan];
+  const fmt = v => Number(v).toLocaleString('ko-KR');
+  const pct = orig > 0 ? Math.round((1 - price/orig) * 1000) / 10 : 0;
+
+  if (plan === 'monthly') {
+    summary.style.display = 'none'; // 월정액은 할인 없음
+    return;
+  }
+  const saved = orig - price;
+  summary.style.display = 'block';
+  origEl.textContent  = `정가 ₩${fmt(orig)}`;
+  discEl.textContent  = `${pct}% 할인 (₩${fmt(saved)} 절약)`;
+  finalEl.textContent = `₩${fmt(price)}`;
 }
 
 // ── 유틸 ─────────────────────────────────────────────────────
@@ -3565,15 +3628,20 @@ function updateModalBtn() {
 // 플랜 변경 시 안내 갱신
 function onPlanChange() {
   const plan = document.getElementById('mPlan')?.value;
-  // 전역 플랜 변수 업데이트
   if (typeof currentPlan !== 'undefined') currentPlan = plan;
 
-  // 모달 desc 갱신 (선택한 플랜에 맞춰, 톤다운)
+  // 할인 요약 업데이트
+  updatePlanSummary(plan);
+
+  // 모달 desc 갱신 (가격은 _PLAN_PRICES에서 동적으로)
+  const prices = window._PLAN_PRICES;
+  const fmt = v => Number(v).toLocaleString('ko-KR');
+  const getPrice = p => prices && prices[p] ? `₩${fmt(prices[p].price)}` : '';
   const descs = {
-    monthly: '전화번호를 등록하면 <strong>내일 아침 첫 메시지</strong>를 보내드립니다. 결제 즉시 발송이 시작됩니다 (₩9,900 일회성, 30일 발송).',
-    pkg3m:   '전화번호를 등록하면 <strong>내일 아침 첫 메시지</strong>를 보내드립니다. 3일 무료 체험 후 ₩14,900 일시불 결제됩니다.',
-    pkg6m:   '전화번호를 등록하면 <strong>내일 아침 첫 메시지</strong>를 보내드립니다. 3일 무료 체험 후 ₩24,900 일시불 결제됩니다.',
-    pkg1y:   '전화번호를 등록하면 <strong>내일 아침 첫 메시지</strong>를 보내드립니다. 3일 무료 체험 후 ₩41,900 일시불 결제됩니다.',
+    monthly: `전화번호를 등록하면 <strong>내일 아침 첫 메시지</strong>를 보내드립니다. 결제 즉시 발송이 시작됩니다 (${getPrice('monthly') || '₩9,900'} 일회성, 30일 발송).`,
+    pkg3m:   `전화번호를 등록하면 <strong>내일 아침 첫 메시지</strong>를 보내드립니다. 3일 무료 체험 후 ${getPrice('pkg3m') || '₩14,900'} 일시불 결제됩니다.`,
+    pkg6m:   `전화번호를 등록하면 <strong>내일 아침 첫 메시지</strong>를 보내드립니다. 3일 무료 체험 후 ${getPrice('pkg6m') || '₩24,900'} 일시불 결제됩니다.`,
+    pkg1y:   `전화번호를 등록하면 <strong>내일 아침 첫 메시지</strong>를 보내드립니다. 3일 무료 체험 후 ${getPrice('pkg1y') || '₩41,900'} 일시불 결제됩니다.`,
   };
   const descEl = document.getElementById('modalDesc');
   if (descEl && descs[plan]) descEl.innerHTML = descs[plan];

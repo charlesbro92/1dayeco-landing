@@ -2103,7 +2103,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     <a onclick="openInfo('terms');return false;" href="#">이용약관</a>
     <a onclick="openInfo('privacy');return false;" href="#">개인정보처리방침</a>
     <a onclick="openInfo('cs');return false;" href="#">고객센터</a>
-    <a onclick="openCancelFlow();return false;" href="#" style="color:var(--error);opacity:.7">체험 취소</a>
+    <a onclick="openCancelFlow();return false;" href="#" style="color:var(--error);opacity:.7">취소 / 환불 요청</a>
   </div>
   <div class="foot-bizinfo">
     <div class="foot-row"><span>상호</span> 원데이에코(1DAYECO) <span class="foot-sep">·</span> <span>대표</span> 박권호</div>
@@ -2316,24 +2316,29 @@ HIDDEN_COMINGSOON_MODAL_END -->
 </div>
 
 <!-- ── 정보 팝업 ── -->
-<!-- ── 체험 취소 팝업 ── -->
+<!-- ── 취소 / 환불 요청 팝업 ── -->
 <div class="info-overlay" id="cancelOverlay" onclick="if(event.target.id==='cancelOverlay')closeCancelFlow()">
   <div class="info-modal" style="max-width:440px">
     <div class="info-header">
-      <div style="font-size:15px;font-weight:700">체험 취소</div>
-      <button onclick="closeCancelFlow()" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px;transition:color .2s" onmouseover="this.style.color=\'var(--text)\'" onmouseout="this.style.color=\'var(--muted)\'">✕</button>
+      <div style="font-size:15px;font-weight:700">취소 / 환불 요청</div>
+      <button onclick="closeCancelFlow()" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px;transition:color .2s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">✕</button>
     </div>
     <div style="padding:24px 22px">
+      <!-- 스텝 인디케이터: 최대 4스텝 (스텝4는 환불 안내, 체험은 3스텝) -->
       <div class="cancel-step" id="cancelStepInd">
         <div class="cancel-step-dot active" id="csDot1">1</div>
         <div class="cancel-step-line"></div>
         <div class="cancel-step-dot" id="csDot2">2</div>
-        <div class="cancel-step-line"></div>
+        <div class="cancel-step-line" id="csLine23"></div>
         <div class="cancel-step-dot" id="csDot3">3</div>
+        <div class="cancel-step-line" id="csLine34" style="display:none"></div>
+        <div class="cancel-step-dot" id="csDot4" style="display:none">4</div>
       </div>
+
+      <!-- ── 스텝 1: 본인 확인 ── -->
       <div id="cancelStep1">
         <div style="font-size:14px;font-weight:700;margin-bottom:8px">본인 확인</div>
-        <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:18px">체험 신청 시 등록한 <strong style="color:var(--text)">이름과 전화번호</strong>를 입력해 주세요. 무료 체험 기간 내 취소 시 요금이 청구되지 않습니다.</p>
+        <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:18px">신청 시 등록한 <strong style="color:var(--text)">이름과 전화번호</strong>를 입력해 주세요.</p>
         <div style="margin-bottom:12px">
           <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:6px">이름</label>
           <input type="text" id="cancelName" placeholder="홍길동" maxlength="20"
@@ -2346,7 +2351,7 @@ HIDDEN_COMINGSOON_MODAL_END -->
             oninput="fmtPhone(this)" onkeydown="if(event.key==='Enter')cancelVerifyPhone()"
             class="cancel-phone-input"
             style="width:100%;background:rgba(255,255,255,.05);border:1.5px solid var(--border);border-radius:8px;padding:12px 16px;font-size:15px;color:var(--text);font-family:var(--sans);outline:none;transition:border-color .2s">
-          <div id="cancelPhoneErr" style="font-size:11px;color:var(--error);margin-top:5px;display:none">등록된 전화번호를 찾을 수 없습니다</div>
+          <div id="cancelPhoneErr" style="font-size:11px;color:var(--error);margin-top:5px;display:none"></div>
         </div>
         <button onclick="cancelVerifyPhone()" id="cancelVerifyBtn"
           style="width:100%;background:var(--error);color:#fff;border:none;padding:12px;border-radius:8px;font-size:14px;font-weight:700;font-family:var(--sans);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
@@ -2354,29 +2359,68 @@ HIDDEN_COMINGSOON_MODAL_END -->
           <span id="cancelVerifySpin" style="display:none"><span class="spinner" style="border-top-color:#fff"></span></span>
         </button>
       </div>
+
+      <!-- ── 스텝 2: 구독 선택 (다중 구독 시) / 자동 진행 (1개 시) ── -->
       <div id="cancelStep2" style="display:none">
-        <div style="font-size:14px;font-weight:700;margin-bottom:8px">체험 취소 확인</div>
-        <div id="cancelSubInfo" style="background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2);border-radius:10px;padding:14px;margin-bottom:14px">
-          <div style="font-size:11px;color:var(--muted);margin-bottom:6px">취소 대상</div>
-          <div id="cancelSubName" style="font-size:15px;font-weight:700;margin-bottom:3px"></div>
-          <div id="cancelSubDetail" style="font-size:12px;color:var(--muted)"></div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px">구독 선택</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:14px">처리할 구독을 선택해 주세요.</p>
+        <div id="cancelSubList" style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px"></div>
+        <button onclick="cancelGoBack()" style="width:100%;background:none;border:1px solid var(--border);color:var(--muted);padding:11px;border-radius:8px;font-size:13px;font-weight:600;font-family:var(--sans);cursor:pointer">돌아가기</button>
+      </div>
+
+      <!-- ── 스텝 3: 확인 (체험 취소 or 환불 안내) ── -->
+      <div id="cancelStep3" style="display:none">
+        <!-- 체험 취소 UI -->
+        <div id="cancelStep3Trial">
+          <div style="font-size:14px;font-weight:700;margin-bottom:8px">체험 취소 확인</div>
+          <div style="background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2);border-radius:10px;padding:14px;margin-bottom:14px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px">취소 대상</div>
+            <div id="cancelSubName" style="font-size:15px;font-weight:700;margin-bottom:3px"></div>
+            <div id="cancelSubDetail" style="font-size:12px;color:var(--muted)"></div>
+          </div>
+          <div style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:12px;font-size:12px;color:var(--amber);line-height:1.7;margin-bottom:16px">
+            ⚠️ 취소 즉시 발송이 중단됩니다. 무료 체험 기간 내 취소이므로 요금이 청구되지 않습니다.
+          </div>
+          <div style="display:flex;gap:8px">
+            <button onclick="cancelGoToStep2()" style="flex:1;background:none;border:1px solid var(--border);color:var(--muted);padding:11px;border-radius:8px;font-size:13px;font-weight:600;font-family:var(--sans);cursor:pointer">돌아가기</button>
+            <button onclick="cancelConfirm()" id="cancelConfirmBtn"
+              style="flex:2;background:var(--error);color:#fff;border:none;padding:11px;border-radius:8px;font-size:13px;font-weight:700;font-family:var(--sans);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+              <span id="cancelConfirmTxt">체험 취소하기</span>
+              <span id="cancelConfirmSpin" style="display:none"><span class="spinner" style="border-top-color:#fff"></span></span>
+            </button>
+          </div>
         </div>
-        <div style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:12px;font-size:12px;color:var(--amber);line-height:1.7;margin-bottom:16px">
-          ⚠️ 취소 즉시 발송이 중단됩니다. 무료 체험 기간 내 취소이므로 요금이 청구되지 않습니다.
-        </div>
-        <div style="display:flex;gap:8px">
-          <button onclick="cancelGoBack()" style="flex:1;background:none;border:1px solid var(--border);color:var(--muted);padding:11px;border-radius:8px;font-size:13px;font-weight:600;font-family:var(--sans);cursor:pointer">돌아가기</button>
-          <button onclick="cancelConfirm()" id="cancelConfirmBtn"
-            style="flex:2;background:var(--error);color:#fff;border:none;padding:11px;border-radius:8px;font-size:13px;font-weight:700;font-family:var(--sans);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
-            <span id="cancelConfirmTxt">체험 취소하기</span>
-            <span id="cancelConfirmSpin" style="display:none"><span class="spinner" style="border-top-color:#fff"></span></span>
-          </button>
+        <!-- 유료 구독 환불 안내 UI -->
+        <div id="cancelStep3Refund" style="display:none">
+          <div style="font-size:14px;font-weight:700;margin-bottom:10px">환불 안내</div>
+          <div style="background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.2);border-radius:10px;padding:14px;margin-bottom:14px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px">환불 요청 대상</div>
+            <div id="refundSubName" style="font-size:15px;font-weight:700;margin-bottom:3px"></div>
+            <div id="refundSubDetail" style="font-size:12px;color:var(--muted)"></div>
+          </div>
+          <div style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:8px;padding:13px;font-size:12px;color:var(--text);line-height:1.85;margin-bottom:16px">
+            <div style="font-weight:700;color:var(--gold);margin-bottom:6px">⚠️ 환불 요청 전 확인해 주세요</div>
+            <div>• 요청 즉시 콘텐츠 발송이 <strong>중단</strong>됩니다</div>
+            <div>• 영업일 1~2일 이내 고객센터에서 연락드립니다</div>
+            <div>• 잔여 발송일 기준 일할 계산으로 환불됩니다</div>
+            <div>• 카드사 입금까지 <strong>영업일 5~7일</strong> 소요됩니다</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button onclick="cancelGoToStep2()" style="flex:1;background:none;border:1px solid var(--border);color:var(--muted);padding:11px;border-radius:8px;font-size:13px;font-weight:600;font-family:var(--sans);cursor:pointer">돌아가기</button>
+            <button onclick="refundRequest()" id="refundRequestBtn"
+              style="flex:2;background:var(--error);color:#fff;border:none;padding:11px;border-radius:8px;font-size:13px;font-weight:700;font-family:var(--sans);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+              <span id="refundRequestTxt">환불 요청 접수하기</span>
+              <span id="refundRequestSpin" style="display:none"><span class="spinner" style="border-top-color:#fff"></span></span>
+            </button>
+          </div>
         </div>
       </div>
-      <div id="cancelStep3" style="display:none;text-align:center;padding:10px 0">
-        <div style="font-size:44px;margin-bottom:14px">✅</div>
-        <div style="font-size:16px;font-weight:700;margin-bottom:8px">체험 취소 완료</div>
-        <p style="font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:20px">무료 체험이 취소되었습니다.<br>요금은 청구되지 않습니다.<br>언제든지 다시 신청하실 수 있습니다.</p>
+
+      <!-- ── 스텝 4: 완료 ── -->
+      <div id="cancelStep4" style="display:none;text-align:center;padding:10px 0">
+        <div style="font-size:44px;margin-bottom:14px" id="cancelDoneEmoji">✅</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:8px" id="cancelDoneTitle">완료</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.75;margin-bottom:20px" id="cancelDoneMsg"></p>
         <button onclick="closeCancelFlow()" style="background:var(--gold);color:var(--dark);border:none;padding:11px 32px;border-radius:8px;font-size:13px;font-weight:700;font-family:var(--sans);cursor:pointer">확인</button>
       </div>
     </div>
@@ -3505,135 +3549,162 @@ function switchInfo(tab) {
 }
 
 // ── 체험 취소 로직 ────────────────────────────────────────────
+// ── Mock DB (개발용) ─────────────────────────────────────────
 const MOCK_SUBS_DB = [
-  { phone:'010-1234-5678', name:'홍길동', plan:'free', status:'trial',
-    trialEnd: new Date(Date.now()+3*86400000) },
-  { phone:'010-9876-5432', name:'김테스트', plan:'monthly', status:'trial',
-    trialEnd: new Date(Date.now()+4*86400000) },
+  { id:'sub_mock1', phone:'010-1234-5678', name:'홍길동', plan:'free', status:'trial',
+    trial_end: new Date(Date.now()+3*86400000).toISOString() },
+  { id:'sub_mock2', phone:'010-1234-5678', name:'홍길동', plan:'pkg3m', status:'active',
+    end_date: new Date(Date.now()+60*86400000).toISOString() },
+  { id:'sub_mock3', phone:'010-9876-5432', name:'김테스트', plan:'monthly', status:'trial',
+    trial_end: new Date(Date.now()+4*86400000).toISOString() },
 ];
-let cancelCurrentSub = null;
 
+// ── 상태 변수 ─────────────────────────────────────────────────
+let cancelCurrentSub  = null;   // 선택된 단일 구독 row
+let cancelFoundList   = [];     // lookup 결과 배열 (다중 구독 대응)
+let _cancelInputName  = '';     // 본인 확인에 입력한 이름
+
+// ── 플랜 한글 ─────────────────────────────────────────────────
+const PLAN_MAP = {
+  free:'무료 체험', monthly:'1개월', pkg3m:'3개월', pkg6m:'6개월', pkg1y:'1년', yearly:'연간'
+};
+function planLabel(p) { return PLAN_MAP[p] || p || '—'; }
+
+// ── 날짜 포맷 ─────────────────────────────────────────────────
+function fmtDate(iso) {
+  if (!iso) return '—';
+  const d = (iso instanceof Date) ? iso : new Date(iso);
+  return isNaN(d.getTime()) ? '—' : d.toLocaleDateString('ko-KR');
+}
+
+// ── 스텝 인디케이터 (최대 4스텝, 유료는 4스텝 / 체험은 3스텝) ──
+function showCancelStep(step, totalSteps) {
+  const total = totalSteps || 3;
+  // 패널 표시/숨김
+  [1,2,3,4].forEach(n => {
+    const panel = document.getElementById('cancelStep' + n);
+    if (panel) panel.style.display = (n === step) ? 'block' : 'none';
+  });
+  // 4스텝 라인/dot 표시 제어
+  const line34 = document.getElementById('csLine34');
+  const dot4   = document.getElementById('csDot4');
+  if (line34) line34.style.display = total >= 4 ? '' : 'none';
+  if (dot4)   dot4.style.display   = total >= 4 ? '' : 'none';
+
+  // dot 상태 업데이트
+  for (let n = 1; n <= total; n++) {
+    const dot = document.getElementById('csDot' + n);
+    if (!dot) continue;
+    if (n < step)       { dot.className = 'cancel-step-dot done';   dot.textContent = '✓'; }
+    else if (n === step){ dot.className = 'cancel-step-dot active';  dot.textContent = String(n); }
+    else                { dot.className = 'cancel-step-dot';         dot.textContent = String(n); }
+  }
+}
+
+// ── 모달 열기/닫기 ─────────────────────────────────────────────
 function openCancelFlow() {
   cancelCurrentSub = null;
-  showCancelStep(1);
-  const nameEl = document.getElementById('cancelName');
-  const ph = document.getElementById('cancelPhone');
-  if (nameEl) nameEl.value = '';
-  if (ph) ph.value = '';
+  cancelFoundList  = [];
+  _cancelInputName = '';
+  document.getElementById('cancelName').value  = '';
+  document.getElementById('cancelPhone').value = '';
   const err = document.getElementById('cancelPhoneErr');
-  if (err) err.style.display = 'none';
+  if (err) { err.textContent = ''; err.style.display = 'none'; }
+  showCancelStep(1, 3);
   document.getElementById('cancelOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
-  // 이름부터 입력하도록 focus (모바일에서 키보드 자동 안 뜨는 케이스 대비)
-  setTimeout(() => nameEl && nameEl.focus(), 300);
+  setTimeout(() => document.getElementById('cancelName').focus(), 300);
 }
 function closeCancelFlow() {
   document.getElementById('cancelOverlay').classList.remove('open');
   document.body.style.overflow = '';
   cancelCurrentSub = null;
 }
-function showCancelStep(step) {
-  [1,2,3].forEach(n => {
-    const panel = document.getElementById('cancelStep' + n);
-    if (panel) panel.style.display = n === step ? 'block' : 'none';
-    const dot = document.getElementById('csDot' + n);
-    if (!dot) return;
-    dot.className = 'cancel-step-dot' + (n < step ? ' done' : n === step ? ' active' : '');
-    dot.textContent = n < step ? '✓' : String(n);
-  });
-}
-function cancelGoBack() { showCancelStep(1); }
 
+// ── 스텝2 돌아가기 ────────────────────────────────────────────
+function cancelGoToStep2() {
+  if (cancelFoundList.length <= 1) {
+    showCancelStep(1, 3);
+  } else {
+    showCancelStep(2, cancelFoundList.length > 0 &&
+      cancelFoundList.some(s => s.status === 'active') ? 4 : 3);
+  }
+}
+function cancelGoBack() { showCancelStep(1, 3); }
+
+// ── 스텝1: 본인 확인 ─────────────────────────────────────────
 async function cancelVerifyPhone() {
-  const nameRaw  = (document.getElementById('cancelName').value || '').trim();
+  const nameRaw  = (document.getElementById('cancelName').value  || '').trim();
   const phoneRaw = document.getElementById('cancelPhone').value.trim();
-  const phone    = phoneRaw.replace(/-/g, '');  // 백엔드에는 하이픈 없이 전송
-  const errEl = document.getElementById('cancelPhoneErr');
-  const btn   = document.getElementById('cancelVerifyBtn');
-  const spin  = document.getElementById('cancelVerifySpin');
-  // 이름 검증
+  const phone    = phoneRaw.replace(/-/g, '');
+  const errEl    = document.getElementById('cancelPhoneErr');
+  const btn      = document.getElementById('cancelVerifyBtn');
+  const spin     = document.getElementById('cancelVerifySpin');
+
   if (!nameRaw) {
-    errEl.textContent = '이름을 입력해 주세요';
-    errEl.style.display = 'block'; return;
+    errEl.textContent = '이름을 입력해 주세요'; errEl.style.display = 'block'; return;
   }
   if (phoneRaw.length < 12) {
     errEl.textContent = '올바른 전화번호를 입력해 주세요 (예: 010-1234-5678)';
     errEl.style.display = 'block'; return;
   }
-  // 로딩: 버튼 disable + spinner inline-flex로 보이게 (텍스트는 유지)
   btn.disabled = true;
   spin.style.display = 'inline-flex';
   errEl.style.display = 'none';
+  _cancelInputName = nameRaw;
+
   try {
-    let found = null;
+    let rows = [];
+
     if (API_BASE) {
-      // 백엔드 호출 (lookup은 phone+name으로 본인 확인)
+      // 백엔드 v53부터 subscriptions 배열 반환
+      // 이전 v52(단일 객체) 응답과 하위 호환 처리
+      let res;
       try {
-        found = await apiPost('/api/lookup', { phone, name: nameRaw });
+        res = await apiPost('/api/lookup', { phone, name: nameRaw });
       } catch (apiErr) {
-        // 백엔드 통신 자체 실패 (404, 500, 네트워크 등)
-        console.error('lookup API error:', apiErr);
-        // 404 (미등록 또는 이름 불일치) vs 다른 에러 구분
-        // apiPost는 응답의 detail 필드를 throw하므로 'not_found'도 미등록 케이스
         const msg = String(apiErr.message || '').toLowerCase();
-        const isNotFound =
-          msg.includes('404') ||
-          msg.includes('not found') ||
-          msg.includes('not_found');
-        if (isNotFound) {
-          errEl.textContent = '입력하신 정보로 가입자를 찾을 수 없습니다. 이름과 전화번호를 다시 확인해 주세요';
-        } else {
-          errEl.textContent = '서버 연결에 일시적인 문제가 있습니다. 잠시 후 다시 시도하거나 카카오톡 @1DAYECO로 문의해 주세요';
-        }
+        const isNotFound = msg.includes('404') || msg.includes('not_found') || msg.includes('not found');
+        errEl.textContent = isNotFound
+          ? '입력하신 정보로 가입자를 찾을 수 없습니다. 이름과 전화번호를 다시 확인해 주세요'
+          : '서버 연결에 일시적인 문제가 있습니다. 잠시 후 다시 시도하거나 카카오톡 @1DAYECO로 문의해 주세요';
         errEl.style.display = 'block';
         return;
       }
+      // v53: { subscriptions: [...] } / v52 호환: { id, status, ... }
+      rows = Array.isArray(res.subscriptions) ? res.subscriptions : [res];
     } else {
-      // 로컬 mock (개발용)
+      // mock
       await new Promise(r => setTimeout(r, 500));
-      found = MOCK_SUBS_DB.find(s =>
+      rows = MOCK_SUBS_DB.filter(s =>
         s.phone.replace(/-/g, '') === phone &&
         (s.name || '').replace(/\s/g, '').toLowerCase() === nameRaw.replace(/\s/g, '').toLowerCase()
       );
     }
 
-    if (!found) {
-      errEl.textContent = '입력하신 정보로 가입자를 찾을 수 없습니다. 이름과 전화번호를 다시 확인해 주세요';
-      errEl.style.display = 'block'; return;
-    }
-    // 백엔드는 status를 active/cancelled 등으로 보낼 수 있음 → trial 상태 검증 완화
-    // 체험 종료 후(active 상태)는 유료 구독이므로 별도 안내
-    if (found.status === 'cancelled' || found.status === 'expired') {
-      errEl.textContent = '이미 취소되었거나 만료된 구독입니다';
-      errEl.style.display = 'block'; return;
-    }
-    if (found.status && found.status !== 'trial' && found.status !== 'active') {
-      errEl.textContent = '구독 상태를 확인할 수 없습니다. 카카오톡 @1DAYECO로 문의해 주세요';
-      errEl.style.display = 'block'; return;
-    }
-    // 무료 체험 중이 아닌 유료 구독자는 직접 취소 불가 → 고객센터 안내
-    if (found.status === 'active') {
-      errEl.textContent = '유료 구독은 카카오톡 @1DAYECO로 문의해 주세요';
-      errEl.style.display = 'block'; return;
+    // 처리 가능한 상태만 필터 (cancelled/expired 제외)
+    const actionable = rows.filter(s => !['cancelled','expired'].includes(s.status));
+    if (!actionable.length) {
+      errEl.textContent = rows.length
+        ? '이미 취소되었거나 만료된 구독입니다'
+        : '입력하신 정보로 가입자를 찾을 수 없습니다. 이름과 전화번호를 다시 확인해 주세요';
+      errEl.style.display = 'block';
+      return;
     }
 
-    cancelCurrentSub = found;
-    // 입력한 이름도 같이 저장 (cancelConfirm에서 다시 검증용)
-    cancelCurrentSub._inputName = nameRaw;
-    document.getElementById('cancelSubName').textContent = (found.name || '고객') + ' 님';
-    // trial_end가 string(ISO) / Date / 없을 수 있음
-    let endStr = '—';
-    const te = found.trialEnd || found.trial_end;
-    if (te) {
-      const d = (te instanceof Date) ? te : new Date(te);
-      if (!isNaN(d.getTime())) endStr = d.toLocaleDateString('ko-KR');
+    cancelFoundList = actionable;
+    const hasActive = actionable.some(s => s.status === 'active');
+    const totalSteps = hasActive ? 4 : 3;
+
+    if (actionable.length === 1) {
+      // 구독 1개 → 바로 스텝3으로
+      selectCancelSub(actionable[0], totalSteps, /* skipStep2 */ true);
+    } else {
+      // 구독 여러 개 → 스텝2에서 선택
+      renderSubList(actionable, totalSteps);
+      showCancelStep(2, totalSteps);
     }
-    const planMap = {free:'무료 체험', monthly:'월간 구독', yearly:'연간 구독',
-                     pkg3m:'3개월', pkg6m:'6개월', pkg1y:'1년'};
-    document.getElementById('cancelSubDetail').innerHTML =
-      '플랜: <strong>' + (planMap[found.plan] || found.plan || '—') +
-      '</strong> &nbsp;|&nbsp; 체험 종료일: <strong>' + endStr + '</strong>';
-    showCancelStep(2);
+
   } catch(e) {
     console.error('cancelVerifyPhone error:', e);
     errEl.textContent = '오류가 발생했습니다. 다시 시도해 주세요';
@@ -3644,6 +3715,60 @@ async function cancelVerifyPhone() {
   }
 }
 
+// ── 스텝2: 구독 목록 렌더링 ───────────────────────────────────
+function renderSubList(rows, totalSteps) {
+  const listEl = document.getElementById('cancelSubList');
+  listEl.innerHTML = rows.map((sub, i) => {
+    const isTrial  = sub.status === 'trial';
+    const isActive = sub.status === 'active';
+    const endKey   = isTrial ? (sub.trial_end || sub.trialEnd) : sub.end_date;
+    const endStr   = fmtDate(endKey);
+    const statusBadge = isTrial
+      ? '<span style="background:rgba(251,191,36,.15);color:#F59E0B;border:1px solid rgba(251,191,36,.3);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700">무료 체험 중</span>'
+      : '<span style="background:rgba(16,185,129,.12);color:#10B981;border:1px solid rgba(16,185,129,.3);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700">유료 구독 중</span>';
+    const label = isTrial ? `체험 종료일: ${endStr}` : `만료일: ${endStr}`;
+    return `
+      <button onclick="selectCancelSub(cancelFoundList[${i}], ${totalSteps}, false)"
+        style="width:100%;background:rgba(255,255,255,.03);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;text-align:left;cursor:pointer;transition:all .2s;font-family:var(--sans)"
+        onmouseover="this.style.borderColor='var(--gold)';this.style.background='rgba(201,168,76,.06)'"
+        onmouseout="this.style.borderColor='var(--border)';this.style.background='rgba(255,255,255,.03)'">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:14px;font-weight:700;color:var(--text)">${planLabel(sub.plan)} 플랜</span>
+          ${statusBadge}
+        </div>
+        <div style="font-size:12px;color:var(--muted)">${label}</div>
+      </button>`;
+  }).join('');
+}
+
+// ── 구독 선택 → 스텝3으로 ────────────────────────────────────
+function selectCancelSub(sub, totalSteps, skipStep2) {
+  cancelCurrentSub = sub;
+  cancelCurrentSub._inputName = _cancelInputName;
+  const isTrial  = sub.status === 'trial';
+  const ts = totalSteps || (isTrial ? 3 : 4);
+
+  if (isTrial) {
+    // 체험 취소 UI
+    document.getElementById('cancelStep3Trial').style.display  = 'block';
+    document.getElementById('cancelStep3Refund').style.display = 'none';
+    document.getElementById('cancelSubName').textContent = (sub.name || '고객') + ' 님';
+    const endStr = fmtDate(sub.trial_end || sub.trialEnd);
+    document.getElementById('cancelSubDetail').innerHTML =
+      '플랜: <strong>' + planLabel(sub.plan) + '</strong> &nbsp;|&nbsp; 체험 종료일: <strong>' + endStr + '</strong>';
+  } else {
+    // 유료 환불 안내 UI
+    document.getElementById('cancelStep3Trial').style.display  = 'none';
+    document.getElementById('cancelStep3Refund').style.display = 'block';
+    document.getElementById('refundSubName').textContent = (sub.name || '고객') + ' 님';
+    const endStr = fmtDate(sub.end_date);
+    document.getElementById('refundSubDetail').innerHTML =
+      '플랜: <strong>' + planLabel(sub.plan) + '</strong> &nbsp;|&nbsp; 만료일: <strong>' + endStr + '</strong>';
+  }
+  showCancelStep(skipStep2 ? 3 : 3, ts);
+}
+
+// ── 체험 취소 실행 ────────────────────────────────────────────
 async function cancelConfirm() {
   if (!cancelCurrentSub) return;
   const btn  = document.getElementById('cancelConfirmBtn');
@@ -3655,22 +3780,65 @@ async function cancelConfirm() {
       const phone = (cancelCurrentSub.phone || '').replace(/-/g, '');
       const name  = cancelCurrentSub._inputName || cancelCurrentSub.name || '';
       const res = await apiPost('/api/cancel-by-phone', { phone, name });
-      // 백엔드가 success:false를 반환한 경우 처리
-      if (res && res.success === false) {
-        throw new Error(res.message || '취소 처리 실패');
-      }
+      if (res && res.success === false) throw new Error(res.message || '취소 처리 실패');
     } else {
       await new Promise(r => setTimeout(r, 700));
-      cancelCurrentSub.status = 'cancelled';
     }
-    showCancelStep(3);
+    // 완료 화면
+    document.getElementById('cancelDoneEmoji').textContent = '✅';
+    document.getElementById('cancelDoneTitle').textContent = '체험 취소 완료';
+    document.getElementById('cancelDoneMsg').innerHTML =
+      '무료 체험이 취소되었습니다.<br>요금은 청구되지 않습니다.<br>언제든지 다시 신청하실 수 있습니다.';
+    showCancelStep(4, 3);  // 체험은 3스텝이지만 완료는 4번 패널
+    // 실제로는 step3이 완료이므로 step4 대신 step3 UI에 완료 결과 표시
+    // → cancelStep4 패널 재사용 (step 번호는 편의상 4로 처리)
+    // 아래 라인에서 실제 패널을 강제로 표시
+    document.getElementById('cancelStep3').style.display = 'none';
+    document.getElementById('cancelStep4').style.display = 'block';
   } catch(e) {
     console.error('cancelConfirm error:', e);
-    showToast(
-      (e && e.message) ||
-      '취소 처리 중 오류가 발생했습니다. 카카오톡 @1DAYECO로 문의해 주세요',
-      'ng'
-    );
+    showToast((e && e.message) || '취소 처리 중 오류. 카카오톡 @1DAYECO로 문의해 주세요', 'ng');
+    btn.disabled = false;
+    spin.style.display = 'none';
+  }
+}
+
+// ── 유료 환불 요청 접수 ──────────────────────────────────────
+async function refundRequest() {
+  if (!cancelCurrentSub) return;
+  const btn  = document.getElementById('refundRequestBtn');
+  const spin = document.getElementById('refundRequestSpin');
+  btn.disabled = true;
+  spin.style.display = 'inline-flex';
+  try {
+    if (API_BASE) {
+      const res = await apiPost('/api/admin/refund-request', {
+        subscriber_id: cancelCurrentSub.id,
+      });
+      if (res && res.success === false) throw new Error(res.message || '요청 처리 실패');
+    } else {
+      await new Promise(r => setTimeout(r, 700));
+    }
+    // 완료 화면
+    document.getElementById('cancelDoneEmoji').textContent = '📩';
+    document.getElementById('cancelDoneTitle').textContent = '환불 요청 접수 완료';
+    document.getElementById('cancelDoneMsg').innerHTML =
+      '환불 요청이 접수되었습니다.<br>콘텐츠 발송이 즉시 중단됩니다.<br><br>' +
+      '영업일 1~2일 이내 카카오톡 채널<br><strong style="color:var(--gold)">@1DAYECO</strong>로 연락드리겠습니다.<br><br>' +
+      '문의: <a href="mailto:onedayeco@naver.com" style="color:var(--gold)">onedayeco@naver.com</a>';
+    document.getElementById('cancelStep3').style.display = 'none';
+    document.getElementById('cancelStep4').style.display = 'block';
+    // 인디케이터 완료 표시
+    for (let n = 1; n <= 4; n++) {
+      const dot = document.getElementById('csDot' + n);
+      if (dot && dot.style.display !== 'none') {
+        dot.className = 'cancel-step-dot done';
+        dot.textContent = '✓';
+      }
+    }
+  } catch(e) {
+    console.error('refundRequest error:', e);
+    showToast((e && e.message) || '요청 처리 중 오류. 카카오톡 @1DAYECO로 문의해 주세요', 'ng');
     btn.disabled = false;
     spin.style.display = 'none';
   }

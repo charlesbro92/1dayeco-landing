@@ -1006,7 +1006,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v65</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v67</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1031,12 +1031,21 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   @media (max-width:768px) { .deploy-badge { display:none; } }
 </style>
 <script>
-  function showDeployInfo() {
+  async function showDeployInfo() {
     const badge = document.getElementById('deployBadge');
     const v = badge ? badge.textContent : 'unknown';
+    let apiVer = '확인 중...';
+    try {
+      const r = await fetch(API_BASE + '/version', { signal: AbortSignal.timeout(3000) });
+      const d = await r.json();
+      apiVer = d.version || 'unknown';
+    } catch(e) {
+      apiVer = 'API 응답 없음';
+    }
     alert(
       '배포 정보\n' +
-      '버전: ' + v + '\n' +
+      '랜딩: ' + v + '\n' +
+      'API:  ' + apiVer + '\n' +
       '도메인: ' + location.hostname + '\n' +
       '경로: ' + location.pathname + '\n' +
       '캐시 무시 새로고침: Cmd+Shift+R (Mac) / Ctrl+F5 (Win)'

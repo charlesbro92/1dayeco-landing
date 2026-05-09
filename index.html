@@ -1006,7 +1006,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v50</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v51</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -3537,62 +3537,117 @@ function showCancelStep(step) {
 function cancelGoBack() { showCancelStep(1); }
 
 async function cancelVerifyPhone() {
-  const phone = document.getElementById('cancelPhone').value.trim();
+  const phoneRaw = document.getElementById('cancelPhone').value.trim();
+  const phone    = phoneRaw.replace(/-/g, '');  // 백엔드에는 하이픈 없이 전송
   const errEl = document.getElementById('cancelPhoneErr');
   const btn   = document.getElementById('cancelVerifyBtn');
-  const txt   = document.getElementById('cancelVerifyTxt');
   const spin  = document.getElementById('cancelVerifySpin');
-  if (phone.length < 12) {
-    errEl.textContent = '올바른 전화번호를 입력해 주세요';
+  if (phoneRaw.length < 12) {
+    errEl.textContent = '올바른 전화번호를 입력해 주세요 (예: 010-1234-5678)';
     errEl.style.display = 'block'; return;
   }
-  btn.disabled=true; txt.style.display='none'; spin.style.display='inline';
-  errEl.style.display='none';
+  // 로딩: 버튼 disable + spinner inline-flex로 보이게 (텍스트는 유지)
+  btn.disabled = true;
+  spin.style.display = 'inline-flex';
+  errEl.style.display = 'none';
   try {
-    await new Promise(r => setTimeout(r, 800));
-    const norm = phone.replace(/-/g,'');
-    const found = API_BASE
-      ? await apiPost('/api/lookup', { phone }).catch(()=>null)
-      : MOCK_SUBS_DB.find(s => s.phone.replace(/-/g,'') === norm);
+    let found = null;
+    if (API_BASE) {
+      // 백엔드 호출 (lookup은 phone으로 구독자 조회)
+      try {
+        found = await apiPost('/api/lookup', { phone });
+      } catch (apiErr) {
+        // 백엔드 통신 자체 실패 (404, 500, 네트워크 등)
+        console.error('lookup API error:', apiErr);
+        // 404 (미등록) vs 다른 에러 구분
+        const msg = String(apiErr.message || '');
+        if (msg.includes('404') || msg.toLowerCase().includes('not found')) {
+          errEl.textContent = '등록된 전화번호를 찾을 수 없습니다';
+        } else {
+          errEl.textContent = '서버 연결에 일시적인 문제가 있습니다. 잠시 후 다시 시도하거나 카카오톡 @1DAYECO로 문의해 주세요';
+        }
+        errEl.style.display = 'block';
+        return;
+      }
+    } else {
+      // 로컬 mock (개발용)
+      await new Promise(r => setTimeout(r, 500));
+      found = MOCK_SUBS_DB.find(s => s.phone.replace(/-/g, '') === phone);
+    }
+
     if (!found) {
-      errEl.textContent = '등록된 전화번호를 찾을 수 없습니다'; errEl.style.display='block'; return;
+      errEl.textContent = '등록된 전화번호를 찾을 수 없습니다';
+      errEl.style.display = 'block'; return;
     }
-    if (found.status !== 'trial') {
-      errEl.textContent = '체험 중인 구독이 없습니다. 유료 구독 해지는 고객센터(@1DAYECO)로 문의해 주세요';
-      errEl.style.display='block'; return;
+    // 백엔드는 status를 active/cancelled 등으로 보낼 수 있음 → trial 상태 검증 완화
+    // 체험 종료 후(active 상태)는 유료 구독이므로 별도 안내
+    if (found.status === 'cancelled' || found.status === 'expired') {
+      errEl.textContent = '이미 취소되었거나 만료된 구독입니다';
+      errEl.style.display = 'block'; return;
     }
+    if (found.status && found.status !== 'trial' && found.status !== 'active') {
+      errEl.textContent = '구독 상태를 확인할 수 없습니다. 카카오톡 @1DAYECO로 문의해 주세요';
+      errEl.style.display = 'block'; return;
+    }
+    // 무료 체험 중이 아닌 유료 구독자는 직접 취소 불가 → 고객센터 안내
+    if (found.status === 'active') {
+      errEl.textContent = '유료 구독은 카카오톡 @1DAYECO로 문의해 주세요';
+      errEl.style.display = 'block'; return;
+    }
+
     cancelCurrentSub = found;
-    document.getElementById('cancelSubName').textContent = found.name + ' 님';
-    const endStr = found.trialEnd instanceof Date
-      ? found.trialEnd.toLocaleDateString('ko-KR') : '—';
+    document.getElementById('cancelSubName').textContent = (found.name || '고객') + ' 님';
+    // trial_end가 string(ISO) / Date / 없을 수 있음
+    let endStr = '—';
+    const te = found.trialEnd || found.trial_end;
+    if (te) {
+      const d = (te instanceof Date) ? te : new Date(te);
+      if (!isNaN(d.getTime())) endStr = d.toLocaleDateString('ko-KR');
+    }
+    const planMap = {free:'무료 체험', monthly:'월간 구독', yearly:'연간 구독',
+                     pkg3m:'3개월', pkg6m:'6개월', pkg1y:'1년'};
     document.getElementById('cancelSubDetail').innerHTML =
-      '플랜: <strong>' + ({free:'무료 체험',monthly:'월간 구독',yearly:'연간 구독'}[found.plan]||found.plan) +
+      '플랜: <strong>' + (planMap[found.plan] || found.plan || '—') +
       '</strong> &nbsp;|&nbsp; 체험 종료일: <strong>' + endStr + '</strong>';
     showCancelStep(2);
   } catch(e) {
-    errEl.textContent = '오류가 발생했습니다. 다시 시도해 주세요'; errEl.style.display='block';
+    console.error('cancelVerifyPhone error:', e);
+    errEl.textContent = '오류가 발생했습니다. 다시 시도해 주세요';
+    errEl.style.display = 'block';
   } finally {
-    btn.disabled=false; txt.style.display='inline'; spin.style.display='none';
+    btn.disabled = false;
+    spin.style.display = 'none';
   }
 }
 
 async function cancelConfirm() {
   if (!cancelCurrentSub) return;
   const btn  = document.getElementById('cancelConfirmBtn');
-  const txt  = document.getElementById('cancelConfirmTxt');
   const spin = document.getElementById('cancelConfirmSpin');
-  btn.disabled=true; txt.style.display='none'; spin.style.display='inline';
+  btn.disabled = true;
+  spin.style.display = 'inline-flex';
   try {
     if (API_BASE) {
-      await apiPost('/api/cancel-by-phone', { phone: cancelCurrentSub.phone });
+      const phone = (cancelCurrentSub.phone || '').replace(/-/g, '');
+      const res = await apiPost('/api/cancel-by-phone', { phone });
+      // 백엔드가 success:false를 반환한 경우 처리
+      if (res && res.success === false) {
+        throw new Error(res.message || '취소 처리 실패');
+      }
     } else {
-      await new Promise(r => setTimeout(r, 900));
+      await new Promise(r => setTimeout(r, 700));
       cancelCurrentSub.status = 'cancelled';
     }
     showCancelStep(3);
   } catch(e) {
-    showToast('취소 처리 중 오류가 발생했습니다. 고객센터(@1DAYECO)로 문의해 주세요', 'ng');
-    btn.disabled=false; txt.style.display='inline'; spin.style.display='none';
+    console.error('cancelConfirm error:', e);
+    showToast(
+      (e && e.message) ||
+      '취소 처리 중 오류가 발생했습니다. 카카오톡 @1DAYECO로 문의해 주세요',
+      'ng'
+    );
+    btn.disabled = false;
+    spin.style.display = 'none';
   }
 }
 

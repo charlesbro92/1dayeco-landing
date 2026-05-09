@@ -1006,7 +1006,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v72</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v73</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2469,7 +2469,7 @@ HIDDEN_COMINGSOON_MODAL_END -->
                   oninput="this.value=this.value.replace(/[^0-9]/g,'');checkRefundAccount()">
               </div>
             </div>
-            <div id="refundAccountErr" style="font-size:11px;color:var(--error);margin-top:5px;display:none">은행명, 예금주, 계좌번호를 모두 입력해 주세요.<br>예금주는 본인 성명만 가능합니다.</div>
+            <div id="refundAccountErr" style="font-size:11px;color:var(--error);margin-top:5px;display:none"></div>
           </div>
           <div style="display:flex;gap:8px">
             <button onclick="cancelGoToStep2()" style="flex:1;background:none;border:1px solid var(--border);color:var(--muted);padding:11px;border-radius:8px;font-size:13px;font-weight:600;font-family:var(--sans);cursor:pointer">돌아가기</button>
@@ -3922,18 +3922,36 @@ async function cancelConfirm() {
 
 // ── 계좌 입력 검증 → 버튼 활성화 ────────────────────────────
 function checkRefundAccount() {
-  const bank    = (document.getElementById('refundBankName')?.value    || '').trim();
-  const acctName= (document.getElementById('refundAccountName')?.value || '').trim();
-  const acct    = (document.getElementById('refundBankAccount')?.value  || '').trim();
-  const btn     = document.getElementById('refundRequestBtn');
-  const err     = document.getElementById('refundAccountErr');
+  const bank     = (document.getElementById('refundBankName')?.value    || '').trim();
+  const acctName = (document.getElementById('refundAccountName')?.value || '').trim();
+  const acct     = (document.getElementById('refundBankAccount')?.value  || '').trim();
+  const btn      = document.getElementById('refundRequestBtn');
+  const err      = document.getElementById('refundAccountErr');
+
+  // 예금주 본인 확인 (공백·대소문자 무시)
+  const subName  = (cancelCurrentSub?.name || '').replace(/\s/g, '').toLowerCase();
+  const inputName= acctName.replace(/\s/g, '').toLowerCase();
+  const nameMatch = subName && inputName && subName === inputName;
+
   const allFilled = bank && acctName && acct.length >= 8;
-  if (btn && !btn.disabled) {
-    btn.style.opacity = allFilled ? '1' : '.5';
-    btn._accountReady = allFilled;
+
+  if (err) {
+    if (acctName && !nameMatch) {
+      err.textContent = '예금주 성명이 구독자 이름과 일치하지 않습니다. 본인 명의 계좌만 가능합니다.';
+      err.style.display = 'block';
+    } else if (allFilled && nameMatch) {
+      err.style.display = 'none';
+    } else {
+      err.style.display = 'none';
+    }
   }
-  if (err) err.style.display = 'none';
-  return allFilled;
+
+  const valid = allFilled && nameMatch;
+  if (btn) {
+    btn.disabled = !valid;
+    btn.style.opacity = valid ? '1' : '.5';
+  }
+  return valid;
 }
 
 // ── 유료 환불 요청 접수 ──────────────────────────────────────
@@ -3945,8 +3963,16 @@ async function refundRequest() {
   const acctName = (document.getElementById('refundAccountName')?.value || '').trim();
   const acct     = (document.getElementById('refundBankAccount')?.value  || '').trim();
   const accErr   = document.getElementById('refundAccountErr');
+
+  const subName   = (cancelCurrentSub?.name || '').replace(/\s/g, '').toLowerCase();
+  const inputName = acctName.replace(/\s/g, '').toLowerCase();
+
   if (!bank || !acctName || acct.length < 8) {
-    if (accErr) accErr.style.display = 'block';
+    if (accErr) { accErr.textContent = '은행명, 예금주, 계좌번호를 모두 입력해 주세요.'; accErr.style.display = 'block'; }
+    return;
+  }
+  if (subName && inputName !== subName) {
+    if (accErr) { accErr.textContent = '예금주 성명이 구독자 이름과 일치하지 않습니다. 본인 명의 계좌만 가능합니다.'; accErr.style.display = 'block'; }
     return;
   }
   if (accErr) accErr.style.display = 'none';

@@ -1006,7 +1006,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v74</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v75</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2667,7 +2667,7 @@ async function _initCategoryVisibility() {
     const activeIds = new Set(activeCats.map(c => c.id));
     const NAV_CATS  = ['economy', 'realestate', 'english', 'trivia'];
 
-    // === 1) nav 탭: 어드민에서 active가 아닌 정식 4개 카테고리는 숨김 ===
+    // === 1) nav 탭: 기존 4개는 active 여부로 show/hide ===
     document.querySelectorAll('.nav-tab').forEach(btn => {
       const onclick = btn.getAttribute('onclick') || '';
       const m = onclick.match(/showCategory\('([^']+)'/);
@@ -2677,6 +2677,29 @@ async function _initCategoryVisibility() {
         btn.style.display = activeIds.has(cat) ? '' : 'none';
       }
     });
+
+    // === 1-b) 신규 카테고리(NAV_CATS에 없는 active) → nav에 동적 추가 ===
+    const navTabs = document.querySelector('.nav-tabs');
+    const comingSoonBtn = document.querySelector('.nav-tab-soon');
+    if (navTabs) {
+      // 이미 동적으로 추가된 nav 탭 제거 (새로고침 중복 방지)
+      navTabs.querySelectorAll('.nav-tab-dynamic').forEach(el => el.remove());
+
+      activeCats
+        .filter(c => !NAV_CATS.includes(c.id))
+        .forEach(c => {
+          const btn = document.createElement('button');
+          btn.className = 'nav-tab nav-tab-dynamic';
+          btn.textContent = `${c.emoji || '📌'} ${c.name}`;
+          btn.onclick = () => openModalWithCategory(c.id);
+          // COMING SOON 버튼 앞에 삽입
+          if (comingSoonBtn) {
+            navTabs.insertBefore(btn, comingSoonBtn);
+          } else {
+            navTabs.appendChild(btn);
+          }
+        });
+    }
 
     // === 2) 소개 페이지 active 카드 그리드 — 어드민에 등록된 active 카테고리 ===
     // (기본 4개와 추가 카테고리 모두 동적 렌더)

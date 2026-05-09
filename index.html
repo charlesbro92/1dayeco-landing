@@ -1006,7 +1006,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v55</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v56</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -3092,7 +3092,7 @@ async function submitStep2() {
       customData: {
         type:          'billing_register',
         subscriber_id: subscriberId,
-        real_amount:   planAmounts[currentPlan] || 24900,
+        real_amount:   { monthly: 9900, pkg3m: 14900, pkg6m: 24900, pkg1y: 41900 }[currentPlan] || 24900,
       },
       redirectUrl: location.origin + location.pathname + '?billing_complete=1',
     });

@@ -1006,7 +1006,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v70</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v71</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2441,6 +2441,36 @@ HIDDEN_COMINGSOON_MODAL_END -->
             <div>• 카드사 입금까지 <strong>영업일 5~7일</strong> 소요됩니다</div>
             <div>• 문의: 카카오톡 <strong>@1DAYECO</strong></div>
           </div>
+          <!-- 환불 계좌 입력 -->
+          <div style="margin-bottom:16px">
+            <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">💳 환불 받으실 계좌 정보</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;gap:8px">
+                <div style="flex:1">
+                  <label style="font-size:10px;color:var(--muted);display:block;margin-bottom:4px">은행명 <span style="color:var(--error)">*</span></label>
+                  <input type="text" id="refundBankName" placeholder="예: 국민은행" maxlength="20"
+                    style="width:100%;background:rgba(255,255,255,.05);border:1.5px solid var(--border);border-radius:7px;padding:9px 12px;font-size:13px;color:var(--text);font-family:var(--sans);outline:none;transition:border-color .2s"
+                    onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"
+                    oninput="checkRefundAccount()">
+                </div>
+                <div style="flex:1">
+                  <label style="font-size:10px;color:var(--muted);display:block;margin-bottom:4px">예금주 <span style="color:var(--error)">*</span></label>
+                  <input type="text" id="refundAccountName" placeholder="본인 성명만 가능" maxlength="20"
+                    style="width:100%;background:rgba(255,255,255,.05);border:1.5px solid var(--border);border-radius:7px;padding:9px 12px;font-size:13px;color:var(--text);font-family:var(--sans);outline:none;transition:border-color .2s"
+                    onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"
+                    oninput="checkRefundAccount()">
+                </div>
+              </div>
+              <div>
+                <label style="font-size:10px;color:var(--muted);display:block;margin-bottom:4px">계좌번호 <span style="color:var(--error)">*</span></label>
+                <input type="tel" id="refundBankAccount" placeholder="숫자만 입력 (예: 12345678901234)" maxlength="20"
+                  style="width:100%;background:rgba(255,255,255,.05);border:1.5px solid var(--border);border-radius:7px;padding:9px 12px;font-size:13px;color:var(--text);font-family:var(--mono);outline:none;transition:border-color .2s"
+                  onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"
+                  oninput="this.value=this.value.replace(/[^0-9]/g,'');checkRefundAccount()">
+              </div>
+            </div>
+            <div id="refundAccountErr" style="font-size:11px;color:var(--error);margin-top:5px;display:none">은행명, 예금주, 계좌번호를 모두 입력해 주세요.<br>예금주는 본인 성명만 가능합니다.</div>
+          </div>
           <div style="display:flex;gap:8px">
             <button onclick="cancelGoToStep2()" style="flex:1;background:none;border:1px solid var(--border);color:var(--muted);padding:11px;border-radius:8px;font-size:13px;font-weight:600;font-family:var(--sans);cursor:pointer">돌아가기</button>
             <button onclick="refundRequest()" id="refundRequestBtn" disabled
@@ -3651,6 +3681,14 @@ function openCancelFlow() {
   document.getElementById('cancelPhone').value = '';
   const err = document.getElementById('cancelPhoneErr');
   if (err) { err.textContent = ''; err.style.display = 'none'; }
+  // 계좌 입력 초기화
+  ['refundBankName','refundAccountName','refundBankAccount'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  const accErr = document.getElementById('refundAccountErr');
+  if (accErr) accErr.style.display = 'none';
+  const refBtn = document.getElementById('refundRequestBtn');
+  if (refBtn) { refBtn.disabled = true; refBtn.style.opacity = '.5'; }
   showCancelStep(1, 3);
   document.getElementById('cancelOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -3882,9 +3920,37 @@ async function cancelConfirm() {
   }
 }
 
+// ── 계좌 입력 검증 → 버튼 활성화 ────────────────────────────
+function checkRefundAccount() {
+  const bank    = (document.getElementById('refundBankName')?.value    || '').trim();
+  const acctName= (document.getElementById('refundAccountName')?.value || '').trim();
+  const acct    = (document.getElementById('refundBankAccount')?.value  || '').trim();
+  const btn     = document.getElementById('refundRequestBtn');
+  const err     = document.getElementById('refundAccountErr');
+  const allFilled = bank && acctName && acct.length >= 8;
+  if (btn && !btn.disabled) {
+    btn.style.opacity = allFilled ? '1' : '.5';
+    btn._accountReady = allFilled;
+  }
+  if (err) err.style.display = 'none';
+  return allFilled;
+}
+
 // ── 유료 환불 요청 접수 ──────────────────────────────────────
 async function refundRequest() {
   if (!cancelCurrentSub) return;
+
+  // 계좌 검증
+  const bank     = (document.getElementById('refundBankName')?.value    || '').trim();
+  const acctName = (document.getElementById('refundAccountName')?.value || '').trim();
+  const acct     = (document.getElementById('refundBankAccount')?.value  || '').trim();
+  const accErr   = document.getElementById('refundAccountErr');
+  if (!bank || !acctName || acct.length < 8) {
+    if (accErr) accErr.style.display = 'block';
+    return;
+  }
+  if (accErr) accErr.style.display = 'none';
+
   const btn  = document.getElementById('refundRequestBtn');
   const spin = document.getElementById('refundRequestSpin');
   btn.disabled = true;
@@ -3894,6 +3960,9 @@ async function refundRequest() {
     if (API_BASE) {
       const res = await apiPost('/api/admin/refund-request', {
         subscriber_id: cancelCurrentSub.id,
+        bank_name:     bank,
+        bank_account:  acct,
+        account_name:  acctName,
       });
       if (res && res.success === false) throw new Error(res.message || '요청 처리 실패');
     } else {
@@ -3903,8 +3972,9 @@ async function refundRequest() {
     document.getElementById('cancelDoneTitle').textContent = '환불 요청 접수 완료';
     document.getElementById('cancelDoneMsg').innerHTML =
       '환불 요청이 접수되었습니다.<br>콘텐츠 발송이 즉시 중단됩니다.<br><br>' +
-      '영업일 1~2일 이내 카카오톡 채널<br><strong style="color:var(--gold)">@1DAYECO</strong>로 연락드리겠습니다.<br><br>' +
-      '문의: <a href="mailto:onedayeco@naver.com" style="color:var(--gold)">onedayeco@naver.com</a>';
+      `입력하신 계좌 <strong style="color:var(--gold)">${bank} ${acct}</strong>로<br>` +
+      '영업일 3일 이내 환불 처리됩니다.<br><br>' +
+      '문의: 카카오톡 <strong style="color:var(--gold)">@1DAYECO</strong>';
     document.getElementById('cancelStep3').style.display = 'none';
     document.getElementById('cancelStep4').style.display = 'block';
     for (let n = 1; n <= 4; n++) {

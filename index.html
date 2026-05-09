@@ -1006,7 +1006,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v61</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v62</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2284,6 +2284,19 @@ HIDDEN_COMINGSOON_MODAL_END -->
         내일 아침부터 <strong id="doneCategory" style="color:var(--gold)">선택하신 카테고리</strong>를 받아보세요.<br>
         매일 오전 <span id="doneHour" style="color:var(--gold);font-weight:700">8시</span> 카카오톡 발송.
       </p>
+
+      <!-- 카카오톡 채널 추가 (필수) -->
+      <div style="background:rgba(254,229,0,.08);border:1.5px solid rgba(254,229,0,.35);border-radius:12px;padding:16px;margin:14px 0;text-align:center">
+        <div style="font-size:13px;font-weight:700;color:#FEE500;margin-bottom:6px">⚠️ 카카오톡 채널 추가 필수</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:12px">
+          채널을 추가해야 메시지를 받을 수 있습니다.<br>아래 버튼을 눌러 <strong style="color:var(--text)">@1DAYECO</strong> 채널을 추가해주세요.
+        </div>
+        <a href="http://pf.kakao.com/_1DAYECO/friend" target="_blank"
+          style="display:inline-flex;align-items:center;gap:8px;background:#FEE500;color:#000;padding:11px 24px;border-radius:8px;font-weight:700;font-size:14px;text-decoration:none;margin-bottom:4px">
+          <span style="font-size:18px">💬</span> 카카오톡 채널 추가하기
+        </a>
+      </div>
+
       <div style="background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:14px;margin:14px 0;font-size:12px;color:var(--muted);text-align:left">
         <div style="font-weight:700;color:var(--gold);margin-bottom:8px;text-align:center">📅 첫 발송: <strong id="doneFirstSend" style="color:var(--gold)">내일 오전 8시</strong></div>
         <div style="font-size:11.5px;line-height:1.7;border-top:1px solid var(--border);padding-top:10px;margin-top:8px">

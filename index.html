@@ -273,6 +273,18 @@ nav {
   .nav-tabs { display:none; }
   .nav-cta  { display:none; }
   .mobile-hamburger { display:flex !important; }
+  /* 로고 가운데 정렬: 좌측 햄버거 영역과 같은 너비를 확보해 정확히 중앙 */
+  .nav-logo-wrap {
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    pointer-events:none;
+  }
+  .nav-logo-wrap .logo,
+  .nav-logo-wrap .deploy-badge {
+    pointer-events:auto;
+  }
+  nav { position:relative; justify-content:flex-end; }
   .category-title { font-size:36px; }
   .category-subtitle { font-size:15px; }
 }
@@ -1150,9 +1162,9 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 
 <!-- NAV -->
 <nav>
-  <div style="display:flex;align-items:center;gap:8px">
-    <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v89</span>
+  <div class="nav-logo-wrap" style="display:flex;align-items:center;gap:8px">
+    <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v90</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>

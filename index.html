@@ -1006,7 +1006,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v81</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v82</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2881,6 +2881,7 @@ async function _updatePlanPrices() {
     const active = rows.find(c => (c.visibility || (c.active ? 'active' : 'hidden')) === 'active');
     if (active) {
       window._PLAN_PRICES = window._CAT_PRICES[active.id] || window._PLAN_PRICES;
+      window._CAT_PRICES_DEFAULT = window._CAT_PRICES[active.id]; // 디폴트 (선택 해제 시 복원용)
     }
 
     const fmt = v => Number(v).toLocaleString('ko-KR');
@@ -3579,10 +3580,19 @@ function toggleCat(cat) {
   });
   updateModalBtn();
 
-  // 선택한 카테고리 가격으로 _PLAN_PRICES 교체 후 요약 업데이트
-  if (cat && window._CAT_PRICES && window._CAT_PRICES[cat]) {
-    window._PLAN_PRICES = window._CAT_PRICES[cat];
+  // 선택한 카테고리 가격으로 _PLAN_PRICES 교체
+  if (selectedCategories.length === 1) {
+    const selCat = selectedCategories[0];
+    if (window._CAT_PRICES && window._CAT_PRICES[selCat]) {
+      window._PLAN_PRICES = window._CAT_PRICES[selCat];
+    }
+  } else {
+    // 선택 해제 시 디폴트 (첫 번째 active 카테고리 가격)로 복원
+    if (window._CAT_PRICES_DEFAULT) {
+      window._PLAN_PRICES = window._CAT_PRICES_DEFAULT;
+    }
   }
+
   const plan = document.getElementById('mPlan')?.value;
   if (plan) updatePlanSummary(plan);
 }
@@ -3610,6 +3620,13 @@ async function openModalWithCategory(cat) {
     btn.classList.toggle('active', selectedCategories.includes(btn.dataset.cat));
   });
   updateModalBtn();
+
+  // 선택한 카테고리 가격으로 _PLAN_PRICES 교체
+  if (window._CAT_PRICES && window._CAT_PRICES[cat]) {
+    window._PLAN_PRICES = window._CAT_PRICES[cat];
+  }
+  const plan = document.getElementById('mPlan')?.value;
+  if (plan) updatePlanSummary(plan);
 }
 
 // ── 발송 시간 (8시 고정) ─────────────────────────────────────

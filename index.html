@@ -2391,7 +2391,7 @@ const API_BASE        = 'https://web-production-761cd.up.railway.app';
 
 // 포트원 V2 설정 (포트원 콘솔 > 결제연동 > 연동 정보)
 const PORTONE_STORE_ID    = 'store-3a0615b4-5d94-46c6-9e1b-45da9a7436d7';     // Store ID (예: 'store-aaaa-bbbb-cccc-dddd-eeee')
-const PORTONE_CHANNEL_KEY = 'channel-key-478634ea-2409-42a7-992e-e3f8600d7480';     // 채널키 (예: 'channel-key-aaaa-bbbb-cccc-dddd-eeee')
+const PORTONE_CHANNEL_KEY = 'channel-key-ea42f3ad-a61d-4738-944b-5db56e4eda97';     // 채널키 (예: 'channel-key-aaaa-bbbb-cccc-dddd-eeee')
                                      // KG이니시스 테스트 채널 또는 라이브 네이버페이 채널
 const PAYMENT_TEST_MODE   = true;   // true: 테스트 안내 배너 표시, false: 숨김
 
@@ -3073,22 +3073,31 @@ async function submitStep2() {
   setLoading('step2Btn', 'step2Spin', 'step2BtnTxt', true);
 
   try {
-    // [v54] 포트원 V2: requestIssueBillingKey (카드 등록만, 0원 결제)
-    const response = await PortOne.requestIssueBillingKey({
-      storeId:       PORTONE_STORE_ID,
-      channelKey:    PORTONE_CHANNEL_KEY,
-      billingKeyMethod: 'CARD',
-      issueName:     planLabels[currentPlan] || '1DAYECO 구독',
+    // [v55] KG이니시스 빌링: requestPayment + customer_uid → BillingKey 동시 발급
+    // KG이니시스는 requestIssueBillingKey 미지원 → requestPayment으로 카드 등록
+    // amount 100원 (테스트용 최소금액, 백엔드 verify에서 즉시 환불)
+    const response = await PortOne.requestPayment({
+      storeId:      PORTONE_STORE_ID,
+      channelKey:   PORTONE_CHANNEL_KEY,
+      paymentId:    customerUidRef,   // paymentId = customer_uid (BillingKey 연결용)
+      orderName:    '카드 등록 (무료 체험)',
+      totalAmount:  100,              // KG이니시스 최소 결제금액 (즉시 환불됨)
+      currency:     'CURRENCY_KRW',
+      payMethod:    'CARD',
       customer: {
         customerId:  customerUidRef,
         fullName:    buyerName,
         phoneNumber: buyerTel,
       },
-      // 모바일 redirect 시 돌아올 URL
+      customData: {
+        type:          'billing_register',
+        subscriber_id: subscriberId,
+        real_amount:   planAmounts[currentPlan] || 24900,
+      },
       redirectUrl: location.origin + location.pathname + '?billing_complete=1',
     });
 
-    // 오류 시 response.code 존재
+    // 오류/취소
     if (response && response.code !== undefined) {
       const userCancelled = response.code === 'PORTONE_FAILED_TO_PROCESS' ||
                            (response.message && response.message.includes('취소'));
@@ -3099,20 +3108,14 @@ async function submitStep2() {
       return;
     }
 
-    // BillingKey 발급 성공
-    const billingKey = response?.billingKey || response?.billing_key || '';
-    if (!billingKey) {
-      showToast('카드 등록 정보를 가져오지 못했습니다. 다시 시도해주세요.', 'ng');
-      setLoading('step2Btn', 'step2Spin', 'step2BtnTxt', false);
-      return;
-    }
-
-    // 백엔드 verify: BillingKey 저장 + trial 전환
+    // 성공 → 백엔드 verify (100원 환불 + BillingKey 저장 + trial 전환)
+    const paymentId = response?.paymentId || customerUidRef;
     try {
       const verify = await apiPost('/api/payment/verify', {
-        billing_key:   billingKey,
+        payment_id:    paymentId,
         subscriber_id: subscriberId,
         customer_uid:  customerUidRef,
+        billing_register: true,   // 백엔드에서 100원 즉시 환불 + BillingKey 저장 처리
       });
       if (verify && verify.success) {
         try { sessionStorage.removeItem('billing_ctx'); } catch(e) {}
@@ -3125,7 +3128,7 @@ async function submitStep2() {
       console.error('verify error:', e);
     }
   } catch(e) {
-    console.error('PortOne.requestIssueBillingKey error:', e);
+    console.error('PortOne.requestPayment(billing) error:', e);
     showToast(e.message || '카드 등록 처리 중 오류가 발생했습니다', 'ng');
   } finally {
     setLoading('step2Btn', 'step2Spin', 'step2BtnTxt', false);

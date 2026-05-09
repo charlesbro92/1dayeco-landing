@@ -1006,7 +1006,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v79</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v80</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2192,16 +2192,28 @@ HIDDEN_COMINGSOON_MODAL_END -->
               <option value="pkg1y">12개월 일시불</option>
             </select>
           </div>
+          <!-- 할인율 강조 박스 -->
           <div id="planAmountBox" style="flex:3;background:rgba(201,168,76,.08);border:1.5px solid rgba(201,168,76,.35);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 6px;min-width:76px">
-            <div id="planAmountVal" style="color:var(--gold);font-weight:800;font-size:16px;line-height:1.2">—</div>
-            <div id="planAmountSub" style="color:var(--muted);font-size:9px;margin-top:2px;text-align:center">플랜 선택</div>
+            <div id="planAmountVal" style="color:var(--gold);font-weight:900;font-size:18px;line-height:1">—</div>
+            <div id="planAmountSub" style="color:var(--muted);font-size:9px;margin-top:3px;text-align:center;letter-spacing:.3px">플랜 선택</div>
           </div>
         </div>
-        <!-- 할인 요약 줄 -->
-        <div id="planPriceSummary" style="margin-top:8px;padding:10px 14px;background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.2);border-radius:8px;font-size:13px;line-height:1.7;display:none">
-          <span id="planOriginalLine" style="color:var(--muted);text-decoration:line-through;font-size:12px"></span>
-          <span id="planDiscountLine" style="color:#ff7676;font-weight:700;font-size:12px;margin-left:6px"></span><br>
-          <span style="color:var(--text)">최종 결제 </span><span id="planFinalPrice" style="color:var(--gold);font-weight:700;font-size:15px"></span>
+
+        <!-- 결제 요약 카드 (플랜 선택 시 표시) -->
+        <div id="planPriceSummary" style="margin-top:8px;padding:12px 14px;background:var(--s3);border:1px solid rgba(201,168,76,.25);border-radius:8px;display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:11px;color:var(--muted);margin-bottom:2px">3일 무료 후 청구</div>
+              <div style="display:flex;align-items:baseline;gap:6px">
+                <span id="planFinalPrice" style="color:var(--gold);font-weight:900;font-size:22px"></span>
+                <span id="planOriginalLine" style="color:var(--muted);text-decoration:line-through;font-size:12px"></span>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div id="planDiscountBadge" style="background:rgba(255,118,118,.15);border:1px solid rgba(255,118,118,.3);color:#ff7676;font-weight:800;font-size:14px;padding:4px 10px;border-radius:20px"></div>
+              <div id="planSavedLine" style="color:var(--muted);font-size:10px;margin-top:3px"></div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2940,12 +2952,13 @@ async function _updatePlanPrices() {
 
 // 플랜 선택 시 할인 요약 업데이트
 function updatePlanSummary(plan) {
-  const summary  = document.getElementById('planPriceSummary');
-  const origEl   = document.getElementById('planOriginalLine');
-  const discEl   = document.getElementById('planDiscountLine');
-  const finalEl  = document.getElementById('planFinalPrice');
-  const amountVal = document.getElementById('planAmountVal');
-  const amountSub = document.getElementById('planAmountSub');
+  const summary      = document.getElementById('planPriceSummary');
+  const origEl       = document.getElementById('planOriginalLine');
+  const finalEl      = document.getElementById('planFinalPrice');
+  const discBadge    = document.getElementById('planDiscountBadge');
+  const savedLine    = document.getElementById('planSavedLine');
+  const amountVal    = document.getElementById('planAmountVal');
+  const amountSub    = document.getElementById('planAmountSub');
   if (!summary) return;
 
   const prices = window._PLAN_PRICES;
@@ -2953,31 +2966,31 @@ function updatePlanSummary(plan) {
 
   if (!prices || !prices[plan]) {
     summary.style.display = 'none';
-    if (amountVal) amountVal.textContent = '—';
+    if (amountVal) { amountVal.textContent = '—'; amountVal.style.fontSize = '18px'; }
     if (amountSub) amountSub.textContent = '플랜 선택';
     return;
   }
 
   const { price, orig, months } = prices[plan];
-  const pct = orig > 0 && orig > price ? Math.round((1 - price/orig) * 1000) / 10 : 0;
-
-  // 금액 박스 업데이트
-  if (amountVal) amountVal.textContent = `₩${fmt(price)}`;
-  if (amountSub) {
-    if (plan === 'monthly') amountSub.textContent = '/ 월';
-    else amountSub.textContent = `${pct > 0 ? pct + '% 할인' : '일시불'}`;
-  }
-
-  // 할인 요약줄
-  if (plan === 'monthly') {
-    summary.style.display = 'none';
-    return;
-  }
+  const pct   = orig > price ? Math.round((1 - price/orig) * 1000) / 10 : 0;
   const saved = orig - price;
-  summary.style.display = 'block';
-  if (origEl) origEl.textContent  = `정가 ₩${fmt(orig)}`;
-  if (discEl) discEl.textContent  = `${pct}% 할인 (₩${fmt(saved)} 절약)`;
-  if (finalEl) finalEl.textContent = `₩${fmt(price)}`;
+
+  // 옆 박스: 월정액은 금액, 일시불은 할인율만
+  if (plan === 'monthly') {
+    if (amountVal) { amountVal.textContent = `₩${fmt(price)}`; amountVal.style.fontSize = '15px'; }
+    if (amountSub) amountSub.textContent = '/ 월';
+    summary.style.display = 'none';
+  } else {
+    if (amountVal) { amountVal.textContent = `${pct}%`; amountVal.style.fontSize = '20px'; }
+    if (amountSub) amountSub.textContent = '할인';
+
+    // 요약 카드
+    summary.style.display = 'block';
+    if (finalEl)   finalEl.textContent   = `₩${fmt(price)}`;
+    if (origEl)    origEl.textContent    = `₩${fmt(orig)}`;
+    if (discBadge) discBadge.textContent = `${pct}% 할인`;
+    if (savedLine) savedLine.textContent = `₩${fmt(saved)} 아낌`;
+  }
 }
 
 // ── 유틸 ─────────────────────────────────────────────────────

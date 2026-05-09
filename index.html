@@ -1006,7 +1006,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v86</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v87</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2426,7 +2426,53 @@ async function renderCategoryListPage(filter) {
       </div>`;
   };
 
-  grid.innerHTML = filteredActive.map(buildActiveCard).join('') + filteredComing.map(buildComingCard).join('');
+  // 전체 탭: 대분류별 그룹핑 / 대분류 탭: 평면 표시
+  if (filter === 'all') {
+    const SUPER_CATS_LIST = [
+      { id: 'finance',   emoji: '💼', label: '경제·금융' },
+      { id: 'lifestyle', emoji: '🏠', label: '생활·실용' },
+      { id: 'language',  emoji: '🌐', label: '글로벌·언어' },
+      { id: 'tech',      emoji: '💻', label: '테크·트렌드' },
+    ];
+    // 대분류별로 active + coming_soon 함께 그룹핑
+    const grouped = {};
+    SUPER_CATS_LIST.forEach(s => { grouped[s.id] = { active: [], coming: [] }; });
+    const ungrouped = { active: [], coming: [] };
+    filteredActive.forEach(c => {
+      const sc = c.super_category || 'finance';
+      if (grouped[sc]) grouped[sc].active.push(c);
+      else ungrouped.active.push(c);
+    });
+    filteredComing.forEach(c => {
+      const sc = c.super_category || 'finance';
+      if (grouped[sc]) grouped[sc].coming.push(c);
+      else ungrouped.coming.push(c);
+    });
+
+    const html = SUPER_CATS_LIST.map(s => {
+      const g = grouped[s.id];
+      const total = g.active.length + g.coming.length;
+      if (total === 0) return '';
+      const header = `<div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:18px 0 6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.15)">
+        <span style="font-size:18px">${s.emoji}</span>
+        <span style="font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px">${s.label}</span>
+        <span style="font-size:11px;color:var(--muted);margin-left:auto">${total}개</span>
+      </div>`;
+      return header + g.active.map(buildActiveCard).join('') + g.coming.map(buildComingCard).join('');
+    }).join('');
+    const ungroupedTotal = ungrouped.active.length + ungrouped.coming.length;
+    const ungroupedHtml = ungroupedTotal > 0
+      ? `<div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:18px 0 6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.15)">
+          <span style="font-size:18px">📌</span>
+          <span style="font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px">기타</span>
+          <span style="font-size:11px;color:var(--muted);margin-left:auto">${ungroupedTotal}개</span>
+        </div>` + ungrouped.active.map(buildActiveCard).join('') + ungrouped.coming.map(buildComingCard).join('')
+      : '';
+    grid.innerHTML = html + ungroupedHtml;
+  } else {
+    // 대분류 탭: 평면 표시 (active 먼저, coming_soon 뒤)
+    grid.innerHTML = filteredActive.map(buildActiveCard).join('') + filteredComing.map(buildComingCard).join('');
+  }
 }
 
 async function showCategory(category, btnEl) {

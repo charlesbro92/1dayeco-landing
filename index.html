@@ -1179,7 +1179,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap" style="display:flex;align-items:center;gap:8px">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v92</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v93</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1656,7 +1656,6 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 
   <div class="cat-hero">
     <h2 class="category-title" id="cdpTitle">—</h2>
-    <div id="cdpTagline" style="font-size:16px;color:var(--gold);font-weight:600;letter-spacing:.5px;margin:8px 0 16px;display:none"></div>
     <p class="category-subtitle" id="cdpSubtitle">—</p>
     <div class="category-coming" id="cdpDelivery">매일 1편</div>
     <div class="cat-hero-btns">
@@ -1664,6 +1663,14 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
       <button class="cta-subscribe-btn" id="cdpHeroCta" onclick="openModalWithCategory(window._currentCatId)">📬 신청하기 →</button>
     </div>
   </div>
+
+  <!-- 부제목 선택 섹션 (어떤 컨텐츠 그룹으로 시작할까요?) -->
+  <section class="cat-section" id="cdpSubtopicSection" style="display:none">
+    <div class="cat-section-eyebrow">Choose</div>
+    <h3 class="cat-section-title">어떤 컨텐츠로 시작할까요?</h3>
+    <p class="cat-section-sub">한 카테고리 안에서도 다양한 컨텐츠 그룹이 있어요. 관심 있는 그룹을 선택해 신청하세요.</p>
+    <div id="cdpSubtopicGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;max-width:880px;margin:24px auto 0;padding:0 20px"></div>
+  </section>
 
   <!-- 페인포인트 -->
   <section class="cat-section">
@@ -1887,6 +1894,15 @@ HIDDEN_COMINGSOON_MODAL_END -->
         </div>
         <div id="catGuide" style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">
           관심 있는 카테고리를 1개 선택하면 매일 그 카테고리 콘텐츠를 받아볼 수 있습니다.
+        </div>
+      </div>
+
+      <!-- 부제목 선택 (카테고리 선택 후 노출) -->
+      <div class="field" id="modalSubtopicField" style="display:none">
+        <label>📑 컨텐츠 그룹 선택 <span style="font-size:11px;color:var(--gold);font-weight:500">(1개 선택 필수)</span></label>
+        <div id="modalSubtopicGrid" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">
+          한 카테고리 안에서도 다양한 컨텐츠 그룹이 있어요. 선택한 그룹의 콘텐츠가 매일 발송됩니다.
         </div>
       </div>
 
@@ -2522,6 +2538,31 @@ const CATEGORY_CONTENT = {
 window._currentCatId = null;
 
 // 카테고리 상세 페이지 렌더 (CATEGORY_CONTENT 데이터 기반)
+// 카테고리 상세 페이지: 부제목 선택 섹션 렌더 (비동기)
+async function _renderDetailSubtopics(catId) {
+  const section = document.getElementById('cdpSubtopicSection');
+  const grid = document.getElementById('cdpSubtopicGrid');
+  if (!section || !grid) return;
+
+  const list = await loadSubtopicsForCategory(catId, false);
+  if (list.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = '';
+
+  grid.innerHTML = list.map(s => `
+    <div onclick="openModalWithCategoryAndSubtopic('${catId}', ${s.id}, '${(s.name || '').replace(/'/g, "\\'")}')"
+      style="cursor:pointer;background:rgba(255,255,255,.025);border:1px solid rgba(201,168,76,.18);border-radius:14px;padding:24px 22px;transition:all .2s;text-align:center"
+      onmouseover="this.style.borderColor='rgba(201,168,76,.5)'; this.style.background='rgba(201,168,76,.06)'; this.style.transform='translateY(-2px)'"
+      onmouseout="this.style.borderColor='rgba(201,168,76,.18)'; this.style.background='rgba(255,255,255,.025)'; this.style.transform='translateY(0)'">
+      <div style="font-size:11px;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;font-weight:700">CHOOSE</div>
+      <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:10px;line-height:1.4">${s.name}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:14px;padding-top:12px;border-top:1px solid rgba(201,168,76,.1)">신청하기 →</div>
+    </div>
+  `).join('');
+}
+
 function renderCategoryDetailPage(catId) {
   const data = CATEGORY_CONTENT[catId];
   if (!data) return false; // 데이터 없으면 렌더 실패
@@ -2529,30 +2570,12 @@ function renderCategoryDetailPage(catId) {
   window._currentCatId = catId;
 
   document.getElementById('cdpTitle').textContent = data.title;
-
-  // DB에서 가져온 subtitle (어드민 입력값)을 태그라인으로 표시
-  const tagEl = document.getElementById('cdpTagline');
-  if (tagEl) {
-    let dbSubtitle = '';
-    if (window._categoriesCache) {
-      const all = (window._categoriesCache.active || [])
-        .concat(window._categoriesCache.coming_soon || [])
-        .concat(window._categoriesCache.hidden || []);
-      const found = all.find(c => c.id === catId);
-      if (found) dbSubtitle = found.subtitle || '';
-    }
-    if (dbSubtitle) {
-      tagEl.textContent = dbSubtitle;
-      tagEl.style.display = '';
-    } else {
-      tagEl.textContent = '';
-      tagEl.style.display = 'none';
-    }
-  }
-
   document.getElementById('cdpSubtitle').innerHTML = data.subtitle;
   document.getElementById('cdpDelivery').textContent = data.delivery;
   document.getElementById('cdpHeroCta').textContent = `📬 ${data.title} 신청하기 →`;
+
+  // 부제목 선택 섹션 (비동기로 채움)
+  _renderDetailSubtopics(catId);
 
   // 페인포인트
   document.getElementById('cdpPainSub').textContent = data.painSub;
@@ -2635,29 +2658,26 @@ async function renderCategoryListPage(filter) {
     const id = c.id;
     const name = c.name || id;
     const emoji = c.emoji || '📌';
-    const subtitle = c.subtitle || '';
     const desc = c.description || '매일 새로운 콘텐츠를 만나보세요.';
-    const subtitleHtml = subtitle ? `<div class="cat-card-tag" style="font-size:12px;color:var(--gold);margin:4px 0 8px;letter-spacing:.3px">${subtitle}</div>` : '';
     return `
       <div class="cat-card" onclick="showCategory('${id}')">
         <div class="cat-card-icon">${emoji}</div>
         <div class="cat-card-name">${name}</div>
-        ${subtitleHtml}
+        <div class="cat-card-tag" data-cat-subtopics="${id}" style="font-size:12px;color:var(--gold);margin:4px 0 8px;letter-spacing:.3px;min-height:0;display:none"></div>
         <p class="cat-card-desc">${desc}</p>
       </div>`;
   };
   const buildComingCard = (c) => {
+    const id = c.id;
     const name = c.name || c.id;
     const emoji = c.emoji || '📌';
-    const subtitle = c.subtitle || '';
     const desc = c.description || '곧 만나볼 카테고리입니다.';
-    const subtitleHtml = subtitle ? `<div class="cat-card-tag" style="font-size:12px;color:var(--gold);margin:4px 0 8px;letter-spacing:.3px;opacity:.7">${subtitle}</div>` : '';
     return `
       <div class="cat-card coming-soon">
         <div class="coming-badge">출시 예정</div>
         <div class="cat-card-icon">${emoji}</div>
         <div class="cat-card-name">${name}</div>
-        ${subtitleHtml}
+        <div class="cat-card-tag" data-cat-subtopics="${id}" style="font-size:12px;color:var(--gold);margin:4px 0 8px;letter-spacing:.3px;opacity:.7;min-height:0;display:none"></div>
         <p class="cat-card-desc">${desc}</p>
         <div class="cat-card-sample">출시 준비 중 ⏳</div>
       </div>`;
@@ -2710,6 +2730,8 @@ async function renderCategoryListPage(filter) {
     // 대분류 탭: 평면 표시 (active 먼저, coming_soon 뒤)
     grid.innerHTML = filteredActive.map(buildActiveCard).join('') + filteredComing.map(buildComingCard).join('');
   }
+  // 부제목 채우기 (비동기)
+  _hydrateCardSubtopics();
 }
 
 // ── 모바일 햄버거 메뉴 토글 ────────────────────────
@@ -2828,6 +2850,51 @@ async function showCategory(category, btnEl) {
 let _categoriesCache = null;
 let _categoriesCachePromise = null;
 
+// 부제목 캐시 (카테고리별)
+const _SUBTOPIC_CACHE = {};
+async function loadSubtopicsForCategory(catId, force) {
+  if (!catId) return [];
+  if (!force && _SUBTOPIC_CACHE[catId]) return _SUBTOPIC_CACHE[catId];
+  if (!API_BASE) return [];
+  try {
+    const res = await fetch(API_BASE + '/admin/subtopics?category_id=' + encodeURIComponent(catId));
+    if (!res.ok) return [];
+    const data = await res.json();
+    if (data && data.success && Array.isArray(data.data)) {
+      _SUBTOPIC_CACHE[catId] = data.data;
+      return data.data;
+    }
+  } catch (e) {
+    console.warn('[subtopics] 로드 실패:', e);
+  }
+  _SUBTOPIC_CACHE[catId] = [];
+  return [];
+}
+
+// 화면에 노출된 모든 [data-cat-subtopics] placeholder를 부제목 이름으로 채움
+async function _hydrateCardSubtopics() {
+  const els = document.querySelectorAll('[data-cat-subtopics]');
+  // 카테고리 ID 모음 (중복 제거)
+  const catIds = new Set();
+  els.forEach(el => {
+    const id = el.dataset.catSubtopics;
+    if (id) catIds.add(id);
+  });
+  // 카테고리별로 부제목 fetch
+  await Promise.all(Array.from(catIds).map(id => loadSubtopicsForCategory(id, false)));
+  // 채우기
+  els.forEach(el => {
+    const id = el.dataset.catSubtopics;
+    const list = _SUBTOPIC_CACHE[id] || [];
+    if (list.length === 0) {
+      el.style.display = 'none';
+      return;
+    }
+    el.textContent = list.map(s => s.name).join(' · ');
+    el.style.display = '';
+  });
+}
+
 async function loadCategoriesFromAPI() {
   if (_categoriesCache) return _categoriesCache;
   if (_categoriesCachePromise) return _categoriesCachePromise;
@@ -2934,14 +3001,12 @@ async function _initCategoryVisibility() {
           const id    = c.id;
           const name  = c.name || id;
           const emoji = c.emoji || '📌';
-          const subtitle = c.subtitle || '';
           const desc  = c.description || '매일 새로운 콘텐츠를 만나보세요.';
-          const subtitleHtml = subtitle ? `<div class="cat-card-tag" style="font-size:12px;color:var(--gold);margin:4px 0 8px;letter-spacing:.3px">${subtitle}</div>` : '';
           return `
             <div class="cat-card" onclick="showCategory('${id}')">
               <div class="cat-card-icon">${emoji}</div>
               <div class="cat-card-name">${name}</div>
-              ${subtitleHtml}
+              <div class="cat-card-tag" data-cat-subtopics="${id}" style="font-size:12px;color:var(--gold);margin:4px 0 8px;letter-spacing:.3px;min-height:0;display:none"></div>
               <p class="cat-card-desc">${desc}</p>
             </div>`;
         };
@@ -2964,6 +3029,7 @@ async function _initCategoryVisibility() {
             </div>` + ungrouped.map(buildCardHtml).join('')
           : '';
         introActiveGrid.innerHTML = html + ungroupedHtml;
+        _hydrateCardSubtopics();
       }
     }
 
@@ -3035,17 +3101,16 @@ async function _initCategoryVisibility() {
         });
 
         const buildCsCard = (c) => {
+          const id = c.id;
           const name  = c.name || c.id;
           const emoji = c.emoji || '📌';
-          const subtitle = c.subtitle || '';
           const desc  = c.description || '곧 만나볼 카테고리입니다.';
-          const subtitleHtml = subtitle ? `<div class="cat-card-tag" style="font-size:12px;color:var(--gold);margin:4px 0 8px;letter-spacing:.3px;opacity:.7">${subtitle}</div>` : '';
           return `
             <div class="cat-card coming-soon">
               <div class="coming-badge">출시 예정</div>
               <div class="cat-card-icon">${emoji}</div>
               <div class="cat-card-name">${name}</div>
-              ${subtitleHtml}
+              <div class="cat-card-tag" data-cat-subtopics="${id}" style="font-size:12px;color:var(--gold);margin:4px 0 8px;letter-spacing:.3px;opacity:.7;min-height:0;display:none"></div>
               <p class="cat-card-desc">${desc}</p>
               <div class="cat-card-sample">출시 준비 중 ⏳</div>
             </div>`;
@@ -3069,6 +3134,7 @@ async function _initCategoryVisibility() {
             </div>` + ungroupedCS.map(buildCsCard).join('')
           : '';
         csMainGrid.innerHTML = csHtml + csUngroupedHtml;
+        _hydrateCardSubtopics();
       }
     }
 
@@ -3493,18 +3559,30 @@ async function submitStep1() {
   }
   if (!ok) return;
 
+  // 부제목이 활성 카테고리에 존재한다면 선택 필수
+  const subtopicField = document.getElementById('modalSubtopicField');
+  const subtopicVisible = subtopicField && subtopicField.style.display !== 'none';
+  if (subtopicVisible && !window._selectedSubtopicId) {
+    showToast('컨텐츠 그룹을 1개 선택해주세요', 'ng');
+    return;
+  }
+
   const finalCats = [selectedCategories[0]];
 
   setLoading('step1Btn','step1Spin','step1BtnTxt', true);
 
   try {
     // payment_prepare: 가입 정보 검증 + subscriber row 생성 (status=pending_payment) + merchant_uid 발급
-    const res = await apiPost('/api/payment/prepare', {
+    const preparePayload = {
       name, phone, plan,
       send_hour:   hour,
       categories:  finalCats,
       notify_d1:   true,  // D-1 만료 안내 디폴트 동의
-    });
+    };
+    if (window._selectedSubtopicId) {
+      preparePayload.subtopic_id = window._selectedSubtopicId;
+    }
+    const res = await apiPost('/api/payment/prepare', preparePayload);
     if (res && res.success === false) {
       throw new Error(res.message || '신청 처리 중 오류가 발생했습니다');
     }
@@ -3833,6 +3911,13 @@ function toggleCat(cat) {
   });
   updateModalBtn();
 
+  // 카테고리 변경 → 부제목 영역 갱신
+  if (selectedCategories.length === 1) {
+    _renderModalSubtopics(selectedCategories[0]);
+  } else {
+    _hideModalSubtopics();
+  }
+
   // 선택한 카테고리 가격으로 _PLAN_PRICES 교체
   if (selectedCategories.length === 1) {
     const selCat = selectedCategories[0];
@@ -3848,6 +3933,53 @@ function toggleCat(cat) {
 
   const plan = document.getElementById('mPlan')?.value;
   if (plan) updatePlanSummary(plan);
+}
+
+// 모달 내 선택된 부제목 (단일)
+window._selectedSubtopicId = null;
+window._selectedSubtopicName = '';
+
+async function _renderModalSubtopics(catId) {
+  const field = document.getElementById('modalSubtopicField');
+  const grid = document.getElementById('modalSubtopicGrid');
+  if (!field || !grid) return;
+  // 일단 노출 + 로딩
+  field.style.display = '';
+  grid.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:6px 0">불러오는 중...</div>';
+
+  const list = await loadSubtopicsForCategory(catId, false);
+  if (list.length === 0) {
+    field.style.display = 'none';
+    window._selectedSubtopicId = null;
+    window._selectedSubtopicName = '';
+    return;
+  }
+  // 첫 번째 부제목 자동 선택 (사용자가 바꿀 수 있음)
+  window._selectedSubtopicId = list[0].id;
+  window._selectedSubtopicName = list[0].name;
+
+  grid.innerHTML = list.map(s => {
+    const isActive = String(s.id) === String(window._selectedSubtopicId);
+    return `<button type="button" class="cat-btn${isActive ? ' active' : ''}"
+      data-subtopic="${s.id}" data-subtopic-name="${(s.name || '').replace(/"/g,'&quot;')}"
+      onclick="selectModalSubtopic(${s.id}, '${(s.name || '').replace(/'/g, "\\'")}')">${s.name}</button>`;
+  }).join('');
+}
+
+function _hideModalSubtopics() {
+  const field = document.getElementById('modalSubtopicField');
+  if (field) field.style.display = 'none';
+  window._selectedSubtopicId = null;
+  window._selectedSubtopicName = '';
+}
+
+function selectModalSubtopic(sid, name) {
+  window._selectedSubtopicId = sid;
+  window._selectedSubtopicName = name;
+  document.querySelectorAll('#modalSubtopicGrid .cat-btn').forEach(btn => {
+    btn.classList.toggle('active', String(btn.dataset.subtopic) === String(sid));
+  });
+  updateModalBtn();
 }
 
 // 카테고리 페이지에서 "이 관심사 신청하기" 클릭 시 호출
@@ -3880,6 +4012,19 @@ async function openModalWithCategory(cat) {
   }
   const plan = document.getElementById('mPlan')?.value;
   if (plan) updatePlanSummary(plan);
+
+  // 부제목 영역 노출 + 첫 번째 자동 선택
+  await _renderModalSubtopics(cat);
+}
+
+// 카테고리 + 부제목을 동시에 지정해서 모달 열기 (상세 페이지의 부제목 카드 클릭 시)
+async function openModalWithCategoryAndSubtopic(cat, subtopicId, subtopicName) {
+  await openModalWithCategory(cat);
+  // 부제목 자동 선택 (이미 _renderModalSubtopics가 첫 번째 자동 선택했지만 명시한 것으로 변경)
+  await new Promise(r => setTimeout(r, 80));
+  if (subtopicId) {
+    selectModalSubtopic(subtopicId, subtopicName || '');
+  }
 }
 
 // ── 발송 시간 (8시 고정) ─────────────────────────────────────
@@ -3913,10 +4058,13 @@ function updateModalBtn() {
   const checked      = document.getElementById('modalAgree')?.checked;
   const autopayAgree = document.getElementById('modalAutopayAgree')?.checked;
   const hasCat       = (selectedCategories && selectedCategories.length > 0);
+  // 부제목: 카테고리에 부제목이 있으면 선택 필수, 없으면 패스
+  const subtopicField = document.getElementById('modalSubtopicField');
+  const subtopicVisible = subtopicField && subtopicField.style.display !== 'none';
+  const hasSubtopic = !subtopicVisible || !!window._selectedSubtopicId;
   const btn = document.getElementById('step1Btn');
   if (!btn) return;
-  // 약관 동의 ✓ + 자동결제 동의 ✓ + 카테고리 1개 이상 → 활성화
-  if (checked && autopayAgree && hasCat) {
+  if (checked && autopayAgree && hasCat && hasSubtopic) {
     btn.style.opacity = '1';
     btn.style.cursor = 'pointer';
     btn.removeAttribute('data-disabled');

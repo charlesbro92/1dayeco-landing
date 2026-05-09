@@ -1006,14 +1006,15 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v83</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v84</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
-    <button class="nav-tab" onclick="showCategory('economy', this)">경제</button>
-    <button class="nav-tab" onclick="showCategory('realestate', this)">부동산</button>
-    <button class="nav-tab" onclick="showCategory('english', this)">영어</button>
-    <button class="nav-tab" onclick="showCategory('trivia', this)">상식</button>
+    <button class="nav-tab" onclick="showCategory('list-all', this)">전체</button>
+    <button class="nav-tab" onclick="showCategory('list-finance', this)">💼 경제·금융</button>
+    <button class="nav-tab" onclick="showCategory('list-lifestyle', this)">🏠 생활·실용</button>
+    <button class="nav-tab" onclick="showCategory('list-language', this)">🌐 글로벌·언어</button>
+    <button class="nav-tab" onclick="showCategory('list-tech', this)">💻 테크·트렌드</button>
     <button class="nav-tab nav-tab-soon" onclick="showCategory('comingsoon', this)" style="display:none">
       COMING SOON <span class="nav-tab-badge" id="navComingSoonBadge" style="display:none">0</span>
     </button>
@@ -1421,640 +1422,82 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 
 </div><!-- /#intro-page -->
 
-<!-- ─────────── 카테고리 4개 페이지 (v27 풍부한 버전) ─────────── -->
-<div class="category-page" id="economy-page">
+<!-- ─────────── 통합 카테고리 페이지 (v84) ─────────── -->
+<!-- 1) 카드 리스트 페이지 (전체 / 대분류) -->
+<div class="category-page" id="category-list-page">
+  <div class="category-page-bg"></div>
+  <div style="max-width:1100px;margin:0 auto;padding:60px 24px">
+    <div style="text-align:center;margin-bottom:36px">
+      <div id="catListEyebrow" style="font-size:11px;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:14px">CATEGORIES</div>
+      <h2 class="category-title" id="catListTitle" style="margin-bottom:14px">전체 카테고리</h2>
+      <p class="category-subtitle" id="catListSubtitle" style="margin-left:auto;margin-right:auto;text-align:center">관심 있는 카테고리를 선택하면 자세한 소개를 확인할 수 있어요.</p>
+    </div>
+    <div class="cs-grid" id="catListGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:13px">불러오는 중...</div>
+    </div>
+    <div style="text-align:center;margin-top:32px">
+      <button class="category-back" onclick="showCategory('intro')">← 소개로 돌아가기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 2) 카테고리 상세 소개 페이지 (동적) -->
+<div class="category-page" id="category-detail-page">
   <div class="category-page-bg"></div>
 
-  <!-- HERO -->
   <div class="cat-hero">
-    <h2 class="category-title">경제</h2>
-    <p class="category-subtitle">
-      매일 아침 1분,
-      경제 기본기를 차곡차곡.<br>
-      뉴스가 보이고, 내 돈의 흐름이 이해되기 시작합니다.
-    </p>
-    <div class="category-coming">매일 1편 · 구독 기간만큼 (최대 1년)</div>
+    <h2 class="category-title" id="cdpTitle">—</h2>
+    <p class="category-subtitle" id="cdpSubtitle">—</p>
+    <div class="category-coming" id="cdpDelivery">매일 1편</div>
     <div class="cat-hero-btns">
-      <button class="category-back" onclick="showCategory('intro', document.querySelector('.nav-tab'))">← 소개로 돌아가기</button>
-      <button class="cta-subscribe-btn" onclick="openModalWithCategory('economy')">📬 경제 신청하기 →</button>
+      <button class="category-back" onclick="showCategory('list-all')">← 카테고리 목록</button>
+      <button class="cta-subscribe-btn" id="cdpHeroCta" onclick="openModalWithCategory(window._currentCatId)">📬 신청하기 →</button>
     </div>
   </div>
 
-  <!-- 1. 공감 페인포인트 -->
+  <!-- 페인포인트 -->
   <section class="cat-section">
     <div class="cat-section-eyebrow">Why</div>
     <h3 class="cat-section-title">이런 고민, 있으셨죠?</h3>
-    <p class="cat-section-sub">경제는 뉴스에 나오지만, 내 삶에 어떻게 연결되는지 막막한 분들이 많습니다.</p>
-    <div class="cat-pain-grid">
-      <div class="cat-pain-card">
-        <div class="cat-pain-emoji">📰</div>
-        <div class="cat-pain-text">"기준금리 0.25%p 인상" 뉴스를 봐도 내 대출이자가 얼마나 오르는지 감이 안 와요.</div>
-      </div>
-      <div class="cat-pain-card">
-        <div class="cat-pain-emoji">💸</div>
-        <div class="cat-pain-text">월급은 그대로인데 마트 가격은 계속 오르네... 인플레이션이라고 하던데 정확히 뭘까요?</div>
-      </div>
-      <div class="cat-pain-card">
-        <div class="cat-pain-emoji">📈</div>
-        <div class="cat-pain-text">주변에서 다 주식·코인 한다는데 GDP, 환율, 금리도 모르고 뛰어들어도 될지 불안해요.</div>
-      </div>
-      <div class="cat-pain-card">
-        <div class="cat-pain-emoji">🤔</div>
-        <div class="cat-pain-text">유튜브 경제 채널을 봐도 1시간씩 길어서 끝까지 못 보고, 다음 날엔 또 까먹어요.</div>
-      </div>
-    </div>
+    <p class="cat-section-sub" id="cdpPainSub">—</p>
+    <div class="cat-pain-grid" id="cdpPainGrid"></div>
   </section>
 
-  <!-- 2. 실제 콘텐츠 미리보기 -->
+  <!-- 미리보기 -->
   <section class="cat-section" style="background:rgba(255,255,255,.015)">
     <div class="cat-section-eyebrow">Preview</div>
     <h3 class="cat-section-title">매일 아침 받아보는 콘텐츠</h3>
-    <p class="cat-section-sub">출근길 1분, 핵심만 깔끔하게. 어려운 용어는 풀어서 설명하고 실제 숫자로 와닿게 전달합니다.</p>
-    <div class="cat-preview-grid">
-      <!-- 미리보기 1: GDP -->
-      <div class="cat-msg-preview">
-        <div class="cat-msg-date-wrap"><span class="cat-msg-date">월요일 아침 8시</span></div>
-        <div class="cat-msg-scroll">
-          <div class="cat-msg-bubble">
-            [1DAYECO] 오늘의 1분 경제<br><br>
-            📌 GDP 1%↑면 일자리 20만개 증가<br><br>
-            📊 2026년 05월 11일 월요일<br>
-            경제 | GDP 1%↑면 일자리 20만개 증가<br><br>
-            <b>[오늘의 핵심]</b> GDP는 국가경제 성적표, 내 일자리·월급과 직결됩니다<br><br>
-            <b>📌 오늘의 포인트</b><br>
-            • GDP는 1년간 국내에서 생산된 모든 재화·서비스의 합계입니다. 2025년 한국 GDP는 2,100조원 규모로, 세계 13위를 기록했어요.<br>
-            • GDP 성장률이 1%p 오르면 약 20만개 일자리가 생기고 가계소득은 평균 2~3% 증가합니다. 마이너스 성장이면 실업률 상승으로 이어져요.<br>
-            • 2026년 1분기 한국 GDP 성장률은 2.1%로 전망됩니다. 수출 호조가 이끌었지만 내수 부진이 발목을 잡고 있어요.<br><br>
-            <b>💡 왜 중요한가?</b><br>
-            GDP 성장률이 높으면 기업 실적↑→채용 확대→임금 인상으로 이어집니다. 주식·부동산 시장도 함께 움직이죠. 경제뉴스의 기본 중 기본입니다.<br><br>
-            <b>📊 오늘의 숫자</b><br>
-            • 2.1%: 2026년 1분기 성장률 전망<br>
-            • 20만개: GDP 1%↑ 시 창출 일자리<br><br>
-            #GDP #경제성장률 #경제입문<br><br>
-            ──────────────<br>
-            ※ 본 메시지는 고객님이 1DAYECO 구독 신청하신 콘텐츠로, 매일 아침 8시에 발송됩니다.
-          </div>
-        </div>
-      </div>
-      <!-- 미리보기 2: 기준금리 -->
-      <div class="cat-msg-preview">
-        <div class="cat-msg-date-wrap"><span class="cat-msg-date">화요일 아침 8시</span></div>
-        <div class="cat-msg-scroll">
-          <div class="cat-msg-bubble">
-            [1DAYECO] 오늘의 1분 경제<br><br>
-            📌 0.25%p 인상, 3억 대출 75만원↑<br><br>
-            📊 2026년 05월 12일 화요일<br>
-            경제 | 0.25%p 인상, 3억 대출 75만원↑<br><br>
-            <b>[오늘의 핵심]</b> 기준금리 변동은 곧 내 통장에 들어옵니다<br><br>
-            <b>📌 오늘의 포인트</b><br>
-            • 한은이 5월 14일 기준금리를 3.25%→3.50%로 0.25%p 인상했어요. 인플레이션 압력 대응이 명분입니다.<br>
-            • 3억 주담대(30년, 변동금리 4.5%) 보유자는 연 75만원, 월 약 6만원 이자 부담이 늘어납니다. 적금 이자율도 0.2%p 안팎 상승해요.<br>
-            • 미국 연준이 6월에 추가 인상 시사 중이라, 한은도 7월에 한 번 더 올릴 가능성이 큽니다.<br><br>
-            <b>💡 왜 중요한가?</b><br>
-            대출 있으면 이자 부담이 무겁게 다가오지만, 예·적금자에겐 기회입니다. 6개월 이상 묶어둔 돈은 정기예금으로 옮기는 게 유리해요.<br><br>
-            <b>📊 오늘의 숫자</b><br>
-            • 3.50%: 현재 기준금리<br>
-            • 75만원: 3억 대출 시 연간 추가 부담<br><br>
-            #기준금리 #대출이자 #예적금<br><br>
-            ──────────────<br>
-            ※ 본 메시지는 고객님이 1DAYECO 구독 신청하신 콘텐츠로, 매일 아침 8시에 발송됩니다.
-          </div>
-        </div>
-      </div>
-    </div>
+    <p class="cat-section-sub">출근길 1분, 핵심만 깔끔하게 전달합니다.</p>
+    <div class="cat-preview-grid" id="cdpPreviewGrid"></div>
   </section>
 
-  <!-- 3. 1년치 주제 미리보기 -->
+  <!-- 주제 미리보기 -->
   <section class="cat-section">
     <div class="cat-section-eyebrow">Topics</div>
-    <h3 class="cat-section-title">1년이면 365개의 인사이트</h3>
-    <p class="cat-section-sub">기본 용어부터 시사 이슈까지, 매일 새로운 주제로 깊이를 더해갑니다. (일부 미리보기)</p>
-    <div class="cat-topics-grid">
-      <div class="cat-topic-chip"><div class="cat-topic-num">01</div>경제는 왜 배워야 할까</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">02</div>GDP, 한 국가의 성적표</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">03</div>인플레이션 vs 디플레이션</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">04</div>기준금리가 내 대출에 끼치는 영향</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">05</div>환율, 해외직구 가격의 비밀</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">06</div>주식과 채권의 차이</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">07</div>경제 사이클의 4단계</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">08</div>실업률과 고용률</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">09</div>중앙은행이 하는 일</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">10</div>달러 강세가 한국에 미치는 영향</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">11</div>인덱스 펀드와 ETF의 차이</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">12</div>... 그리고 매일 새로운 주제</div>
-    </div>
+    <h3 class="cat-section-title" id="cdpTopicsTitle">콘텐츠 주제 미리보기</h3>
+    <p class="cat-section-sub">매일 새로운 주제로 깊이를 더해갑니다.</p>
+    <div class="cat-topics-grid" id="cdpTopicsGrid"></div>
   </section>
 
-  <!-- 4. 추천 대상 -->
+  <!-- 추천 대상 -->
   <section class="cat-section" style="background:rgba(255,255,255,.015)">
     <div class="cat-section-eyebrow">For Whom</div>
     <h3 class="cat-section-title">이런 분들에게 추천해요</h3>
-    <div class="cat-persona-grid">
-      <div class="cat-persona">
-        <span class="cat-persona-icon">👨‍💼</span>
-        <div class="cat-persona-title">사회 초년생 직장인</div>
-        <div class="cat-persona-desc">월급 받기 시작했는데 경제 뉴스가 외계어처럼 들리는 분. 기본기부터 차근차근.</div>
-      </div>
-      <div class="cat-persona">
-        <span class="cat-persona-icon">📈</span>
-        <div class="cat-persona-title">투자 입문자</div>
-        <div class="cat-persona-desc">주식·코인 시작하기 전에, 경제 사이클과 거시지표를 먼저 이해하고 싶은 분.</div>
-      </div>
-      <div class="cat-persona">
-        <span class="cat-persona-icon">⏰</span>
-        <div class="cat-persona-title">시간이 부족한 직장인</div>
-        <div class="cat-persona-desc">긴 영상·기사 볼 시간은 없지만, 매일 1분이면 꾸준히 쌓고 싶은 분.</div>
-      </div>
-    </div>
+    <div class="cat-persona-grid" id="cdpPersonaGrid"></div>
   </section>
 
-  <!-- 5. 최종 CTA -->
+  <!-- 최종 CTA -->
   <section class="cat-section">
     <div class="cat-final-cta">
-      <div class="cat-final-cta-title">📬 매일 아침, 경제가 도착합니다</div>
-      <div class="cat-final-cta-sub">3일 무료 체험 후 월 ₩9,900부터 · 언제든 해지 가능<br>가만히 두면 1년 365일, 매일 새로운 인사이트가 쌓여요.</div>
-      <button class="cat-final-cta-btn" onclick="openModalWithCategory('economy')">🎁 무료 체험 시작하기 →</button>
+      <div class="cat-final-cta-title" id="cdpFinalTitle">📬 매일 아침, 콘텐츠가 도착합니다</div>
+      <div class="cat-final-cta-sub" id="cdpFinalSub">3일 무료 체험 후 결제 · 언제든 해지 가능</div>
+      <button class="cat-final-cta-btn" onclick="openModalWithCategory(window._currentCatId)">🎁 무료 체험 시작하기 →</button>
       <div class="cat-final-cta-meta">카카오톡 채널 친구추가 후 자동 발송</div>
     </div>
   </section>
 </div>
 
-<!-- ─────────── 부동산 카테고리 페이지 ─────────── -->
-<div class="category-page" id="realestate-page">
-  <div class="category-page-bg"></div>
-
-  <!-- HERO -->
-  <div class="cat-hero">
-    <h2 class="category-title">부동산</h2>
-    <p class="category-subtitle">
-      처음이라 무서운 거 알아요.<br>
-      매일 아침 1분, 부동산 용어가 친근해집니다.
-    </p>
-    <div class="category-coming">매일 1편 · 구독 기간만큼 (최대 1년)</div>
-    <div class="cat-hero-btns">
-      <button class="category-back" onclick="showCategory('intro', document.querySelector('.nav-tab'))">← 소개로 돌아가기</button>
-      <button class="cta-subscribe-btn" onclick="openModalWithCategory('realestate')">📬 부동산 신청하기 →</button>
-    </div>
-  </div>
-
-  <!-- 1. 공감 페인포인트 -->
-  <section class="cat-section">
-    <div class="cat-section-eyebrow">Why</div>
-    <h3 class="cat-section-title">이런 막막함, 있으셨죠?</h3>
-    <p class="cat-section-sub">부동산은 큰돈이 오가는 만큼, 모르고 시작하면 손해보기 쉽습니다.</p>
-    <div class="cat-pain-grid">
-      <div class="cat-pain-card">
-        <div class="cat-pain-emoji">🏘️</div>
-        <div class="cat-pain-text">전세 계약하러 갔는데 등기부등본·확정일자·전입신고... 뭐부터 봐야 할지 모르겠어요.</div>
-      </div>
-      <div class="cat-pain-card">
-        <div class="cat-pain-emoji">💳</div>
-        <div class="cat-pain-text">청약 가점이 뭔지, LTV·DTI·DSR 차이가 뭔지 들어도 매번 까먹어요.</div>
-      </div>
-      <div class="cat-pain-card">
-        <div class="cat-pain-emoji">⚖️</div>
-        <div class="cat-pain-text">취득세·재산세·종부세... 부동산 사면 어떤 세금이 얼마나 나오는지 감이 없어요.</div>
-      </div>
-      <div class="cat-pain-card">
-        <div class="cat-pain-emoji">😰</div>
-        <div class="cat-pain-text">전세 사기 뉴스 보면 무서운데, 뭘 조심해야 안전한지 정확히 모르겠어요.</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 2. 콘텐츠 미리보기 -->
-  <section class="cat-section" style="background:rgba(255,255,255,.015)">
-    <div class="cat-section-eyebrow">Preview</div>
-    <h3 class="cat-section-title">매일 아침 받아보는 콘텐츠</h3>
-    <p class="cat-section-sub">어려운 용어는 일상 언어로, 실제 사례와 숫자로 와닿게 풀어드립니다.</p>
-    <div class="cat-preview-grid">
-      <!-- 미리보기 1: LTV -->
-      <div class="cat-msg-preview">
-        <div class="cat-msg-date-wrap"><span class="cat-msg-date">월요일 아침 8시</span></div>
-        <div class="cat-msg-scroll">
-          <div class="cat-msg-bubble">
-            [1DAYECO] 오늘의 1분 부동산<br><br>
-            📌 LTV 70% = 3억 집에 최대 2.1억<br><br>
-            🏠 2026년 05월 11일 월요일<br>
-            부동산 | LTV 70% = 3억 집에 최대 2.1억<br><br>
-            <b>[오늘의 핵심]</b> 집값의 몇 %까지 빌려주는지가 LTV<br><br>
-            <b>📌 오늘의 포인트</b><br>
-            • LTV(주택담보인정비율)는 집값 대비 대출 한도 비율을 뜻해요. 은행이 "이 집을 담보로 얼마까지 빌려줄까"의 기준입니다.<br>
-            • 2026년 기준 무주택자는 LTV 70%까지, 다주택자는 50%까지 적용됩니다. 규제지역(서울·경기 일부)은 더 낮아요.<br>
-            • 3억짜리 집을 LTV 70%로 매수하면 최대 2.1억 대출 가능. 단, 본인 소득에 따라 더 줄어들 수 있어요.<br><br>
-            <b>💡 알아두면 좋은 점</b><br>
-            LTV는 "최대 한도"일 뿐, 실제론 DTI(소득 대비 부채비율)·DSR(총부채원리금상환비율)도 함께 봅니다. 연봉 5천이라면 DSR 40% 한도로 연간 2천만원이 부채 상환 한도예요.<br><br>
-            <b>📐 핵심 숫자</b><br>
-            • 70%: 무주택자 LTV<br>
-            • 40%: DSR 한도 (연봉 기준)<br><br>
-            #LTV #DSR #첫집마련<br><br>
-            ──────────────<br>
-            ※ 본 메시지는 고객님이 1DAYECO 구독 신청하신 콘텐츠로, 매일 아침 8시에 발송됩니다.
-          </div>
-        </div>
-      </div>
-      <!-- 미리보기 2: 등기부등본 -->
-      <div class="cat-msg-preview">
-        <div class="cat-msg-date-wrap"><span class="cat-msg-date">화요일 아침 8시</span></div>
-        <div class="cat-msg-scroll">
-          <div class="cat-msg-bubble">
-            [1DAYECO] 오늘의 1분 부동산<br><br>
-            📌 등기부등본 1분 만에 보는 법<br><br>
-            🏠 2026년 05월 12일 화요일<br>
-            부동산 | 등기부등본 1분 만에 보는 법<br><br>
-            <b>[오늘의 핵심]</b> 등기부등본은 집의 신분증, 안 보면 전세사기 당해요<br><br>
-            <b>📌 오늘의 포인트</b><br>
-            • 등기부등본은 표제부·갑구·을구 3개 영역으로 구성됩니다. 표제부는 주소·면적 등 집 자체 정보이고, 갑구는 소유자 정보, 을구는 근저당 정보예요.<br>
-            • 갑구에서 "현재 집주인이 진짜 맞는지" 확인하세요. 계약하러 온 사람과 등기부 소유자가 같아야 합니다.<br>
-            • 을구의 근저당액(은행 대출)이 시세 70% 이상이면 위험! 집이 경매로 넘어가면 보증금 못 돌려받을 수 있어요.<br><br>
-            <b>💡 알아두면 좋은 점</b><br>
-            인터넷등기소(iros.go.kr)에서 700원이면 발급 가능합니다. 계약 직전, 잔금 직전에 두 번 확인하세요. 등기부 갱신은 실시간이 아니라 24시간 차이가 있을 수 있어요.<br><br>
-            <b>📐 핵심 숫자</b><br>
-            • 700원: 등기부등본 발급 비용<br>
-            • 70%: 위험 근저당 비율 마지노선<br><br>
-            #등기부등본 #전세사기예방 #계약체크<br><br>
-            ──────────────<br>
-            ※ 본 메시지는 고객님이 1DAYECO 구독 신청하신 콘텐츠로, 매일 아침 8시에 발송됩니다.
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 3. 주제 미리보기 -->
-  <section class="cat-section">
-    <div class="cat-section-eyebrow">Topics</div>
-    <h3 class="cat-section-title">1년이면 부동산 마스터</h3>
-    <p class="cat-section-sub">용어부터 실전까지, 첫 집 마련에 필요한 모든 것을 차근차근. (일부 미리보기)</p>
-    <div class="cat-topics-grid">
-      <div class="cat-topic-chip"><div class="cat-topic-num">01</div>전세 vs 월세, 내 상황엔?</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">02</div>등기부등본 1분 만에 읽기</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">03</div>LTV·DTI·DSR 한 번에 정리</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">04</div>청약 가점 계산법</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">05</div>전세 사기 피하는 5가지 방법</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">06</div>취득세·재산세·종부세 차이</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">07</div>분양가상한제와 청약 당첨</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">08</div>월세 세액공제 받는 법</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">09</div>임대차보호법 핵심 5조항</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">10</div>주담대와 전세대출의 차이</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">11</div>역세권·학군지 시세 분석법</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">12</div>... 그리고 매일 새로운 주제</div>
-    </div>
-  </section>
-
-  <!-- 4. 추천 대상 -->
-  <section class="cat-section" style="background:rgba(255,255,255,.015)">
-    <div class="cat-section-eyebrow">For Whom</div>
-    <h3 class="cat-section-title">이런 분들에게 추천해요</h3>
-    <div class="cat-persona-grid">
-      <div class="cat-persona">
-        <span class="cat-persona-icon">🔑</span>
-        <div class="cat-persona-title">첫 집 마련 준비자</div>
-        <div class="cat-persona-desc">곧 전세·매매를 알아봐야 하는데 아직 용어가 익숙하지 않은 분.</div>
-      </div>
-      <div class="cat-persona">
-        <span class="cat-persona-icon">📋</span>
-        <div class="cat-persona-title">청약 도전자</div>
-        <div class="cat-persona-desc">청약 가점 관리하면서 분양 정보를 꾸준히 따라가고 싶은 분.</div>
-      </div>
-      <div class="cat-persona">
-        <span class="cat-persona-icon">🛡️</span>
-        <div class="cat-persona-title">전월세 거주자</div>
-        <div class="cat-persona-desc">계약 갱신, 보증금 보호, 임대차법 등 안전하게 살고 싶은 분.</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 5. 최종 CTA -->
-  <section class="cat-section">
-    <div class="cat-final-cta">
-      <div class="cat-final-cta-title">🏠 부동산이 더 이상 무섭지 않게</div>
-      <div class="cat-final-cta-sub">3일 무료 체험 후 월 ₩9,900부터 · 언제든 해지 가능<br>가만히 두면 1년 365일, 매일 부동산 지식이 쌓여요.</div>
-      <button class="cat-final-cta-btn" onclick="openModalWithCategory('realestate')">🎁 무료 체험 시작하기 →</button>
-      <div class="cat-final-cta-meta">카카오톡 채널 친구추가 후 자동 발송</div>
-    </div>
-  </section>
-</div>
-
-<!-- ─────────── 영어 카테고리 페이지 ─────────── -->
-<div class="category-page" id="english-page">
-  <div class="category-page-bg"></div>
-
-  <!-- HERO -->
-  <div class="cat-hero">
-    <h2 class="category-title">영어</h2>
-    <p class="category-subtitle">
-      심슨이랑 노는 기분으로 영어 한 표현.<br>
-      외워지는 게 아니라, 머리에 박힙니다.
-    </p>
-    <div class="category-coming">매일 1편 · 구독 기간만큼 (최대 1년)</div>
-    <div class="cat-hero-btns">
-      <button class="category-back" onclick="showCategory('intro', document.querySelector('.nav-tab'))">← 소개로 돌아가기</button>
-      <button class="cta-subscribe-btn" onclick="openModalWithCategory('english')">📬 영어 신청하기 →</button>
-    </div>
-  </div>
-
-  <!-- 1. 공감 페인포인트 -->
-  <section class="cat-section">
-    <div class="cat-section-eyebrow">Why</div>
-    <h3 class="cat-section-title">이런 경험, 있으셨죠?</h3>
-    <p class="cat-section-sub">교과서 영어는 알지만, 미국인이 진짜 쓰는 표현은 늘 새롭게 느껴집니다.</p>
-    <div class="cat-pain-grid">
-      <div class="cat-pain-card">
-        <div class="cat-pain-emoji">📚</div>
-        <div class="cat-pain-text">단어장 외우고 토익 점수도 좋은데, 막상 외국인이랑 대화하면 입이 안 떨어져요.</div>
-      </div>
-      <div class="cat-pain-card">
-        <div class="cat-pain-emoji">🎬</div>
-        <div class="cat-pain-text">영어 드라마·영화 보면 자막 없으면 60%만 알아들어요. 슬랭이나 관용구가 어려워요.</div>
-      </div>
-      <div class="cat-pain-card">
-        <div class="cat-pain-emoji">😴</div>
-        <div class="cat-pain-text">영어 학습 앱 깔아봐도 며칠 만에 그만뒀어요. 매일 1시간씩 시간 내기가 너무 부담돼요.</div>
-      </div>
-      <div class="cat-pain-card">
-        <div class="cat-pain-emoji">💬</div>
-        <div class="cat-pain-text">"How are you" 외에 자연스러운 표현을 다양하게 알고 싶은데, 어디서 배우죠?</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 2. 콘텐츠 미리보기 -->
-  <section class="cat-section" style="background:rgba(255,255,255,.015)">
-    <div class="cat-section-eyebrow">Preview</div>
-    <h3 class="cat-section-title">매일 아침 받아보는 콘텐츠</h3>
-    <p class="cat-section-sub">심슨 가족의 명대사로 자연스러운 미국식 표현 한 개. 1분이면 입에 붙어요.</p>
-    <div class="cat-preview-grid">
-      <!-- 미리보기 1: D'oh -->
-      <div class="cat-msg-preview">
-        <div class="cat-msg-date-wrap"><span class="cat-msg-date">월요일 아침 8시</span></div>
-        <div class="cat-msg-scroll">
-          <div class="cat-msg-bubble">
-            [1DAYECO] 오늘의 1분 영어<br><br>
-            📌 D'oh! — 호머 심슨의 한 마디<br><br>
-            🇬🇧 2026년 05월 11일 월요일<br>
-            영어 | D'oh! — 호머 심슨의 한 마디<br><br>
-            <b>[오늘의 표현]</b><br>
-            원문: "D'oh!"<br>
-            직역: "아이고!" / "헐!"<br><br>
-            <b>🎬 어디서 나온 표현?</b><br>
-            심슨 가족의 아빠 호머 심슨의 트레이드마크 감탄사. 실수했거나 뒤늦게 뭘 깨달았을 때 머리를 감싸쥐며 내뱉는 한 마디예요. 1989년 첫 등장 이후 옥스포드 영어사전에까지 등재됐습니다.<br><br>
-            <b>💬 어떻게 쓰나?</b><br>
-            한국어 "아이고", "헐", "이런!" 같은 자조적 감탄. 친구가 농담을 너무 늦게 알아챘을 때, 본인이 멍청한 실수를 했을 때 자연스럽게 써먹을 수 있어요.<br><br>
-            <b>📝 예문 2개</b><br>
-            1. I locked my keys in the car. D'oh!<br>
-            &nbsp;&nbsp;→ 차 안에 키를 두고 잠갔네. 아이고!<br>
-            2. Wait, that was today? D'oh!<br>
-            &nbsp;&nbsp;→ 잠깐, 그거 오늘이었어? 헐!<br><br>
-            <b>💡 비슷한 표현</b><br>
-            "Oops!" 와 비슷하지만, D'oh는 좀 더 자조적·바보같음 강조. Oops는 가벼운 실수, D'oh는 "아 나 또 이런 짓을".<br><br>
-            #심슨 #감탄사 #영어회화<br><br>
-            ──────────────<br>
-            ※ 본 메시지는 고객님이 1DAYECO 구독 신청하신 콘텐츠로, 매일 아침 8시에 발송됩니다.
-          </div>
-        </div>
-      </div>
-      <!-- 미리보기 2: Eat my shorts -->
-      <div class="cat-msg-preview">
-        <div class="cat-msg-date-wrap"><span class="cat-msg-date">화요일 아침 8시</span></div>
-        <div class="cat-msg-scroll">
-          <div class="cat-msg-bubble">
-            [1DAYECO] 오늘의 1분 영어<br><br>
-            📌 Eat my shorts! — 바트의 약 올림<br><br>
-            🇬🇧 2026년 05월 12일 화요일<br>
-            영어 | Eat my shorts! — 바트의 약 올림<br><br>
-            <b>[오늘의 표현]</b><br>
-            원문: "Eat my shorts!"<br>
-            직역: "내 반바지나 먹어라!"<br><br>
-            <b>🎬 어디서 나온 표현?</b><br>
-            심슨의 장남 바트 심슨이 약 올리거나 도발할 때 외치는 트레이드마크. 1980년대 청소년 슬랭에서 따온 표현으로, 실제 의미보다는 어이없는 도발 그 자체가 포인트예요.<br><br>
-            <b>💬 어떻게 쓰나?</b><br>
-            친구끼리 가볍게 약 올릴 때만! 진지한 자리나 어른에게 쓰면 무례합니다. 한국어 "메롱~"이나 "흥, 칫뽕!"이 가장 가까운 뉘앙스예요.<br><br>
-            <b>📝 예문 2개</b><br>
-            1. You think you're better than me? Eat my shorts!<br>
-            &nbsp;&nbsp;→ 네가 나보다 잘났다고? 메롱~<br>
-            2. Boring lecture? Eat my shorts, professor!<br>
-            &nbsp;&nbsp;→ 지루한 강의라고? 흥, 교수님!<br><br>
-            <b>💡 비슷한 표현</b><br>
-            "Bite me!" 와 비슷한 상황에서 사용. 둘 다 가볍게 약 올리는 표현이지만, Eat my shorts는 좀 더 '바보같이' 도발하는 느낌.<br><br>
-            #심슨 #슬랭 #영어회화<br><br>
-            ──────────────<br>
-            ※ 본 메시지는 고객님이 1DAYECO 구독 신청하신 콘텐츠로, 매일 아침 8시에 발송됩니다.
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 3. 주제 미리보기 -->
-  <section class="cat-section">
-    <div class="cat-section-eyebrow">Topics</div>
-    <h3 class="cat-section-title">1년이면 365개의 영어 표현</h3>
-    <p class="cat-section-sub">교과서엔 없는 진짜 미국식 표현, 심슨이 가르쳐줍니다. (일부 미리보기)</p>
-    <div class="cat-topics-grid">
-      <div class="cat-topic-chip"><div class="cat-topic-num">01</div>"D'oh!" — 호머 심슨의 트레이드마크</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">02</div>"Cowabunga!" — 신날 때 외치는 외침</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">03</div>"Eat my shorts!" — 약 올릴 때</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">04</div>"Don't have a cow!" — 진정해</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">05</div>"Why you little...!" — 화났을 때</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">06</div>"Worst ___ ever." — 강조 패턴</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">07</div>"Mmm, donuts." — 좋아하는 거 표현</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">08</div>"It's funny because it's true."</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">09</div>"That's the joke." — 농담 설명</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">10</div>"I'm in." — 동참 의사 표현</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">11</div>"You can say that again." — 격공</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">12</div>... 그리고 매일 새로운 표현</div>
-    </div>
-  </section>
-
-  <!-- 4. 추천 대상 -->
-  <section class="cat-section" style="background:rgba(255,255,255,.015)">
-    <div class="cat-section-eyebrow">For Whom</div>
-    <h3 class="cat-section-title">이런 분들에게 추천해요</h3>
-    <div class="cat-persona-grid">
-      <div class="cat-persona">
-        <span class="cat-persona-icon">🎬</span>
-        <div class="cat-persona-title">미드·영화 좋아하는 분</div>
-        <div class="cat-persona-desc">자막 없이 영어 콘텐츠 즐기고 싶은 분. 슬랭과 관용구 위주로 배워요.</div>
-      </div>
-      <div class="cat-persona">
-        <span class="cat-persona-icon">✈️</span>
-        <div class="cat-persona-title">해외여행·출장자</div>
-        <div class="cat-persona-desc">현지인이 진짜 쓰는 표현으로 자연스럽게 대화하고 싶은 분.</div>
-      </div>
-      <div class="cat-persona">
-        <span class="cat-persona-icon">😎</span>
-        <div class="cat-persona-title">가볍게 영어 즐기고 싶은 분</div>
-        <div class="cat-persona-desc">학원·앱은 부담스럽고, 매일 1분이면 좋겠다는 분.</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 5. 최종 CTA -->
-  <section class="cat-section">
-    <div class="cat-final-cta">
-      <div class="cat-final-cta-title">🇬🇧 영어가 즐거워지는 1분</div>
-      <div class="cat-final-cta-sub">3일 무료 체험 후 월 ₩9,900부터 · 언제든 해지 가능<br>심슨과 함께라면 영어 공부도 부담 없어져요.</div>
-      <button class="cat-final-cta-btn" onclick="openModalWithCategory('english')">🎁 무료 체험 시작하기 →</button>
-      <div class="cat-final-cta-meta">카카오톡 채널 친구추가 후 자동 발송</div>
-    </div>
-  </section>
-</div>
-
-<!-- ─────────── 상식 카테고리 페이지 ─────────── -->
-<div class="category-page" id="trivia-page">
-  <div class="category-page-bg"></div>
-
-  <!-- HERO -->
-  <div class="cat-hero">
-    <h2 class="category-title">상식</h2>
-    <p class="category-subtitle">
-      친구한테 자랑하고 싶어지는 이야기.<br>
-      매일 하나, 호기심을 채워드립니다.
-    </p>
-    <div class="category-coming">매일 1편 · 구독 기간만큼 (최대 1년)</div>
-    <div class="cat-hero-btns">
-      <button class="category-back" onclick="showCategory('intro', document.querySelector('.nav-tab'))">← 소개로 돌아가기</button>
-      <button class="cta-subscribe-btn" onclick="openModalWithCategory('trivia')">📬 상식 신청하기 →</button>
-    </div>
-  </div>
-
-  <!-- 1. 공감 페인포인트 -->
-  <section class="cat-section">
-    <div class="cat-section-eyebrow">Why</div>
-    <h3 class="cat-section-title">이런 순간, 있으셨죠?</h3>
-    <p class="cat-section-sub">아는 만큼 보이고, 아는 만큼 대화가 풍성해집니다.</p>
-    <div class="cat-pain-grid">
-      <div class="cat-pain-card">
-        <div class="cat-pain-emoji">🍻</div>
-        <div class="cat-pain-text">회식·친구 모임에서 조용히 듣기만 하다가 끝나는 게 싫어요. 흥미로운 이야기 하나쯤은 갖고 싶어요.</div>
-      </div>
-      <div class="cat-pain-card">
-        <div class="cat-pain-emoji">👶</div>
-        <div class="cat-pain-text">자녀가 "왜?" 물어볼 때마다 "어... 글쎄?" 만 반복하는 게 부끄러워요.</div>
-      </div>
-      <div class="cat-pain-card">
-        <div class="cat-pain-emoji">📱</div>
-        <div class="cat-pain-text">유튜브 쇼츠로 정보를 보긴 하는데, 출처가 불분명해서 친구한테 말하기 찝찝해요.</div>
-      </div>
-      <div class="cat-pain-card">
-        <div class="cat-pain-emoji">🎓</div>
-        <div class="cat-pain-text">"왜 그런지" 궁금했던 적 많은데, 인터넷 검색해도 너무 길거나 지루하더라고요.</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 2. 콘텐츠 미리보기 -->
-  <section class="cat-section" style="background:rgba(255,255,255,.015)">
-    <div class="cat-section-eyebrow">Preview</div>
-    <h3 class="cat-section-title">매일 아침 받아보는 콘텐츠</h3>
-    <p class="cat-section-sub">검증된 사실만, 호기심을 자극하는 톤으로. 1분이면 친구한테 자랑할 거리가 생겨요.</p>
-    <div class="cat-preview-grid">
-      <!-- 미리보기 1: 비행기 창문 -->
-      <div class="cat-msg-preview">
-        <div class="cat-msg-date-wrap"><span class="cat-msg-date">월요일 아침 8시</span></div>
-        <div class="cat-msg-scroll">
-          <div class="cat-msg-bubble">
-            [1DAYECO] 오늘의 1분 상식<br><br>
-            📌 비행기 창문은 왜 둥글까?<br><br>
-            🧠 2026년 05월 11일 월요일<br>
-            상식 | 비행기 창문은 왜 둥글까?<br><br>
-            <b>[흥미로운 사실 한 줄]</b><br>
-            사각형 창문 비행기는 공중분해 사고로 35명이 사망했어요<br><br>
-            <b>🔍 그래서 왜 그럴까?</b><br>
-            1950년대 영국 De Havilland Comet기는 세계 최초 상용 제트여객기로 사각형 창문을 달고 운항했어요. 그런데 이착륙으로 인한 압력 변화가 반복되면서 사각형 모서리에 응력(stress)이 집중됐고, 결국 균열이 생겨 공중에서 동체가 분해되는 사고가 잇따라 발생했습니다.<br><br>
-            <b>📚 좀 더 자세히</b><br>
-            1954년에만 두 차례 추락 사고로 승객 56명이 사망. 조사 결과 사각 모서리에 응력이 집중돼 금속 피로가 누적된 것이 원인으로 밝혀졌어요. 이후 모든 항공기는 둥근 곡선 창문으로 바뀌었고, 이게 항공 공학의 표준이 됐습니다. 모서리 없는 곡선이 압력을 균등하게 분산시키거든요.<br><br>
-            <b>💡 알아두면 어디에 쓸까?</b><br>
-            "왜 창문이 둥글지?" 호기심 많은 자녀에게 멋있게 설명해주세요. 공학·과학에 관한 흥미를 일으키기에 딱 좋은 이야기입니다.<br><br>
-            #비행기상식 #공학원리 #금속피로<br><br>
-            ──────────────<br>
-            ※ 본 메시지는 고객님이 1DAYECO 구독 신청하신 콘텐츠로, 매일 아침 8시에 발송됩니다.
-          </div>
-        </div>
-      </div>
-      <!-- 미리보기 2: 꿀 -->
-      <div class="cat-msg-preview">
-        <div class="cat-msg-date-wrap"><span class="cat-msg-date">화요일 아침 8시</span></div>
-        <div class="cat-msg-scroll">
-          <div class="cat-msg-bubble">
-            [1DAYECO] 오늘의 1분 상식<br><br>
-            📌 꿀은 왜 영원히 안 상할까?<br><br>
-            🧠 2026년 05월 12일 화요일<br>
-            상식 | 꿀은 왜 영원히 안 상할까?<br><br>
-            <b>[흥미로운 사실 한 줄]</b><br>
-            3,000년 전 이집트 무덤에서 나온 꿀이 지금도 먹을 수 있어요<br><br>
-            <b>🔍 그래서 왜 그럴까?</b><br>
-            꿀은 수분 함량이 17% 미만이고 산성도(pH)가 3~4.5로 매우 낮아서, 박테리아나 곰팡이가 도저히 살 수 없는 환경이에요. 게다가 꿀벌이 만드는 효소(글루코오스 옥시다아제)가 미량의 과산화수소를 생성해 천연 살균 역할까지 합니다. 식품 보존의 끝판왕이죠.<br><br>
-            <b>📚 좀 더 자세히</b><br>
-            1922년 투탕카멘 무덤 발굴 시 함께 나온 꿀 단지가 실제로 먹을 수 있는 상태였다고 합니다. 단, 조건이 있어요. 반드시 밀봉되어 있어야 합니다. 뚜껑을 열어두면 공기 중 수분을 흡수해 결국 발효되거나 곰팡이가 생길 수 있어요. 결정화돼 굳은 꿀은 따뜻한 물에 중탕하면 다시 액체로 돌아옵니다.<br><br>
-            <b>💡 알아두면 어디에 쓸까?</b><br>
-            식품 보존의 가장 오래된 사례. 친구·자녀와 식품 보관 이야기 할 때 흥미로운 화제로 던져보세요.<br><br>
-            #생활상식 #식품과학 #자연방부제<br><br>
-            ──────────────<br>
-            ※ 본 메시지는 고객님이 1DAYECO 구독 신청하신 콘텐츠로, 매일 아침 8시에 발송됩니다.
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 3. 주제 미리보기 -->
-  <section class="cat-section">
-    <div class="cat-section-eyebrow">Topics</div>
-    <h3 class="cat-section-title">1년이면 365개의 알쓸상식</h3>
-    <p class="cat-section-sub">생활·과학·역사·문화까지 골고루. 어디서든 한 번쯤 써먹을 이야기. (일부 미리보기)</p>
-    <div class="cat-topics-grid">
-      <div class="cat-topic-chip"><div class="cat-topic-num">01</div>비행기 창문은 왜 둥글까?</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">02</div>꿀은 왜 안 상할까?</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">03</div>지하철 좌석이 7명인 이유</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">04</div>QWERTY 자판은 왜 이 순서?</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">05</div>김치 냉장고가 한국에만 있는 이유</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">06</div>바나나는 왜 점점 사라질 위기?</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">07</div>토끼는 정말 외로우면 죽을까?</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">08</div>해킹 안 당하는 비밀번호 만드는 법</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">09</div>왜 우유팩 위는 삼각형일까?</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">10</div>커피믹스가 한국에서 대박난 이유</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">11</div>'OK'라는 단어의 진짜 어원</div>
-      <div class="cat-topic-chip"><div class="cat-topic-num">12</div>... 그리고 매일 새로운 이야기</div>
-    </div>
-  </section>
-
-  <!-- 4. 추천 대상 -->
-  <section class="cat-section" style="background:rgba(255,255,255,.015)">
-    <div class="cat-section-eyebrow">For Whom</div>
-    <h3 class="cat-section-title">이런 분들에게 추천해요</h3>
-    <div class="cat-persona-grid">
-      <div class="cat-persona">
-        <span class="cat-persona-icon">🗣️</span>
-        <div class="cat-persona-title">대화 소재가 필요한 분</div>
-        <div class="cat-persona-desc">회식·모임에서 자연스럽게 화제 만들고 싶은 분. 어디서든 던질 수 있는 이야기.</div>
-      </div>
-      <div class="cat-persona">
-        <span class="cat-persona-icon">👨‍👩‍👧</span>
-        <div class="cat-persona-title">자녀에게 들려줄 분</div>
-        <div class="cat-persona-desc">호기심 많은 아이 질문에 멋있게 답하고 싶은 부모님.</div>
-      </div>
-      <div class="cat-persona">
-        <span class="cat-persona-icon">📖</span>
-        <div class="cat-persona-title">알쓸신잡 좋아하는 분</div>
-        <div class="cat-persona-desc">유튜브로 보긴 부담스럽고, 짧고 알찬 지식이 좋은 분.</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 5. 최종 CTA -->
-  <section class="cat-section">
-    <div class="cat-final-cta">
-      <div class="cat-final-cta-title">🧠 매일 자랑할 거리 하나씩</div>
-      <div class="cat-final-cta-sub">3일 무료 체험 후 월 ₩9,900부터 · 언제든 해지 가능<br>1년이면 365개의 흥미로운 이야기, 자연스럽게 쌓여요.</div>
-      <button class="cat-final-cta-btn" onclick="openModalWithCategory('trivia')">🎁 무료 체험 시작하기 →</button>
-      <div class="cat-final-cta-meta">카카오톡 채널 친구추가 후 자동 발송</div>
-    </div>
-  </section>
-</div>
-
-<!-- ─────────── COMING SOON 통합 페이지 ─────────── -->
+<!-- 3) COMING SOON 페이지 -->
 <div class="category-page comingsoon-page" id="comingsoon-page">
   <div class="category-page-bg"></div>
   <div class="cs-page-inner">
@@ -2077,14 +1520,12 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
       </div>
     </div>
 
-    <!-- ⭐ 어드민에 등록된 coming_soon 카테고리 동적 렌더 -->
     <div class="cs-grid" id="csMainGrid">
       <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:13px">
         출시 예정 카테고리를 불러오는 중...
       </div>
     </div>
 
-    <!-- 빈 상태 안내 (coming_soon 카테고리 0개일 때) -->
     <div id="csEmptyState" style="display:none;text-align:center;padding:60px 20px">
       <div style="font-size:48px;margin-bottom:16px;opacity:.4">📭</div>
       <div style="font-size:16px;color:var(--muted);font-weight:600;margin-bottom:8px">아직 출시 예정 카테고리가 없습니다</div>
@@ -2100,10 +1541,11 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     </div>
 
     <div style="text-align:center;margin-top:32px">
-      <button class="category-back" onclick="showCategory('intro', document.querySelector('.nav-tab'))">← 소개로 돌아가기</button>
+      <button class="category-back" onclick="showCategory('intro')">← 소개로 돌아가기</button>
     </div>
   </div>
 </div>
+
 
 <footer>
   <div class="foot-logo" style="letter-spacing:1px;font-weight:900">1DAYECO</div>
@@ -2565,10 +2007,405 @@ const FIXED_SEND_HOUR = 8;      // 발송 시간 고정
 // 포트원 V2 SDK는 별도 init 필요 없음 (PortOne.requestIssueBillingKey 호출 시 storeId 전달)
 
 // ── 카테고리 탭 전환 ─────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════
+// 카테고리 상세 컨텐츠 데이터 (정식 4개 풍부 + 신규 4개 간소)
+// ════════════════════════════════════════════════════════════════
+const CATEGORY_CONTENT = {
+  economy: {
+    title: '경제',
+    subtitle: '매일 아침 1분, 경제 기본기를 차곡차곡.<br>뉴스가 보이고, 내 돈의 흐름이 이해되기 시작합니다.',
+    delivery: '매일 1편 · 구독 기간만큼 (최대 1년)',
+    painSub: '경제는 뉴스에 나오지만, 내 삶에 어떻게 연결되는지 막막한 분들이 많습니다.',
+    pains: [
+      { e: '📰', t: '"기준금리 0.25%p 인상" 뉴스를 봐도 내 대출이자가 얼마나 오르는지 감이 안 와요.' },
+      { e: '💸', t: '월급은 그대로인데 마트 가격은 계속 오르네... 인플레이션이라고 하던데 정확히 뭘까요?' },
+      { e: '📈', t: '주변에서 다 주식·코인 한다는데 GDP, 환율, 금리도 모르고 뛰어들어도 될지 불안해요.' },
+      { e: '🤔', t: '유튜브 경제 채널을 봐도 1시간씩 길어서 끝까지 못 보고, 다음 날엔 또 까먹어요.' },
+    ],
+    previews: [
+      {
+        day: '월요일 아침 8시',
+        title: '📌 GDP 1%↑면 일자리 20만개 증가',
+        body: '<b>[오늘의 핵심]</b> GDP는 국가경제 성적표, 내 일자리·월급과 직결됩니다<br><br><b>📌 오늘의 포인트</b><br>• GDP는 1년간 국내에서 생산된 모든 재화·서비스의 합계입니다.<br>• GDP 성장률 1%p↑면 약 20만개 일자리, 가계소득 2~3% 증가.<br>• 2026년 1분기 한국 GDP 성장률 2.1% 전망.<br><br><b>💡 왜 중요한가?</b><br>GDP↑ → 기업실적↑ → 채용 확대 → 임금 인상으로 이어집니다.<br><br>#GDP #경제성장률 #경제입문',
+      },
+      {
+        day: '화요일 아침 8시',
+        title: '📌 0.25%p 인상, 3억 대출 75만원↑',
+        body: '<b>[오늘의 핵심]</b> 기준금리 변동은 곧 내 통장에 들어옵니다<br><br><b>📌 오늘의 포인트</b><br>• 한은이 기준금리를 3.25%→3.50%로 0.25%p 인상.<br>• 3억 주담대(30년, 변동 4.5%) 보유자는 연 75만원, 월 약 6만원 부담↑.<br>• 미국 연준 추가 인상 가능성으로 한은도 추가 인상 검토 중.<br><br>#기준금리 #대출이자 #예적금',
+      },
+    ],
+    topicsTitle: '1년이면 365개의 인사이트',
+    topics: [
+      '경제는 왜 배워야 할까', 'GDP, 한 국가의 성적표', '인플레이션 vs 디플레이션',
+      '기준금리가 내 대출에 끼치는 영향', '환율, 해외직구 가격의 비밀', '주식과 채권의 차이',
+      '경제 사이클의 4단계', '실업률과 고용률', '중앙은행이 하는 일',
+      '달러 강세가 한국에 미치는 영향', '인덱스 펀드와 ETF의 차이', '... 그리고 매일 새로운 주제',
+    ],
+    personas: [
+      { i: '👨‍💼', t: '사회 초년생 직장인', d: '월급 받기 시작했는데 경제 뉴스가 외계어처럼 들리는 분. 기본기부터 차근차근.' },
+      { i: '📈', t: '투자 입문자', d: '주식·코인 시작하기 전에, 경제 사이클과 거시지표를 먼저 이해하고 싶은 분.' },
+      { i: '⏰', t: '시간이 부족한 직장인', d: '긴 영상·기사 볼 시간은 없지만, 매일 1분이면 꾸준히 쌓고 싶은 분.' },
+    ],
+    finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능<br>가만히 두면 1년 365일, 매일 새로운 인사이트가 쌓여요.',
+  },
+  realestate: {
+    title: '부동산',
+    subtitle: '매일 아침 1분, 부동산의 기초부터 시장 흐름까지.<br>임대차·세금·청약·재건축 — 내 자산을 지키는 지식.',
+    delivery: '매일 1편 · 구독 기간만큼',
+    painSub: '내 집 마련, 전세·월세, 청약 — 알아야 할 게 너무 많은데 한 번에 익히기 어렵죠.',
+    pains: [
+      { e: '🏘️', t: '전세 만기인데 보증금 올려달라네요. 갱신청구권은 언제 쓸 수 있는 건가요?' },
+      { e: '📋', t: '청약 1순위가 뭔지, 가점은 어떻게 계산되는지 매번 헷갈려요.' },
+      { e: '💰', t: '집을 팔면 양도세는 얼마나 나오는지, 1주택자 비과세 조건은 뭔지 모르겠어요.' },
+      { e: '🏗️', t: '재건축·재개발 뉴스가 많은데 내가 사는 동네에 영향이 있는지 판단이 안 돼요.' },
+    ],
+    previews: [
+      {
+        day: '월요일 아침 8시',
+        title: '📌 전세 갱신청구권, 한 번만 쓸 수 있어요',
+        body: '<b>[오늘의 핵심]</b> 임대차보호법으로 임차인이 한 번에 한해 2년 더 살 권리가 있습니다<br><br><b>📌 오늘의 포인트</b><br>• 갱신청구권은 계약 만료 6개월~2개월 전 사이에 행사.<br>• 임대료는 5% 이내로만 인상 가능.<br>• 단, 집주인 본인 거주 시 거절 가능.<br><br>#임대차 #갱신청구권 #전세',
+      },
+      {
+        day: '화요일 아침 8시',
+        title: '📌 1주택자 양도세 비과세, 2년 거주가 핵심',
+        body: '<b>[오늘의 핵심]</b> 1주택자도 조건을 못 맞추면 수천만원 세금<br><br><b>📌 오늘의 포인트</b><br>• 보유 2년 + 조정대상지역은 거주 2년 필요.<br>• 12억 초과 고가주택은 초과분 과세.<br>• 양도일은 잔금일 기준.<br><br>#양도세 #1주택자 #비과세',
+      },
+    ],
+    topicsTitle: '1년이면 365개의 부동산 지식',
+    topics: [
+      '임대차 3법 기본', '전세보증금 보호 방법', '청약 가점 계산법',
+      '특별공급의 종류', '취득세·재산세 구조', '양도세 비과세 요건',
+      '1주택자 절세 전략', '재건축·재개발 차이', '용적률·건폐율 이해',
+      'LTV·DTI·DSR 차이', '갭투자 vs 실거주', '... 매일 새로운 주제',
+    ],
+    personas: [
+      { i: '🏠', t: '내 집 마련 준비 중', d: '청약, 대출, 세금 — 한 번에 정리하기 어려운 정보를 매일 한 조각씩.' },
+      { i: '📑', t: '전·월세 거주자', d: '계약갱신, 보증금 보호, 분쟁 대응 — 임차인이 알아야 할 권리.' },
+      { i: '💼', t: '실수요·투자자', d: '재건축, 재개발, 세금 변화 — 자산 결정에 필요한 정보.' },
+    ],
+    finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능<br>매일 차곡차곡 쌓이는 부동산 지식.',
+  },
+  english: {
+    title: '영어',
+    subtitle: '매일 아침 1분, 비즈니스에서 일상까지.<br>오늘 바로 쓸 수 있는 영어 표현을 배워가요.',
+    delivery: '매일 1편 · 구독 기간만큼',
+    painSub: '학원·교재·앱 다 해봤지만 막상 쓸 일 있을 때 입이 안 떨어지죠.',
+    pains: [
+      { e: '🤐', t: '회사에서 영어 메일 한 줄 쓸 때마다 번역기 돌리고 있어요.' },
+      { e: '📚', t: '문법 다 알지만 외국인 앞에 서면 머리가 하얘져요.' },
+      { e: '⏰', t: '하루 30분 영어 공부 — 작심삼일이 디폴트예요.' },
+      { e: '🎯', t: '광범위한 영어 말고, 진짜 자주 쓰는 표현만 콕 짚어줬으면 좋겠어요.' },
+    ],
+    previews: [
+      {
+        day: '월요일 아침 8시',
+        title: '📌 회의에서 의견 정중히 말하기',
+        body: '<b>[오늘의 표현]</b> "I see your point, but..."<br><br><b>📌 사용 상황</b><br>• 상대 의견에 동의하지 않을 때 부드럽게 반박<br>• 회의·토론·이메일에서 자주 사용<br><br><b>예문</b><br>"I see your point, but I think we need more data."<br>(말씀은 이해되지만, 데이터가 더 필요할 것 같아요)<br><br>#비즈니스영어 #회의표현',
+      },
+    ],
+    topicsTitle: '1년이면 365개의 표현',
+    topics: [
+      '회의 진행 표현', '이메일 인사·맺음말', '요청·거절 표현',
+      '의견 제시', '동의·반대', '제안하기',
+      '확인·재확인', '약속 잡기', '문제 해결',
+      '발표 시작·마무리', '인사말 다양화', '... 매일 새로운 표현',
+    ],
+    personas: [
+      { i: '💼', t: '직장인', d: '영어 메일·회의가 부담인 분. 매일 한 표현씩 자연스럽게.' },
+      { i: '🎓', t: '취준생', d: '면접·자기소개에 쓸 표현을 매일 익히고 싶은 분.' },
+      { i: '✈️', t: '여행자', d: '여행에서 자주 쓰는 영어를 한 번에 정리하고 싶은 분.' },
+    ],
+    finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능<br>매일 1분, 진짜 쓰는 영어로.',
+  },
+  trivia: {
+    title: '상식',
+    subtitle: '매일 아침 1분, 세상이 더 흥미로워지는 지식.<br>대화의 양념이 되는 이야기들을 한 입씩.',
+    delivery: '매일 1편 · 구독 기간만큼',
+    painSub: '뉴스 본 척하고 싶고, 대화 자리에서 멋진 한 마디 던지고 싶은데 — 막상 떠오르지 않죠.',
+    pains: [
+      { e: '🤷', t: '뉴스에 자주 나오는 용어인데 정확히 뭔지 설명 못하겠어요.' },
+      { e: '💬', t: '회식 자리에서 똑똑한 사람 한 마디 던지는 게 부러웠어요.' },
+      { e: '🧠', t: '머리에 든 게 없는 느낌. 매일 뭔가 새로 배우고 싶어요.' },
+      { e: '📺', t: '교양 프로그램은 길고 지루한데, 짧고 재밌게 알려줬으면 해요.' },
+    ],
+    previews: [
+      {
+        day: '월요일 아침 8시',
+        title: '📌 검은 백조(Black Swan), 예측 불가능한 충격',
+        body: '<b>[오늘의 상식]</b> 검은 백조 이론 — 일어날 가능성은 낮지만 일어나면 충격이 큰 사건<br><br><b>📌 알아두기</b><br>• 17세기까지 백조는 모두 흰색이라 믿었지만, 호주에서 검은 백조 발견.<br>• 나심 탈레브가 2007년 책에서 개념화.<br>• 9·11, 코로나 팬데믹, 2008 금융위기가 대표적.<br><br>#상식 #검은백조 #리스크관리',
+      },
+    ],
+    topicsTitle: '1년이면 365개의 흥미로운 지식',
+    topics: [
+      '경제 이론', '심리학 효과', '역사 사건',
+      '과학 상식', '문화·예술', '비즈니스 용어',
+      '국제 정세', '명언과 인물', '용어의 어원',
+      '잘못 알려진 사실', '뇌과학 트리비아', '... 매일 새로운 주제',
+    ],
+    personas: [
+      { i: '💬', t: '대화 자리가 잦은 분', d: '회식·미팅에서 한 마디 던질 수 있는 잡지식이 필요한 분.' },
+      { i: '🧠', t: '꾸준한 자극을 원하는 분', d: '매일 새로운 걸 배우면서 사고를 자극받고 싶은 분.' },
+      { i: '📚', t: '독서 입문자', d: '책 읽기 부담스러워도 핵심 개념은 알고 싶은 분.' },
+    ],
+    finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능<br>매일 1분, 대화의 양념이 되는 지식.',
+  },
+  // ─── 신규 4개 (간소 버전) ───
+  kr_stock: {
+    title: '한국증시',
+    subtitle: '매일 아침 1분, 코스피·코스닥 시황을 짧게.<br>오늘 시장이 어떻게 움직였고, 무엇이 중요한지.',
+    delivery: '매일 1편 · 평일 시황 중심',
+    painSub: '뉴스가 너무 많고, 핵심만 짚어주는 곳은 적습니다.',
+    pains: [
+      { e: '📊', t: '코스피가 어디까지 올랐는지, 무엇 때문에 움직였는지 매일 따라가기 힘들어요.' },
+      { e: '🔔', t: '증권사 리포트는 너무 길고, 유튜브는 광고가 많아서 결론이 잘 안 보여요.' },
+    ],
+    previews: [
+      {
+        day: '평일 아침 8시',
+        title: '📌 오늘의 코스피 — 시장은 어디로?',
+        body: '<b>[오늘의 핵심]</b> 코스피 / 코스닥 전일 종가, 외국인·기관 매매 동향, 주요 이슈를 한눈에<br><br><b>📌 오늘의 포인트</b><br>• 지수 변동 요인 1줄 정리<br>• 외국인·기관 매매 동향<br>• 주요 업종/테마 흐름<br><br>#코스피 #코스닥 #시황',
+      },
+    ],
+    topicsTitle: '매일 새로운 시황',
+    topics: [
+      '오늘의 코스피·코스닥', '외국인 수급 동향', '기관 매매 흐름',
+      '주요 업종 등락', '테마주 점검', '환율·금리와 시장',
+    ],
+    personas: [
+      { i: '📈', t: '주식 투자자', d: '매일 시황을 짧게 정리해서 받고 싶은 분.' },
+      { i: '⏰', t: '바쁜 직장인', d: '뉴스 다 못 보지만 시장 흐름은 놓치고 싶지 않은 분.' },
+    ],
+    finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능',
+  },
+  us_stock: {
+    title: '미국증시',
+    subtitle: '매일 아침 1분, S&P 500·나스닥 시황을 짧게.<br>밤사이 무슨 일이 있었는지, 한국 시장에 어떤 영향이 있는지.',
+    delivery: '매일 1편 · 평일 시황 중심',
+    painSub: '미국 시장은 한국 시장에 영향을 주지만, 매일 따라가기 어렵습니다.',
+    pains: [
+      { e: '🌙', t: '밤사이 미국 시장이 어떻게 움직였는지 아침에 빠르게 알고 싶어요.' },
+      { e: '💱', t: '환율, 금리, 빅테크 실적 — 모두 중요하지만 한 번에 정리해줬으면 해요.' },
+    ],
+    previews: [
+      {
+        day: '평일 아침 8시',
+        title: '📌 밤사이 미국 시장 — 한 줄 정리',
+        body: '<b>[오늘의 핵심]</b> 다우, S&P 500, 나스닥 종가와 주요 빅테크 동향<br><br><b>📌 오늘의 포인트</b><br>• 밤사이 지수 변동 요인<br>• 빅테크(애플·MS·엔비디아 등) 등락<br>• 한국 시장에 미칠 영향<br><br>#미국증시 #나스닥 #S&P500',
+      },
+    ],
+    topicsTitle: '매일 새로운 시황',
+    topics: [
+      '다우/S&P/나스닥', '빅테크 동향', '연준·금리 이슈',
+      '환율과 시장', '경제지표 발표', '한국 시장 영향',
+    ],
+    personas: [
+      { i: '🇺🇸', t: '미국 주식 투자자', d: '한국에서 미국 주식 들고 있는 분. 시황을 빠르게.' },
+      { i: '📊', t: '거시 흐름이 궁금한 분', d: '미국 → 한국 영향까지 짧게 정리해서 보고 싶은 분.' },
+    ],
+    finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능',
+  },
+  it_news: {
+    title: 'IT뉴스',
+    subtitle: '매일 아침 1분, IT·테크 핵심 뉴스.<br>AI, 빅테크, 스타트업 — 산업의 흐름을 짧게.',
+    delivery: '매일 1편',
+    painSub: 'IT 뉴스는 너무 많고 빠르게 변해서 따라가기 어렵습니다.',
+    pains: [
+      { e: '🤖', t: 'AI, 반도체, 빅테크 뉴스가 매일 쏟아지는데 핵심을 짚기 힘들어요.' },
+      { e: '📱', t: '신제품·서비스 출시 정보, 스타트업 동향 — 한 번에 정리됐으면 해요.' },
+    ],
+    previews: [
+      {
+        day: '월요일 아침 8시',
+        title: '📌 오늘의 IT — 한 가지만 짚어드려요',
+        body: '<b>[오늘의 핵심]</b> AI / 빅테크 / 스타트업 / 신기술 중 가장 중요한 한 가지<br><br><b>📌 오늘의 포인트</b><br>• 어떤 일이 있었는지<br>• 왜 중요한지<br>• 시장에 미칠 영향<br><br>#IT #AI #빅테크',
+      },
+    ],
+    topicsTitle: '매일 새로운 IT 인사이트',
+    topics: [
+      'AI 모델 동향', '반도체 산업', '빅테크 신제품',
+      '스타트업 투자', '클라우드 트렌드', '보안·프라이버시',
+    ],
+    personas: [
+      { i: '💻', t: 'IT 종사자', d: '업계 흐름을 매일 짧게 받아보고 싶은 분.' },
+      { i: '🚀', t: '테크 트렌드에 관심 있는 분', d: 'IT가 직업은 아니지만 흐름은 따라가고 싶은 분.' },
+    ],
+    finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능',
+  },
+  vietnamese: {
+    title: '베트남어',
+    subtitle: '매일 아침 1분, 기초 베트남어 한 표현.<br>여행·비즈니스에서 바로 쓸 수 있는 짧은 회화.',
+    delivery: '매일 1편',
+    painSub: '베트남에 자주 가지만 인사·주문·길 묻기 정도만 하고 있죠.',
+    pains: [
+      { e: '✈️', t: '베트남 여행·출장 자주 가는데 매번 영어로만 소통해요.' },
+      { e: '📖', t: '베트남어 책은 두껍고, 매일 한 표현씩 가볍게 시작하고 싶어요.' },
+    ],
+    previews: [
+      {
+        day: '월요일 아침 8시',
+        title: '📌 오늘의 한 표현 — 인사부터',
+        body: '<b>[오늘의 표현]</b> Xin chào (씬 짜오) — 안녕하세요<br><br><b>📌 사용 상황</b><br>• 처음 만났을 때, 가게 들어갈 때<br>• 시간대 상관없이 사용 가능<br><br><b>응용</b><br>Xin chào, em! (씬 짜오, 엠) — 안녕, 동생/후배에게<br><br>#베트남어 #기초회화',
+      },
+    ],
+    topicsTitle: '매일 한 표현',
+    topics: [
+      '인사·자기소개', '식당 주문', '시장에서 흥정',
+      '길 묻기·교통', '숙소·예약', '비즈니스 인사',
+    ],
+    personas: [
+      { i: '✈️', t: '베트남 여행·출장 가는 분', d: '현지에서 한 마디라도 베트남어로 해보고 싶은 분.' },
+      { i: '🤝', t: '베트남 비즈니스 관계자', d: '베트남 파트너와 인사·간단한 대화를 시도하고 싶은 분.' },
+    ],
+    finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능',
+  },
+};
+
+window._currentCatId = null;
+
+// 카테고리 상세 페이지 렌더 (CATEGORY_CONTENT 데이터 기반)
+function renderCategoryDetailPage(catId) {
+  const data = CATEGORY_CONTENT[catId];
+  if (!data) return false; // 데이터 없으면 렌더 실패
+
+  window._currentCatId = catId;
+
+  document.getElementById('cdpTitle').textContent = data.title;
+  document.getElementById('cdpSubtitle').innerHTML = data.subtitle;
+  document.getElementById('cdpDelivery').textContent = data.delivery;
+  document.getElementById('cdpHeroCta').textContent = `📬 ${data.title} 신청하기 →`;
+
+  // 페인포인트
+  document.getElementById('cdpPainSub').textContent = data.painSub;
+  document.getElementById('cdpPainGrid').innerHTML = data.pains.map(p =>
+    `<div class="cat-pain-card"><div class="cat-pain-emoji">${p.e}</div><div class="cat-pain-text">${p.t}</div></div>`
+  ).join('');
+
+  // 미리보기
+  document.getElementById('cdpPreviewGrid').innerHTML = data.previews.map(p => `
+    <div class="cat-msg-preview">
+      <div class="cat-msg-date-wrap"><span class="cat-msg-date">${p.day}</span></div>
+      <div class="cat-msg-scroll">
+        <div class="cat-msg-bubble">
+          [1DAYECO] 오늘의 1분<br><br>
+          ${p.title}<br><br>
+          ${p.body}<br><br>
+          ──────────────<br>
+          ※ 본 메시지는 1DAYECO 구독 콘텐츠로, 매일 아침 8시에 발송됩니다.
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // 주제
+  document.getElementById('cdpTopicsTitle').textContent = data.topicsTitle;
+  document.getElementById('cdpTopicsGrid').innerHTML = data.topics.map((t, i) =>
+    `<div class="cat-topic-chip"><div class="cat-topic-num">${String(i+1).padStart(2,'0')}</div>${t}</div>`
+  ).join('');
+
+  // 추천 대상
+  document.getElementById('cdpPersonaGrid').innerHTML = data.personas.map(p =>
+    `<div class="cat-persona"><span class="cat-persona-icon">${p.i}</span><div class="cat-persona-title">${p.t}</div><div class="cat-persona-desc">${p.d}</div></div>`
+  ).join('');
+
+  // 최종 CTA
+  document.getElementById('cdpFinalTitle').textContent = `📬 매일 아침, ${data.title}이(가) 도착합니다`;
+  document.getElementById('cdpFinalSub').innerHTML = data.finalSub;
+
+  return true;
+}
+
+// 카드 리스트 페이지 렌더 (전체 / 대분류별)
+async function renderCategoryListPage(filter) {
+  // filter: 'all' | 'finance' | 'lifestyle' | 'language' | 'tech'
+  const SUPER_CATS = {
+    all:       { eyebrow: 'ALL CATEGORIES', title: '전체 카테고리',     sub: '관심 있는 카테고리를 선택하면 자세한 소개를 확인할 수 있어요.' },
+    finance:   { eyebrow: 'FINANCE',         title: '💼 경제·금융',     sub: '경제 흐름과 시장 움직임을 짧게 정리해드려요.' },
+    lifestyle: { eyebrow: 'LIFESTYLE',       title: '🏠 생활·실용',     sub: '내 삶에 직접 도움 되는 실용 지식.' },
+    language:  { eyebrow: 'LANGUAGE',        title: '🌐 글로벌·언어',   sub: '비즈니스부터 여행까지, 매일 한 표현씩.' },
+    tech:      { eyebrow: 'TECH',            title: '💻 테크·트렌드',   sub: 'IT·AI·빅테크 — 산업의 흐름을 짧게.' },
+  };
+  const meta = SUPER_CATS[filter] || SUPER_CATS.all;
+  document.getElementById('catListEyebrow').textContent = meta.eyebrow;
+  document.getElementById('catListTitle').innerHTML = meta.title;
+  document.getElementById('catListSubtitle').textContent = meta.sub;
+
+  let activeCats = [];
+  let comingSoonCats = [];
+  try {
+    const data = await loadCategoriesFromAPI();
+    activeCats     = data.active || [];
+    comingSoonCats = data.coming_soon || [];
+  } catch (e) {}
+
+  // filter 적용
+  let filteredActive = activeCats;
+  let filteredComing = comingSoonCats;
+  if (filter !== 'all') {
+    filteredActive = activeCats.filter(c => (c.super_category || 'finance') === filter);
+    filteredComing = comingSoonCats.filter(c => (c.super_category || 'finance') === filter);
+  }
+
+  const grid = document.getElementById('catListGrid');
+  if (filteredActive.length === 0 && filteredComing.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:13px">해당 분류의 카테고리가 아직 없습니다.</div>';
+    return;
+  }
+
+  const buildActiveCard = (c) => {
+    const id = c.id;
+    const name = c.name || id;
+    const emoji = c.emoji || '📌';
+    const desc = c.description || '매일 새로운 콘텐츠를 만나보세요.';
+    return `
+      <div class="cat-card" onclick="showCategory('${id}')">
+        <div class="cat-card-icon">${emoji}</div>
+        <div class="cat-card-name">${name}</div>
+        <p class="cat-card-desc">${desc}</p>
+      </div>`;
+  };
+  const buildComingCard = (c) => {
+    const name = c.name || c.id;
+    const emoji = c.emoji || '📌';
+    const desc = c.description || '곧 만나볼 카테고리입니다.';
+    return `
+      <div class="cat-card coming-soon">
+        <div class="coming-badge">출시 예정</div>
+        <div class="cat-card-icon">${emoji}</div>
+        <div class="cat-card-name">${name}</div>
+        <p class="cat-card-desc">${desc}</p>
+        <div class="cat-card-sample">출시 준비 중 ⏳</div>
+      </div>`;
+  };
+
+  grid.innerHTML = filteredActive.map(buildActiveCard).join('') + filteredComing.map(buildComingCard).join('');
+}
+
 async function showCategory(category, btnEl) {
-  // 정식 4개 카테고리에 대해 어드민 visibility 체크 → 자동 redirect
-  // (intro, comingsoon은 시스템 페이지라 항상 접근 가능)
-  if (['economy', 'realestate', 'english', 'trivia'].includes(category)) {
+  // 카테고리 ID 직접 호출 (예: economy, realestate, kr_stock 등) → 상세 페이지로
+  // list-* → 카드 리스트 페이지
+  // intro / comingsoon → 시스템 페이지
+
+  let pageTarget = null;       // 활성화할 페이지 ID
+  let activeNavSelector = null; // nav 활성화할 선택자
+
+  // 1) 시스템 페이지
+  if (category === 'intro') {
+    pageTarget = 'intro-page';
+    activeNavSelector = "[onclick*=\"'intro'\"]";
+  } else if (category === 'comingsoon') {
+    pageTarget = 'comingsoon-page';
+    activeNavSelector = "[onclick*=\"'comingsoon'\"]";
+  }
+  // 2) 카드 리스트 페이지 (전체 / 대분류)
+  else if (category && category.startsWith('list-')) {
+    pageTarget = 'category-list-page';
+    activeNavSelector = `[onclick*="'${category}'"]`;
+    const filter = category.substring(5); // 'all' | 'finance' | 'lifestyle' | ...
+    await renderCategoryListPage(filter);
+  }
+  // 3) 카테고리 상세 페이지 (동적 데이터로 채움)
+  else {
+    // 어드민 visibility 체크
     try {
       const data = await loadCategoriesFromAPI();
       const activeIds     = new Set((data.active      || []).map(c => c.id));
@@ -2576,42 +2413,55 @@ async function showCategory(category, btnEl) {
 
       if (!activeIds.has(category)) {
         if (comingSoonIds.has(category)) {
-          // 어드민에서 coming_soon으로 설정 → 통합 Coming Soon 페이지로
           category = 'comingsoon';
+          pageTarget = 'comingsoon-page';
+          activeNavSelector = "[onclick*=\"'comingsoon'\"]";
         } else {
-          // hidden 또는 알 수 없는 상태 → intro로
           category = 'intro';
+          pageTarget = 'intro-page';
+          activeNavSelector = "[onclick*=\"'intro'\"]";
+        }
+      } else {
+        // active 카테고리 → 상세 페이지 렌더
+        const ok = renderCategoryDetailPage(category);
+        if (ok) {
+          pageTarget = 'category-detail-page';
+          // nav: 해당 카테고리의 super_category 탭을 활성화
+          const cat = (data.active || []).find(c => c.id === category) || {};
+          const sc = cat.super_category || 'finance';
+          activeNavSelector = `[onclick*="'list-${sc}'"]`;
+        } else {
+          // 데이터 없음 → 모달로 직행
+          openModalWithCategory(category);
+          return;
         }
       }
     } catch (e) {
-      // API 실패 시 그냥 진행
+      pageTarget = 'intro-page';
+      activeNavSelector = "[onclick*=\"'intro'\"]";
     }
   }
 
-  // 모든 페이지 숨기기
+  // 페이지 전환
   const intro = document.getElementById('intro-page');
-  const pages = document.querySelectorAll('.category-page');
-  pages.forEach(p => p.classList.remove('active'));
-
-  if (category === 'intro') {
+  document.querySelectorAll('.category-page').forEach(p => p.classList.remove('active'));
+  if (pageTarget === 'intro-page') {
     intro.classList.remove('hidden');
   } else {
     intro.classList.add('hidden');
-    const target = document.getElementById(category + '-page');
+    const target = document.getElementById(pageTarget);
     if (target) target.classList.add('active');
   }
 
-  // 탭 활성화 표시
+  // nav 활성화
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   if (btnEl && btnEl.classList.contains('nav-tab')) {
     btnEl.classList.add('active');
-  } else {
-    const tabs = document.querySelectorAll('.nav-tab');
-    const idx = ['intro','economy','realestate','english','trivia','comingsoon'].indexOf(category);
-    if (tabs[idx]) tabs[idx].classList.add('active');
+  } else if (activeNavSelector) {
+    const navBtn = document.querySelector(`.nav-tab${activeNavSelector}`);
+    if (navBtn) navBtn.classList.add('active');
   }
 
-  // 스크롤 맨 위로
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -2694,57 +2544,22 @@ async function _initCategoryVisibility() {
     const data = await loadCategoriesFromAPI();
     const activeCats     = (data.active      || []);
     const comingSoonCats = (data.coming_soon || []);
-    const activeIds = new Set(activeCats.map(c => c.id));
-    const NAV_CATS  = ['economy', 'realestate', 'english', 'trivia'];
 
-    // === 1) nav 탭: 기존 4개는 active 여부로 show/hide ===
-    document.querySelectorAll('.nav-tab').forEach(btn => {
-      const onclick = btn.getAttribute('onclick') || '';
-      const m = onclick.match(/showCategory\('([^']+)'/);
-      if (!m) return;
-      const cat = m[1];
-      if (NAV_CATS.includes(cat)) {
-        btn.style.display = activeIds.has(cat) ? '' : 'none';
-      }
-    });
+    // 새 nav는 대분류 기반이므로 동적 추가 없음
+    // 단, 소개 페이지의 introActiveGrid는 그룹핑 유지 (홈에서 한눈에 보이도록)
 
-    // === 1-b) 신규 카테고리(NAV_CATS에 없는 active) → nav에 동적 추가 ===
-    const navTabs = document.querySelector('.nav-tabs');
-    const comingSoonBtn = document.querySelector('.nav-tab-soon');
-    if (navTabs) {
-      // 이미 동적으로 추가된 nav 탭 제거 (새로고침 중복 방지)
-      navTabs.querySelectorAll('.nav-tab-dynamic').forEach(el => el.remove());
-
-      activeCats
-        .filter(c => !NAV_CATS.includes(c.id))
-        .forEach(c => {
-          const btn = document.createElement('button');
-          btn.className = 'nav-tab nav-tab-dynamic';
-          btn.textContent = c.name;
-          btn.onclick = () => openModalWithCategory(c.id);
-          // COMING SOON 버튼 앞에 삽입
-          if (comingSoonBtn) {
-            navTabs.insertBefore(btn, comingSoonBtn);
-          } else {
-            navTabs.appendChild(btn);
-          }
-        });
-    }
-
-    // === 2) 소개 페이지 active 카드 그리드 — 대분류별 그룹핑 ===
+    // === 소개 페이지 active 카드 그리드 — 대분류별 그룹핑 ===
     const introActiveGrid = document.getElementById('introActiveGrid');
     if (introActiveGrid) {
       if (activeCats.length === 0) {
         introActiveGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:13px">현재 운영 중인 카테고리가 없습니다.</div>';
       } else {
-        // 대분류 정의 (하드코딩 + 순서)
         const SUPER_CATS = [
           { id: 'finance',   emoji: '💼', label: '경제·금융' },
           { id: 'lifestyle', emoji: '🏠', label: '생활·실용' },
           { id: 'language',  emoji: '🌐', label: '글로벌·언어' },
           { id: 'tech',      emoji: '💻', label: '테크·트렌드' },
         ];
-        // 대분류별로 카테고리 그룹핑
         const grouped = {};
         SUPER_CATS.forEach(s => { grouped[s.id] = []; });
         const ungrouped = [];
@@ -2759,16 +2574,15 @@ async function _initCategoryVisibility() {
           const name  = c.name || id;
           const emoji = c.emoji || '📌';
           const desc  = c.description || '매일 새로운 콘텐츠를 만나보세요.';
+          // 카드 클릭 → 카테고리 상세 페이지 (showCategory)
           return `
-            <div class="cat-card" onclick="openModalWithCategory('${id}')">
+            <div class="cat-card" onclick="showCategory('${id}')">
               <div class="cat-card-icon">${emoji}</div>
               <div class="cat-card-name">${name}</div>
               <p class="cat-card-desc">${desc}</p>
             </div>`;
         };
 
-        // 그리드를 그룹별로 렌더 (각 그룹: 헤더 + 카드 묶음)
-        // introActiveGrid는 grid-column 레이아웃이므로 grid-column:1/-1 헤더 + 카드 순으로
         const html = SUPER_CATS.map(s => {
           const cats = grouped[s.id];
           if (!cats || cats.length === 0) return '';
@@ -2779,7 +2593,6 @@ async function _initCategoryVisibility() {
           </div>`;
           return header + cats.map(buildCardHtml).join('');
         }).join('');
-        // 미분류 카테고리 (혹시 super_category가 없는 신규)
         const ungroupedHtml = ungrouped.length > 0
           ? `<div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:18px 0 6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.15)">
               <span style="font-size:18px">📌</span>

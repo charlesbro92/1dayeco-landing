@@ -1006,7 +1006,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v80</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v81</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2180,24 +2180,15 @@ HIDDEN_COMINGSOON_MODAL_END -->
       <div class="modal-title" id="modalTitle">무료 체험 시작</div>
       <p class="modal-desc" id="modalDesc">전화번호를 등록하면 <strong>내일 아침 첫 메시지</strong>를 보내드립니다.</p>
 
-      <!-- 구독 플랜 선택 + 결제 금액 한 줄 -->
+      <!-- 구독 플랜 선택 -->
       <div class="field" id="planField">
         <label>구독 플랜 선택 <span style="font-size:11px;color:var(--muted);font-weight:400">(카테고리 1개당)</span></label>
-        <div style="display:flex;gap:10px;align-items:stretch">
-          <div style="flex:7">
-            <select id="mPlan" onchange="onPlanChange()" style="width:100%;height:100%">
-              <option value="monthly">월간 정기결제</option>
-              <option value="pkg3m">3개월 일시불</option>
-              <option value="pkg6m">6개월 일시불 ⭐ 인기</option>
-              <option value="pkg1y">12개월 일시불</option>
-            </select>
-          </div>
-          <!-- 할인율 강조 박스 -->
-          <div id="planAmountBox" style="flex:3;background:rgba(201,168,76,.08);border:1.5px solid rgba(201,168,76,.35);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 6px;min-width:76px">
-            <div id="planAmountVal" style="color:var(--gold);font-weight:900;font-size:18px;line-height:1">—</div>
-            <div id="planAmountSub" style="color:var(--muted);font-size:9px;margin-top:3px;text-align:center;letter-spacing:.3px">플랜 선택</div>
-          </div>
-        </div>
+        <select id="mPlan" onchange="onPlanChange()">
+          <option value="monthly">월간 정기결제</option>
+          <option value="pkg3m">3개월 일시불</option>
+          <option value="pkg6m">6개월 일시불 ⭐ 인기</option>
+          <option value="pkg1y">12개월 일시불</option>
+        </select>
 
         <!-- 결제 요약 카드 (플랜 선택 시 표시) -->
         <div id="planPriceSummary" style="margin-top:8px;padding:12px 14px;background:var(--s3);border:1px solid rgba(201,168,76,.25);border-radius:8px;display:none">
@@ -2874,37 +2865,44 @@ async function _updatePlanPrices() {
     if (!r.ok) return;
     const d = await r.json();
     const rows = (d && Array.isArray(d.data)) ? d.data : [];
+    // 카테고리별 가격 전체 저장 (선택한 카테고리 기준으로 금액 표시)
+    window._CAT_PRICES = {};
+    rows.forEach(c => {
+      if (!c || !c.id) return;
+      window._CAT_PRICES[c.id] = {
+        monthly: { price: c.monthly_price || 9900,   orig: c.monthly_price || 9900,    months: 1  },
+        pkg3m:   { price: c.pkg3m_price   || 14900,  orig: c.pkg3m_original || 29700,  months: 3  },
+        pkg6m:   { price: c.pkg6m_price   || 24900,  orig: c.pkg6m_original || 59400,  months: 6  },
+        pkg1y:   { price: c.pkg1y_price   || 41900,  orig: c.pkg1y_original || 118800, months: 12 },
+      };
+    });
+
+    // 초기 _PLAN_PRICES: 첫 번째 active 카테고리 기준 (카테고리 선택 전 기본값)
     const active = rows.find(c => (c.visibility || (c.active ? 'active' : 'hidden')) === 'active');
-    if (!active) return;
+    if (active) {
+      window._PLAN_PRICES = window._CAT_PRICES[active.id] || window._PLAN_PRICES;
+    }
 
     const fmt = v => Number(v).toLocaleString('ko-KR');
     const pct = (orig, price) => orig > 0 ? Math.round((1 - price/orig) * 1000) / 10 : 0;
 
-    // 가격 캐시 (모달 플랜 요약에 사용)
-    window._PLAN_PRICES = {
-      monthly: { price: active.monthly_price || 9900,  orig: active.monthly_price || 9900,  months: 1  },
-      pkg3m:   { price: active.pkg3m_price   || 14900, orig: active.pkg3m_original || 29700, months: 3  },
-      pkg6m:   { price: active.pkg6m_price   || 24900, orig: active.pkg6m_original || 59400, months: 6  },
-      pkg1y:   { price: active.pkg1y_price   || 41900, orig: active.pkg1y_original || 118800, months: 12 },
-    };
-
-    // 모달 플랜 select 옵션 텍스트 업데이트
+    // 모달 플랜 select 옵션: 간소화 (금액/할인율 제거, 인기만 유지)
     const mPlan = document.getElementById('mPlan');
     if (mPlan) {
       const labels = {
-        monthly: `월간 정기결제 — ₩${fmt(window._PLAN_PRICES.monthly.price)}/월`,
-        pkg3m:   `3개월 일시불 — ₩${fmt(window._PLAN_PRICES.pkg3m.price)} (${pct(window._PLAN_PRICES.pkg3m.orig, window._PLAN_PRICES.pkg3m.price)}% 할인)`,
-        pkg6m:   `6개월 일시불 — ₩${fmt(window._PLAN_PRICES.pkg6m.price)} (${pct(window._PLAN_PRICES.pkg6m.orig, window._PLAN_PRICES.pkg6m.price)}% 할인) ⭐ 인기`,
-        pkg1y:   `12개월 일시불 — ₩${fmt(window._PLAN_PRICES.pkg1y.price)} (${pct(window._PLAN_PRICES.pkg1y.orig, window._PLAN_PRICES.pkg1y.price)}% 할인)`,
+        monthly: '월간 정기결제',
+        pkg3m:   '3개월 일시불',
+        pkg6m:   '6개월 일시불 ⭐ 인기',
+        pkg1y:   '12개월 일시불',
       };
       mPlan.querySelectorAll('option').forEach(opt => {
         if (labels[opt.value]) opt.textContent = labels[opt.value];
       });
-      // 현재 선택된 플랜 요약 업데이트
       updatePlanSummary(mPlan.value);
     }
 
-    // 랜딩 가격표 업데이트
+    // 랜딩 가격표 업데이트 (첫 번째 active 카테고리 기준)
+    if (!active) return;
     if (active.pkg3m_price) {
       const el = document.getElementById('price-pkg3m');
       const orig = document.getElementById('price-pkg3m-original');
@@ -2957,8 +2955,6 @@ function updatePlanSummary(plan) {
   const finalEl      = document.getElementById('planFinalPrice');
   const discBadge    = document.getElementById('planDiscountBadge');
   const savedLine    = document.getElementById('planSavedLine');
-  const amountVal    = document.getElementById('planAmountVal');
-  const amountSub    = document.getElementById('planAmountSub');
   if (!summary) return;
 
   const prices = window._PLAN_PRICES;
@@ -2966,31 +2962,27 @@ function updatePlanSummary(plan) {
 
   if (!prices || !prices[plan]) {
     summary.style.display = 'none';
-    if (amountVal) { amountVal.textContent = '—'; amountVal.style.fontSize = '18px'; }
-    if (amountSub) amountSub.textContent = '플랜 선택';
     return;
   }
 
-  const { price, orig, months } = prices[plan];
+  const { price, orig } = prices[plan];
   const pct   = orig > price ? Math.round((1 - price/orig) * 1000) / 10 : 0;
   const saved = orig - price;
 
-  // 옆 박스: 월정액은 금액, 일시불은 할인율만
   if (plan === 'monthly') {
-    if (amountVal) { amountVal.textContent = `₩${fmt(price)}`; amountVal.style.fontSize = '15px'; }
-    if (amountSub) amountSub.textContent = '/ 월';
-    summary.style.display = 'none';
-  } else {
-    if (amountVal) { amountVal.textContent = `${pct}%`; amountVal.style.fontSize = '20px'; }
-    if (amountSub) amountSub.textContent = '할인';
-
-    // 요약 카드
     summary.style.display = 'block';
-    if (finalEl)   finalEl.textContent   = `₩${fmt(price)}`;
-    if (origEl)    origEl.textContent    = `₩${fmt(orig)}`;
-    if (discBadge) discBadge.textContent = `${pct}% 할인`;
-    if (savedLine) savedLine.textContent = `₩${fmt(saved)} 아낌`;
+    if (finalEl)   finalEl.textContent   = `₩${fmt(price)}/월`;
+    if (origEl)    origEl.textContent    = '';
+    if (discBadge) discBadge.textContent = '자동 갱신';
+    if (savedLine) savedLine.textContent = '매달 자동 결제';
+    return;
   }
+
+  summary.style.display = 'block';
+  if (finalEl)   finalEl.textContent   = `₩${fmt(price)}`;
+  if (origEl)    origEl.textContent    = `₩${fmt(orig)}`;
+  if (discBadge) discBadge.textContent = `${pct}% 할인`;
+  if (savedLine) savedLine.textContent = `₩${fmt(saved)} 아낌`;
 }
 
 // ── 유틸 ─────────────────────────────────────────────────────
@@ -3586,7 +3578,11 @@ function toggleCat(cat) {
     btn.classList.toggle('active', selectedCategories.includes(c));
   });
   updateModalBtn();
-  // 카테고리 선택 시 금액 박스 업데이트 (플랜 기준)
+
+  // 선택한 카테고리 가격으로 _PLAN_PRICES 교체 후 요약 업데이트
+  if (cat && window._CAT_PRICES && window._CAT_PRICES[cat]) {
+    window._PLAN_PRICES = window._CAT_PRICES[cat];
+  }
   const plan = document.getElementById('mPlan')?.value;
   if (plan) updatePlanSummary(plan);
 }

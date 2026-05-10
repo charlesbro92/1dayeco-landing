@@ -1213,7 +1213,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v105</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v108</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1433,7 +1433,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 .cat-preview-section .sec-title { text-align:center; }
 .cat-preview-section .sec-sub { text-align:center; max-width:560px; margin:0 auto; }
 .cat-grid {
-  display:grid; grid-template-columns:repeat(4, 1fr); gap:18px; margin-top:48px;
+  display:grid; grid-template-columns:repeat(3, 1fr); gap:18px; margin-top:48px;
 }
 .cat-card {
   background:linear-gradient(180deg, var(--dark2), var(--dark3));
@@ -1441,7 +1441,10 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   padding:30px 22px; text-align:center; transition:all .3s;
   cursor:pointer;
   position:relative;
+  /* v108: 그리드 내 카드 높이 균일화 */
+  display:flex; flex-direction:column;
 }
+.cat-card .cat-card-desc { flex:1 0 auto; }
 .cat-card:hover {
   border-color:var(--gold); transform:translateY(-4px);
   box-shadow:0 12px 40px rgba(201,168,76,.15);
@@ -3056,12 +3059,13 @@ async function _initCategoryVisibility() {
           const name  = c.name || id;
           const emoji = c.emoji || '📌';
           const desc  = c.description || '매일 새로운 콘텐츠를 만나보세요.';
+          // v107: 카테고리 리스트 페이지와 동일한 순서 (이모지→제목→설명→부제목)
           return `
             <div class="cat-card" onclick="showCategory('${id}')">
               <div class="cat-card-icon">${emoji}</div>
               <div class="cat-card-name">${name}</div>
-              <div class="cat-card-tag" data-cat-subtopics="${id}" style="font-size:12px;color:var(--gold);margin:4px 0 8px;letter-spacing:.3px;min-height:0;display:none"></div>
               <p class="cat-card-desc">${desc}</p>
+              <div class="cat-card-tag" data-cat-subtopics="${id}" style="font-size:12px;color:var(--gold);letter-spacing:.3px;min-height:0;display:none"></div>
             </div>`;
         };
 
@@ -3101,6 +3105,7 @@ async function _initCategoryVisibility() {
       const preview = comingSoonCats.slice(0, 3);
       if (introCsGrid) {
         introCsGrid.innerHTML = preview.map(c => {
+          const id    = c.id;
           const name  = c.name || c.id;
           const emoji = c.emoji || '📌';
           const desc  = c.description || '곧 만나볼 카테고리입니다.';
@@ -3110,9 +3115,11 @@ async function _initCategoryVisibility() {
               <div class="cat-card-icon">${emoji}</div>
               <div class="cat-card-name">${name}</div>
               <p class="cat-card-desc">${desc}</p>
+              <div class="cat-card-tag" data-cat-subtopics="${id}" style="font-size:12px;color:var(--gold);letter-spacing:.3px;opacity:.7;min-height:0;display:none"></div>
               <div class="cat-card-sample">출시 준비 중 ⏳</div>
             </div>`;
         }).join('');
+        _hydrateCardSubtopics();
       }
       // 4개 이상이면 "더 보기" 버튼 표시
       if (introCsViewAll) {
@@ -3159,13 +3166,14 @@ async function _initCategoryVisibility() {
           const name  = c.name || c.id;
           const emoji = c.emoji || '📌';
           const desc  = c.description || '곧 만나볼 카테고리입니다.';
+          // v107: 다른 카드와 동일한 순서 (이모지→제목→설명→부제목→샘플)
           return `
             <div class="cat-card coming-soon">
               <div class="coming-badge">출시 예정</div>
               <div class="cat-card-icon">${emoji}</div>
               <div class="cat-card-name">${name}</div>
-              <div class="cat-card-tag" data-cat-subtopics="${id}" style="font-size:12px;color:var(--gold);margin:4px 0 8px;letter-spacing:.3px;opacity:.7;min-height:0;display:none"></div>
               <p class="cat-card-desc">${desc}</p>
+              <div class="cat-card-tag" data-cat-subtopics="${id}" style="font-size:12px;color:var(--gold);letter-spacing:.3px;opacity:.7;min-height:0;display:none"></div>
               <div class="cat-card-sample">출시 준비 중 ⏳</div>
             </div>`;
         };

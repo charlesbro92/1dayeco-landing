@@ -44,15 +44,22 @@ body::before {
 /* ── NAV ── */
 nav {
   position:fixed; top:0; left:0; right:0; z-index:100;
-  padding:14px 40px; display:flex; justify-content:space-between; align-items:center; gap:24px;
+  padding:20px 40px 14px; display:flex; justify-content:space-between; align-items:center; gap:24px;
   background:linear-gradient(to bottom,rgba(10,10,8,.96),transparent);
   backdrop-filter:blur(12px);
   border-bottom:1px solid rgba(201,168,76,.08);
+  /* iOS 노치/펀치홀 안전영역 + 충분한 높이 */
+  padding-top:max(20px, env(safe-area-inset-top));
+  min-height:64px;
+  box-sizing:border-box;
 }
 .logo {
   font-family:var(--serif); font-size:20px; font-weight:900; color:var(--gold);
   letter-spacing:1px; flex-shrink:0;
   text-shadow:0 0 20px rgba(201,168,76,.25);
+  line-height:1.2;
+  padding:2px 0;
+  display:inline-block;
 }
 .logo span { color:var(--text); font-weight:400; }
 
@@ -929,7 +936,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
 /* ── STEP INDICATOR ── (모달 내 단계 표시) */
-.steps-ind { display:flex; gap:6px; margin-bottom:24px; }
+.steps-ind { display:flex; gap:6px; margin-top:8px; margin-bottom:24px; padding-right:36px; }
 .si { flex:1; height:3px; border-radius:2px; background:var(--border); transition:background .4s; }
 .si.done { background:var(--gold); }
 
@@ -1247,9 +1254,9 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     padding:2px 6px; border:1px solid rgba(201,168,76,.2); border-radius:3px;
     font-family:monospace; cursor:pointer; transition:opacity .2s;
     user-select:none;
+    display:none; /* 운영 환경에서는 숨김 */
   }
   .deploy-badge:hover { opacity:1; color:var(--gold); border-color:var(--gold); }
-  @media (max-width:768px) { .deploy-badge { display:none; } }
 </style>
 <script>
   async function showDeployInfo() {
@@ -1307,8 +1314,13 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
           <a onclick="openInfo('privacy');return false;" href="#">개인정보처리방침</a>에 동의합니다 (필수)
         </label>
       </div>
-      <div class="agree-err" id="heroAgreeErr">개인정보처리방침에 동의해 주세요</div>
-      <p class="form-caption" style="margin-top:4px">3일 무료 체험 · 언제든 해지 가능</p>
+      <div class="agree-row" style="margin-top:6px">
+        <input type="checkbox" id="heroAgreeTrial" onchange="updateHeroBtn()">
+        <label for="heroAgreeTrial" style="cursor:pointer">
+          3일 무료 체험 · 언제든 해지 가능에 동의합니다 (필수)
+        </label>
+      </div>
+      <div class="agree-err" id="heroAgreeErr">필수 약관에 모두 동의해 주세요</div>
     </div>
   </div>
 
@@ -1360,7 +1372,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
       <h2 style="font-family:var(--serif);font-size:30px;font-weight:700;line-height:1.4;letter-spacing:-.5px;margin-bottom:14px">
         가만히 있어도<br><span style="color:var(--gold)">매일 새로운 지식</span>이 쌓입니다
       </h2>
-      <p style="font-size:14px;color:var(--muted);line-height:1.9;margin-bottom:32px">신청만 해두면 끝. 매일 아침 자동으로 정기 발송됩니다.<br class="br-desktop">1년 365일, 단 하루도 같은 콘텐츠가 반복되지 않습니다.</p>
+      <p style="font-size:14px;color:var(--muted);line-height:1.9;margin-bottom:32px">신청만 해두면 끝.<br>매일 아침 자동으로 정기 발송됩니다.<br>1년 365일, 단 하루도 같은 콘텐츠가 반복되지 않습니다.</p>
 
       <div class="content-breakdown">
         <div class="breakdown-item">
@@ -1483,7 +1495,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <section class="cat-preview-section">
   <div class="sec-eye">Categories</div>
   <h2 class="sec-title">관심 분야를 골라 구독하세요</h2>
-  <p class="sec-sub">관심 있는 만큼 자유롭게 골라보세요. 1년 내내 같은 콘텐츠는 단 하나도 없습니다.</p>
+  <p class="sec-sub">관심 있는 만큼 자유롭게 골라보세요.<br>1년 내내 같은 콘텐츠는 단 하나도 없습니다.</p>
 
   <!-- ⭐ 어드민에 등록된 active 카테고리 동적 렌더 -->
   <div class="cat-grid" id="introActiveGrid">
@@ -1716,12 +1728,16 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     <h3 class="cat-section-title" id="cdpTopicsTitle">콘텐츠 주제 미리보기</h3>
     <p class="cat-section-sub">매일 새로운 주제로 깊이를 더해갑니다.</p>
     <div class="cat-topics-grid" id="cdpTopicsGrid"></div>
+    <p style="text-align:center;font-size:11px;color:var(--muted);margin-top:18px;line-height:1.7;max-width:640px;margin-left:auto;margin-right:auto;padding:0 16px">
+      ※ 위 주제들은 참고용 예시입니다. 실제 발송 콘텐츠는 시기·이슈에 따라 AI가 자동으로 선정·생성하며 변경될 수 있습니다.
+    </p>
   </section>
 
   <!-- 추천 대상 -->
   <section class="cat-section" style="background:rgba(255,255,255,.015)">
     <div class="cat-section-eyebrow">For Whom</div>
     <h3 class="cat-section-title">이런 분들에게 추천해요</h3>
+    <p class="cat-section-sub">아래 항목 중 하나라도 해당된다면, 매일 1분의 투자가 분명한 변화를 만들어드립니다.</p>
     <div class="cat-persona-grid" id="cdpPersonaGrid"></div>
   </section>
 
@@ -1797,7 +1813,6 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   </div>
   <div class="foot-bizinfo">
     <div class="foot-row"><span>상호</span> 원데이에코(1DAYECO) <span class="foot-sep">·</span> <span>대표</span> 박권호</div>
-    <div class="foot-row"><span>사업자등록번호</span> 671-77-00518 (간이과세자) <span class="foot-sep">·</span> <span>통신판매신고</span> 준비 중</div>
     <div class="foot-row"><span>주소</span> 인천광역시 서구 솔빛로 13</div>
     <div class="foot-row"><span>고객센터</span> 카카오톡 채널 @1DAYECO <span class="foot-sep">·</span> <span>이메일</span> onedayeco@naver.com</div>
   </div>
@@ -1961,9 +1976,6 @@ HIDDEN_COMINGSOON_MODAL_END -->
           <label for="modalAutopayAgree" style="cursor:pointer">
             <span class="agree-emp">3일 무료 체험</span> 후 등록하신 카드로 <span class="agree-emp">자동 결제</span>됨에 동의합니다 (필수)
           </label>
-        </div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px;padding-left:24px;line-height:1.5">
-          결제를 원하지 않으시면 3일 이내 해지해주세요.
         </div>
         <div class="agree-err" id="modalAutopayErr">결제 진행 및 환불 정책에 동의해 주세요</div>
       </div>
@@ -3431,16 +3443,20 @@ async function apiPost(path, body) {
 function heroSubmit() {
   const p      = document.getElementById('heroPhone').value;
   const agreed = document.getElementById('heroAgree')?.checked;
+  const trialAgreed = document.getElementById('heroAgreeTrial')?.checked;
   const errEl  = document.getElementById('heroAgreeErr');
-  if (!agreed) {
+  if (!agreed || !trialAgreed) {
     if (errEl) { errEl.style.display='block'; setTimeout(()=>errEl.style.display='none',3000); }
-    showToast('개인정보처리방침에 동의해 주세요','ng'); return;
+    showToast('필수 약관 2개에 모두 동의해 주세요','ng'); return;
   }
   if (p.length < 12) { showToast('올바른 전화번호를 입력해주세요','ng'); return; }
   openModal('pkg6m');  // 디폴트: 6개월 (가장 인기), 모달 안에서 변경 가능
   document.getElementById('mPhone').value = p;
   const mAgree = document.getElementById('modalAgree');
-  if (mAgree) { mAgree.checked = true; updateModalBtn(); }
+  if (mAgree) { mAgree.checked = true; }
+  const mAutopay = document.getElementById('modalAutopayAgree');
+  if (mAutopay) { mAutopay.checked = true; }
+  updateModalBtn();
 }
 
 // ── 모달 ─────────────────────────────────────────────────────
@@ -4076,8 +4092,9 @@ function updateFirstSendInfo() {
 // ── 체크박스 상태 ──────────────────────────────────────────
 function updateHeroBtn() {
   const checked = document.getElementById('heroAgree')?.checked;
+  const trialChecked = document.getElementById('heroAgreeTrial')?.checked;
   const btn = document.getElementById('heroBtn');
-  if (btn) btn.style.opacity = checked ? '1' : '0.6';
+  if (btn) btn.style.opacity = (checked && trialChecked) ? '1' : '0.6';
 }
 function updateModalBtn() {
   const checked      = document.getElementById('modalAgree')?.checked;

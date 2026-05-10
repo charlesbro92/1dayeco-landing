@@ -1213,7 +1213,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v112</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v113</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1789,7 +1789,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
       <div class="cs-hero-stats">
         <div class="cs-stat"><span class="cs-stat-num" id="csStatCount">0</span><span class="cs-stat-label">카테고리</span></div>
         <div class="cs-stat-divider"></div>
-        <div class="cs-stat"><span class="cs-stat-num" id="csStatGroups">0</span><span class="cs-stat-label">부주제</span></div>
+        <div class="cs-stat"><span class="cs-stat-num" id="csStatGroups">0</span><span class="cs-stat-label">Topic</span></div>
         <div class="cs-stat-divider"></div>
         <div class="cs-stat"><span class="cs-stat-num">⏳</span><span class="cs-stat-label">출시 대기</span></div>
       </div>
@@ -3015,6 +3015,9 @@ async function loadCategoriesFromAPI() {
           subtitle:       c.subtitle || '',
           description:    c.description || '',
           super_category: c.super_category || 'finance',
+          // v113: 백엔드가 내려주는 부제목 정보 함께 보존
+          subtopic_count: c.subtopic_count || 0,
+          subtopics:      Array.isArray(c.subtopics) ? c.subtopics : [],
         });
       });
 
@@ -3241,8 +3244,13 @@ async function _initCategoryVisibility() {
     if (csStatCount) csStatCount.textContent = String(total);
     const csStatGroups = document.getElementById('csStatGroups');
     if (csStatGroups) {
-      // 백엔드가 내려준 subtopic_count 필드 단순 합산
-      const subtopicTotal = comingSoonCats.reduce((sum, c) => sum + (c.subtopic_count || 0), 0);
+      // 백엔드 subtopic_count → subtopics 배열 길이 → 0 순으로 폴백
+      const subtopicTotal = comingSoonCats.reduce((sum, c) => {
+        const cnt = (typeof c.subtopic_count === 'number')
+          ? c.subtopic_count
+          : (Array.isArray(c.subtopics) ? c.subtopics.length : 0);
+        return sum + cnt;
+      }, 0);
       csStatGroups.textContent = String(subtopicTotal);
     }
   } catch (e) {

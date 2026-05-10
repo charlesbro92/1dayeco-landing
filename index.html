@@ -1213,7 +1213,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v108</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v112</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1787,11 +1787,11 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
         준비가 끝나는 대로 빠르게 선보이겠습니다.
       </p>
       <div class="cs-hero-stats">
-        <div class="cs-stat"><span class="cs-stat-num" id="csStatCount">0</span><span class="cs-stat-label">출시 예정</span></div>
+        <div class="cs-stat"><span class="cs-stat-num" id="csStatCount">0</span><span class="cs-stat-label">카테고리</span></div>
         <div class="cs-stat-divider"></div>
-        <div class="cs-stat"><span class="cs-stat-num" id="csStatGroups">0</span><span class="cs-stat-label">카테고리</span></div>
+        <div class="cs-stat"><span class="cs-stat-num" id="csStatGroups">0</span><span class="cs-stat-label">부주제</span></div>
         <div class="cs-stat-divider"></div>
-        <div class="cs-stat"><span class="cs-stat-num">⏳</span><span class="cs-stat-label">준비 중</span></div>
+        <div class="cs-stat"><span class="cs-stat-num">⏳</span><span class="cs-stat-label">출시 대기</span></div>
       </div>
     </div>
 
@@ -2909,6 +2909,19 @@ const _SUBTOPIC_CACHE = {};
 async function loadSubtopicsForCategory(catId, force) {
   if (!catId) return [];
   if (!force && _SUBTOPIC_CACHE[catId]) return _SUBTOPIC_CACHE[catId];
+
+  // 1순위: 카테고리 응답에 포함된 subtopics 사용 (백엔드 v89+)
+  try {
+    const catData = await loadCategoriesFromAPI();
+    const allCats = [...(catData.active || []), ...(catData.coming_soon || []), ...(catData.hidden || [])];
+    const cat = allCats.find(c => c.id === catId);
+    if (cat && Array.isArray(cat.subtopics) && cat.subtopics.length > 0) {
+      _SUBTOPIC_CACHE[catId] = cat.subtopics;
+      return cat.subtopics;
+    }
+  } catch (e) { /* 폴백으로 진행 */ }
+
+  // 2순위: 직접 API 호출 (백엔드 구버전 호환)
   if (!API_BASE) return [];
   try {
     const res = await fetch(API_BASE + '/admin/subtopics?category_id=' + encodeURIComponent(catId));
@@ -2919,7 +2932,7 @@ async function loadSubtopicsForCategory(catId, force) {
       return data.data;
     }
   } catch (e) {
-    console.warn('[subtopics] 로드 실패:', e);
+    // 로그 노이즈 줄이기 — 카테고리 응답에 subtopics 없으면 그냥 빈 배열로
   }
   _SUBTOPIC_CACHE[catId] = [];
   return [];
@@ -3228,8 +3241,9 @@ async function _initCategoryVisibility() {
     if (csStatCount) csStatCount.textContent = String(total);
     const csStatGroups = document.getElementById('csStatGroups');
     if (csStatGroups) {
-      // 분야 그룹은 의미 없어졌으니 ⏳ 같은 ASCII로 대체
-      csStatGroups.textContent = total > 0 ? String(total) : '0';
+      // 백엔드가 내려준 subtopic_count 필드 단순 합산
+      const subtopicTotal = comingSoonCats.reduce((sum, c) => sum + (c.subtopic_count || 0), 0);
+      csStatGroups.textContent = String(subtopicTotal);
     }
   } catch (e) {
     console.warn('[카테고리 visibility 초기화 실패]', e);

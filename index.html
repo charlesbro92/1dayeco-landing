@@ -33,7 +33,7 @@
 
 * { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior:smooth; }
-body { background:var(--dark); color:var(--text); font-family:var(--sans); overflow-x:hidden; }
+body { background:var(--dark); color:var(--text); font-family:var(--sans); overflow-x:hidden; word-break:keep-all; word-wrap:break-word; }
 
 /* grain */
 body::before {
@@ -497,6 +497,10 @@ body.menu-open {
   font-family:var(--serif); font-size:clamp(36px,7vw,78px);
   font-weight:900; line-height:1.08; letter-spacing:-2px;
   margin-bottom:24px; animation:fadeUp .7s .1s ease both;
+}
+@media (max-width:768px) {
+  .hero-title { letter-spacing:-0.5px; line-height:1.18; }
+  .hero-sub { line-height:1.75; word-break:keep-all; }
 }
 .hero-title .gold { color:var(--gold); }
 .hero-title .thin { font-weight:400; }
@@ -1156,6 +1160,11 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   margin-top:14px; font-size:11px; color:var(--muted);
 }
 
+/* 데스크톱 전용 줄바꿈 — 모바일에서는 자연 흐름 */
+@media (max-width:768px) {
+  .br-desktop { display:none; }
+}
+
 @media (max-width:768px) {
   .category-title { font-size:36px; }
   .category-subtitle { font-size:15px; }
@@ -1279,7 +1288,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     <span class="thin">사람이 됩니다</span>
   </h1>
   <p class="hero-sub">
-    관심 있는 분야를 <strong>원하는 만큼 골라 구독</strong>하세요.<br>
+    관심 있는 분야를 <strong>원하는 만큼 골라 구독</strong>하세요.<br class="br-desktop">
     매일 아침 8시, 1분이면 읽는 새로운 지식이 메시지로 도착합니다.
   </p>
 
@@ -1351,7 +1360,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
       <h2 style="font-family:var(--serif);font-size:30px;font-weight:700;line-height:1.4;letter-spacing:-.5px;margin-bottom:14px">
         가만히 있어도<br><span style="color:var(--gold)">매일 새로운 지식</span>이 쌓입니다
       </h2>
-      <p style="font-size:14px;color:var(--muted);line-height:1.9;margin-bottom:32px">신청만 해두면 끝. 매일 아침 자동으로 정기 발송됩니다.<br>1년 365일, 단 하루도 같은 콘텐츠가 반복되지 않습니다.</p>
+      <p style="font-size:14px;color:var(--muted);line-height:1.9;margin-bottom:32px">신청만 해두면 끝. 매일 아침 자동으로 정기 발송됩니다.<br class="br-desktop">1년 365일, 단 하루도 같은 콘텐츠가 반복되지 않습니다.</p>
 
       <div class="content-breakdown">
         <div class="breakdown-item">
@@ -1508,7 +1517,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <!-- HOW IT WORKS -->
 <section class="section">
   <div class="sec-eye">How it works</div>
-  <h2 class="sec-title">딱 3단계로<br>시작합니다</h2>
+  <h2 class="sec-title">딱 3단계로<br class="br-desktop">시작합니다</h2>
   <p class="sec-sub">앱 설치 없이, 평소 쓰던 메신저로 바로 받아보세요.</p>
   <div class="steps">
     <div class="step"><div class="step-n">01</div><span class="step-ico">📱</span><div class="step-t">전화번호 등록</div><div class="step-d">이름, 전화번호, 카드를 등록하면 3일 무료 체험이 시작됩니다.</div></div>
@@ -1521,7 +1530,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <div class="pricing-wrap">
   <div style="max-width:860px;margin:0 auto">
     <div class="sec-eye">Pricing</div>
-    <h2 class="sec-title">커피 한 잔보다 저렴한<br>지식 구독</h2>
+    <h2 class="sec-title">커피 한 잔보다 저렴한<br class="br-desktop">지식 구독</h2>
   </div>
 
   <!-- 탭 -->
@@ -1630,7 +1639,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <!-- FINAL CTA -->
 <section class="final">
   <div class="eyebrow" style="display:inline-flex;margin-bottom:28px">지금 신청하면 내일 아침 첫 메시지 발송</div>
-  <h2 class="hero-title" style="font-size:clamp(30px,5vw,58px)">가만히 있어도<br><span class="gold">매일 새로운 지식</span><br><span class="thin">3일 무료로 받아보세요</span></h2>
+  <h2 class="hero-title" style="font-size:clamp(30px,5vw,58px)">가만히 있어도<br><span class="gold">매일 새로운 지식</span><br class="br-desktop"><span class="thin"> 3일 무료로 받아보세요</span></h2>
   <p style="color:var(--muted);margin:18px 0 36px;font-size:15px">3일 무료 체험 · 이후 월 ₩9,900부터 · 언제든 해지 가능</p>
   <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
     <button class="submit-btn" style="font-size:15px;padding:16px 44px;border-radius:10px" onclick="openModalWithCategory('economy')">

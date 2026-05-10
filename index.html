@@ -285,8 +285,9 @@ nav {
   /* 햄버거: 좌측 (order로 순서 강제) */
   .mobile-hamburger {
     display:flex !important;
-    order:1;
+    order:0;
     margin-left:0;
+    margin-right:auto;
   }
   /* 로고 가운데 정렬 */
   .nav-logo-wrap {
@@ -294,7 +295,7 @@ nav {
     left:50%;
     transform:translateX(-50%);
     pointer-events:none;
-    order:2;
+    order:1;
   }
   .nav-logo-wrap .logo,
   .nav-logo-wrap .deploy-badge {
@@ -1414,9 +1415,20 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   color:var(--gold); margin-bottom:8px; letter-spacing:.5px;
 }
 .cat-card-tag {
-  display:inline-block; font-size:11px; color:var(--muted);
-  background:rgba(201,168,76,.06); padding:4px 10px; border-radius:20px;
-  margin-bottom:14px; letter-spacing:.3px;
+  /* 부제목 칩들의 컨테이너 */
+  display:flex; flex-direction:column; align-items:center;
+  gap:4px; margin-bottom:14px;
+}
+/* 부제목 칩 (한 줄에 하나씩) */
+.cat-card-tag .card-subtopic-chip {
+  display:inline-block;
+  background:rgba(201,168,76,.1);
+  border:1px solid rgba(201,168,76,.25);
+  color:var(--gold);
+  font-size:11px;
+  padding:3px 12px;
+  border-radius:14px;
+  letter-spacing:.2px;
 }
 .cat-card-desc { font-size:13px; color:var(--text); line-height:1.7; opacity:.85; }
 .cat-card-sample {
@@ -1609,9 +1621,9 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   <div class="sec-eye">Reviews</div>
   <h2 class="sec-title">구독자들의 진짜 후기</h2>
   <div class="testis">
-    <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"뉴스는 길고 유튜브는 시간이 아까웠는데, 1분이라 매일 읽게 됩니다. 출근길에 카톡 열면 그 날 공부 끝."</p><div class="testi-who"><div class="testi-av">👨‍💼</div><div><div class="testi-name">김태민</div><div class="testi-job">IT 스타트업 대표</div></div></div></div>
-    <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"하루는 부동산 용어, 다른 날은 심슨으로 영어 한 마디. 지루할 틈이 없고 매일 다른 분야가 채워집니다."</p><div class="testi-who"><div class="testi-av">👩‍🏫</div><div><div class="testi-name">박지수</div><div class="testi-job">중학교 교사</div></div></div></div>
-    <div class="testi"><div class="testi-stars">★★★★☆</div><p class="testi-text">"팀원들한테 단체로 구독시켰어요. 월요일 미팅 때 경제·상식 얘기가 자연스럽게 나오기 시작했습니다."</p><div class="testi-who"><div class="testi-av">👨‍💻</div><div><div class="testi-name">이준혁</div><div class="testi-job">마케팅 팀장</div></div></div></div>
+    <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"뉴스는 길고 유튜브는 시간이 아까웠는데, 1분이라 매일 읽게 됩니다. 출근길에 카톡 열면 그 날 공부 끝."</p><div class="testi-who"><div class="testi-av">👨‍💼</div><div><div class="testi-name">김**</div><div class="testi-job">IT 스타트업 대표</div></div></div></div>
+    <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"하루는 부동산 용어, 다른 날은 심슨으로 영어 한 마디. 지루할 틈이 없고 매일 다른 분야가 채워집니다."</p><div class="testi-who"><div class="testi-av">👩‍🏫</div><div><div class="testi-name">박**</div><div class="testi-job">중학교 교사</div></div></div></div>
+    <div class="testi"><div class="testi-stars">★★★★☆</div><p class="testi-text">"팀원들한테 단체로 구독시켰어요. 월요일 미팅 때 경제·상식 얘기가 자연스럽게 나오기 시작했습니다."</p><div class="testi-who"><div class="testi-av">👨‍💻</div><div><div class="testi-name">이**</div><div class="testi-job">마케팅 팀장</div></div></div></div>
   </div>
 </section>
 
@@ -2891,7 +2903,10 @@ async function _hydrateCardSubtopics() {
       el.style.display = 'none';
       return;
     }
-    el.textContent = list.map(s => s.name).join(' · ');
+    // 한 줄에 한 부제목씩 — 칩 형태로 분리
+    el.innerHTML = list.map(s =>
+      '<span class="card-subtopic-chip">' + (s.name || '').replace(/</g,'&lt;') + '</span>'
+    ).join('');
     el.style.display = '';
   });
 }

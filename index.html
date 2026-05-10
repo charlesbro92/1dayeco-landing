@@ -1213,15 +1213,17 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v113</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v114</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
     <button class="nav-tab" onclick="showCategory('list-all', this)">전체</button>
-    <button class="nav-tab" onclick="showCategory('list-finance', this)">경제·금융</button>
-    <button class="nav-tab" onclick="showCategory('list-lifestyle', this)">생활·실용</button>
-    <button class="nav-tab" onclick="showCategory('list-language', this)">글로벌·언어</button>
-    <button class="nav-tab" onclick="showCategory('list-tech', this)">테크·트렌드</button>
+    <button class="nav-tab" onclick="showCategory('list-finance', this)">금융·투자</button>
+    <button class="nav-tab" onclick="showCategory('list-tech', this)">테크·디지털</button>
+    <button class="nav-tab" onclick="showCategory('list-language', this)">외국어</button>
+    <button class="nav-tab" onclick="showCategory('list-work', this)">일·업무</button>
+    <button class="nav-tab" onclick="showCategory('list-knowledge', this)">교양·지식</button>
+    <button class="nav-tab" onclick="showCategory('list-wellness', this)">건강·일상</button>
     <button class="nav-tab nav-tab-soon" onclick="showCategory('comingsoon', this)" style="display:none">
       COMING SOON <span class="nav-tab-badge" id="navComingSoonBadge" style="display:none">0</span>
     </button>
@@ -1253,10 +1255,12 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     <button class="mmp-item" onclick="showCategory('intro'); closeMobileMenu();">소개</button>
     <div class="mmp-section-title">카테고리</div>
     <button class="mmp-item" onclick="showCategory('list-all'); closeMobileMenu();">전체</button>
-    <button class="mmp-item" onclick="showCategory('list-finance'); closeMobileMenu();">💼 경제·금융</button>
-    <button class="mmp-item" onclick="showCategory('list-lifestyle'); closeMobileMenu();">🏠 생활·실용</button>
-    <button class="mmp-item" onclick="showCategory('list-language'); closeMobileMenu();">🌐 글로벌·언어</button>
-    <button class="mmp-item" onclick="showCategory('list-tech'); closeMobileMenu();">💻 테크·트렌드</button>
+    <button class="mmp-item" onclick="showCategory('list-finance'); closeMobileMenu();">💰 금융·투자</button>
+    <button class="mmp-item" onclick="showCategory('list-tech'); closeMobileMenu();">💻 테크·디지털</button>
+    <button class="mmp-item" onclick="showCategory('list-language'); closeMobileMenu();">🌐 외국어</button>
+    <button class="mmp-item" onclick="showCategory('list-work'); closeMobileMenu();">💼 일·업무</button>
+    <button class="mmp-item" onclick="showCategory('list-knowledge'); closeMobileMenu();">📚 교양·지식</button>
+    <button class="mmp-item" onclick="showCategory('list-wellness'); closeMobileMenu();">🌱 건강·일상</button>
     <button class="mmp-item mmp-item-soon" id="mmpComingSoon" onclick="showCategory('comingsoon'); closeMobileMenu();" style="display:none">
       COMING SOON <span class="mmp-badge" id="mmpComingSoonBadge">0</span>
     </button>
@@ -2673,13 +2677,15 @@ function renderCategoryDetailPage(catId) {
 
 // 카드 리스트 페이지 렌더 (전체 / 대분류별)
 async function renderCategoryListPage(filter) {
-  // filter: 'all' | 'finance' | 'lifestyle' | 'language' | 'tech'
+  // filter: 'all' | 'finance' | 'tech' | 'language' | 'work' | 'knowledge' | 'wellness'
   const SUPER_CATS = {
     all:       { eyebrow: 'ALL CATEGORIES', title: '전체 카테고리',     sub: '관심 있는 카테고리를 선택하면 자세한 소개를 확인할 수 있어요.' },
-    finance:   { eyebrow: 'FINANCE',         title: '💼 경제·금융',     sub: '경제 흐름과 시장 움직임을 짧게 정리해드려요.' },
-    lifestyle: { eyebrow: 'LIFESTYLE',       title: '🏠 생활·실용',     sub: '내 삶에 직접 도움 되는 실용 지식.' },
-    language:  { eyebrow: 'LANGUAGE',        title: '🌐 글로벌·언어',   sub: '비즈니스부터 여행까지, 매일 한 표현씩.' },
-    tech:      { eyebrow: 'TECH',            title: '💻 테크·트렌드',   sub: 'IT·AI·빅테크 — 산업의 흐름을 짧게.' },
+    finance:   { eyebrow: 'FINANCE',         title: '💰 금융·투자',     sub: '경제 흐름과 시장 움직임을 짧게 정리해드려요.' },
+    tech:      { eyebrow: 'TECH',            title: '💻 테크·디지털',   sub: 'IT·AI·디지털 도구 — 직장인을 위한 트렌드.' },
+    language:  { eyebrow: 'LANGUAGE',        title: '🌐 외국어',         sub: '비즈니스부터 여행까지, 매일 한 표현씩.' },
+    work:      { eyebrow: 'WORK',            title: '💼 일·업무',       sub: '회사에서 한 단계 올라가는 한 줄 인사이트.' },
+    knowledge: { eyebrow: 'KNOWLEDGE',       title: '📚 교양·지식',     sub: '내 삶에 직접 도움 되는 실용 지식.' },
+    wellness:  { eyebrow: 'WELLNESS',        title: '🌱 건강·일상',     sub: '몸과 일상을 가볍게 정돈하는 한 걸음.' },
   };
   const meta = SUPER_CATS[filter] || SUPER_CATS.all;
   document.getElementById('catListEyebrow').textContent = meta.eyebrow;
@@ -2740,10 +2746,12 @@ async function renderCategoryListPage(filter) {
   // 전체 탭: 대분류별 그룹핑 / 대분류 탭: 평면 표시
   if (filter === 'all') {
     const SUPER_CATS_LIST = [
-      { id: 'finance',   emoji: '💼', label: '경제·금융' },
-      { id: 'lifestyle', emoji: '🏠', label: '생활·실용' },
-      { id: 'language',  emoji: '🌐', label: '글로벌·언어' },
-      { id: 'tech',      emoji: '💻', label: '테크·트렌드' },
+      { id: 'finance',   emoji: '💰', label: '금융·투자' },
+      { id: 'tech',      emoji: '💻', label: '테크·디지털' },
+      { id: 'language',  emoji: '🌐', label: '외국어' },
+      { id: 'work',      emoji: '💼', label: '일·업무' },
+      { id: 'knowledge', emoji: '📚', label: '교양·지식' },
+      { id: 'wellness',  emoji: '🌱', label: '건강·일상' },
     ];
     // 대분류별로 active + coming_soon 함께 그룹핑
     const grouped = {};
@@ -3056,10 +3064,12 @@ async function _initCategoryVisibility() {
         introActiveGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:13px">현재 운영 중인 카테고리가 없습니다.</div>';
       } else {
         const SUPER_CATS = [
-          { id: 'finance',   emoji: '💼', label: '경제·금융' },
-          { id: 'lifestyle', emoji: '🏠', label: '생활·실용' },
-          { id: 'language',  emoji: '🌐', label: '글로벌·언어' },
-          { id: 'tech',      emoji: '💻', label: '테크·트렌드' },
+          { id: 'finance',   emoji: '💰', label: '금융·투자' },
+          { id: 'tech',      emoji: '💻', label: '테크·디지털' },
+          { id: 'language',  emoji: '🌐', label: '외국어' },
+          { id: 'work',      emoji: '💼', label: '일·업무' },
+          { id: 'knowledge', emoji: '📚', label: '교양·지식' },
+          { id: 'wellness',  emoji: '🌱', label: '건강·일상' },
         ];
         const grouped = {};
         SUPER_CATS.forEach(s => { grouped[s.id] = []; });
@@ -3163,10 +3173,12 @@ async function _initCategoryVisibility() {
         csEmptyState.style.display = 'none';
 
         const SUPER_CATS_CS = [
-          { id: 'finance',   emoji: '💼', label: '경제·금융' },
-          { id: 'lifestyle', emoji: '🏠', label: '생활·실용' },
-          { id: 'language',  emoji: '🌐', label: '글로벌·언어' },
-          { id: 'tech',      emoji: '💻', label: '테크·트렌드' },
+          { id: 'finance',   emoji: '💰', label: '금융·투자' },
+          { id: 'tech',      emoji: '💻', label: '테크·디지털' },
+          { id: 'language',  emoji: '🌐', label: '외국어' },
+          { id: 'work',      emoji: '💼', label: '일·업무' },
+          { id: 'knowledge', emoji: '📚', label: '교양·지식' },
+          { id: 'wellness',  emoji: '🌱', label: '건강·일상' },
         ];
         const groupedCS = {};
         SUPER_CATS_CS.forEach(s => { groupedCS[s.id] = []; });

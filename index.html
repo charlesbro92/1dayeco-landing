@@ -61,6 +61,12 @@ nav {
   padding:2px 0;
   display:inline-block;
 }
+/* nav-logo-wrap: 데스크톱에선 1DAYECO + deploy-badge 가로 배치 */
+.nav-logo-wrap {
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
 .logo span { color:var(--text); font-weight:400; }
 
 /* ── 카테고리 탭 ── */
@@ -289,20 +295,30 @@ nav {
   /* 모바일에서는 가로 스크롤 탭/CTA 숨기고 햄버거만 표시 */
   .nav-tabs { display:none; }
   .nav-cta  { display:none; }
-  /* 햄버거: 좌측 (order로 순서 강제) */
+  /* 햄버거: 화면 왼쪽 끝 절대 고정 */
   .mobile-hamburger {
     display:flex !important;
-    order:0;
-    margin-left:0;
-    margin-right:auto;
+    position:absolute;
+    left:16px;
+    top:50%;
+    transform:translateY(-50%);
+    margin:0;
+    flex-shrink:0;
+    z-index:2;
   }
-  /* 로고 가운데 정렬 */
+  /* 로고: 화면 정 가운데 (햄버거와 무관) */
   .nav-logo-wrap {
     position:absolute;
     left:50%;
-    transform:translateX(-50%);
+    top:50%;
+    transform:translate(-50%, -50%);
     pointer-events:none;
-    order:1;
+    z-index:1;
+    /* 모바일에선 deploy-badge 숨김이므로 단순 인라인 가운데 정렬 */
+    display:block;
+    text-align:center;
+    margin:0;
+    padding:0;
   }
   .nav-logo-wrap .logo,
   .nav-logo-wrap .deploy-badge {
@@ -1195,9 +1211,9 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 
 <!-- NAV -->
 <nav>
-  <div class="nav-logo-wrap" style="display:flex;align-items:center;gap:8px">
+  <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v93</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v105</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1254,9 +1270,9 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     padding:2px 6px; border:1px solid rgba(201,168,76,.2); border-radius:3px;
     font-family:monospace; cursor:pointer; transition:opacity .2s;
     user-select:none;
-    display:none; /* 운영 환경에서는 숨김 */
   }
   .deploy-badge:hover { opacity:1; color:var(--gold); border-color:var(--gold); }
+  @media (max-width:768px) { .deploy-badge { display:none; } }
 </style>
 <script>
   async function showDeployInfo() {

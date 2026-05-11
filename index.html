@@ -1258,7 +1258,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v125</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v126</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1367,12 +1367,19 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   </p>
 
   <div class="signup-wrap">
-    <div class="form-hint">📱 전화번호 입력 → 내일 아침 첫 메시지 발송</div>
+    <div class="form-hint">📱 이름 + 전화번호 입력 → 내일 아침 첫 메시지 발송</div>
+    <div style="margin-bottom:10px">
+      <input type="text" class="phone-input" id="heroName" placeholder="이름을 입력해주세요"
+             maxlength="20" style="width:100%;box-sizing:border-box"
+             onkeydown="if(event.key==='Enter')heroSubmit()">
+      <div class="agree-err" id="heroNameErr">이름을 입력해 주세요</div>
+    </div>
     <div class="input-row">
       <input type="tel" class="phone-input" id="heroPhone" placeholder="010-0000-0000"
              maxlength="13" oninput="fmtPhone(this)" onkeydown="if(event.key==='Enter')heroSubmit()">
       <button class="submit-btn" id="heroBtn" onclick="heroSubmit()" style="opacity:0.6">무료 체험</button>
     </div>
+    <div class="agree-err" id="heroPhoneErr">올바른 전화번호를 입력해 주세요</div>
     <!-- 개인정보 동의 체크박스 -->
     <div style="margin-top:10px">
       <div class="agree-row">
@@ -1983,15 +1990,17 @@ HIDDEN_COMINGSOON_MODAL_END -->
       <div style="display:flex;gap:10px;margin-bottom:14px">
         <div style="flex:1">
           <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">이름</label>
-          <input type="text" id="mName" placeholder="홍길동"
+          <input type="text" id="mName" placeholder="이름을 입력해주세요"
             style="width:100%;background:var(--s3);border:1.5px solid rgba(201,168,76,.4);color:var(--text);padding:11px 14px;border-radius:8px;font-size:14px;outline:none;font-family:var(--sans);box-sizing:border-box;transition:border-color .15s"
             onfocus="this.style.borderColor='rgba(201,168,76,.9)'" onblur="this.style.borderColor='rgba(201,168,76,.4)'">
+          <div class="agree-err" id="mNameErr">이름을 입력해 주세요</div>
         </div>
         <div style="flex:1">
           <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px">카카오톡 전화번호</label>
           <input type="tel" id="mPhone" placeholder="010-0000-0000" maxlength="13" oninput="fmtPhone(this)"
             style="width:100%;background:var(--s3);border:1.5px solid rgba(201,168,76,.4);color:var(--text);padding:11px 14px;border-radius:8px;font-size:14px;outline:none;font-family:var(--sans);box-sizing:border-box;transition:border-color .15s"
             onfocus="this.style.borderColor='rgba(201,168,76,.9)'" onblur="this.style.borderColor='rgba(201,168,76,.4)'">
+          <div class="agree-err" id="mPhoneErr">올바른 전화번호를 입력해 주세요</div>
         </div>
       </div>
 
@@ -2157,7 +2166,7 @@ HIDDEN_COMINGSOON_MODAL_END -->
         <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:18px">신청 시 등록한 <strong style="color:var(--text)">이름과 전화번호</strong>를 입력해 주세요.</p>
         <div style="margin-bottom:12px">
           <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:6px">이름</label>
-          <input type="text" id="cancelName" placeholder="홍길동" maxlength="20"
+          <input type="text" id="cancelName" placeholder="이름을 입력해주세요" maxlength="20"
             onkeydown="if(event.key==='Enter')document.getElementById('cancelPhone').focus()"
             style="width:100%;background:rgba(255,255,255,.05);border:1.5px solid var(--border);border-radius:8px;padding:12px 16px;font-size:15px;color:var(--text);font-family:var(--sans);outline:none;transition:border-color .2s">
         </div>
@@ -3992,16 +4001,44 @@ async function apiPost(path, body) {
 
 // ── 히어로 폼 ────────────────────────────────────────────────
 function heroSubmit() {
+  const name   = document.getElementById('heroName')?.value.trim() || '';
   const p      = document.getElementById('heroPhone').value;
   const agreed = document.getElementById('heroAgree')?.checked;
   const trialAgreed = document.getElementById('heroAgreeTrial')?.checked;
   const errEl  = document.getElementById('heroAgreeErr');
+  const nameErrEl  = document.getElementById('heroNameErr');
+  const phoneErrEl = document.getElementById('heroPhoneErr');
+
+  // 에러 표시 초기화
+  if (nameErrEl) nameErrEl.style.display = 'none';
+  if (phoneErrEl) phoneErrEl.style.display = 'none';
+
+  // v126: 이름·전화번호 검증
+  if (!name) {
+    if (nameErrEl) {
+      nameErrEl.style.display = 'block';
+      setTimeout(() => nameErrEl.style.display = 'none', 3000);
+    }
+    showToast('이름을 입력해 주세요', 'ng');
+    document.getElementById('heroName')?.focus();
+    return;
+  }
+  if (p.length < 12) {
+    if (phoneErrEl) {
+      phoneErrEl.style.display = 'block';
+      setTimeout(() => phoneErrEl.style.display = 'none', 3000);
+    }
+    showToast('올바른 전화번호를 입력해 주세요', 'ng');
+    document.getElementById('heroPhone')?.focus();
+    return;
+  }
   if (!agreed || !trialAgreed) {
     if (errEl) { errEl.style.display='block'; setTimeout(()=>errEl.style.display='none',3000); }
     showToast('필수 약관 2개에 모두 동의해 주세요','ng'); return;
   }
-  if (p.length < 12) { showToast('올바른 전화번호를 입력해주세요','ng'); return; }
+
   openModal('pkg6m');  // 디폴트: 6개월 (가장 인기), 모달 안에서 변경 가능
+  document.getElementById('mName').value  = name;
   document.getElementById('mPhone').value = p;
   const mAgree = document.getElementById('modalAgree');
   if (mAgree) { mAgree.checked = true; }
@@ -4137,16 +4174,42 @@ async function submitStep1() {
     showToast('결제 안내에 동의해 주세요','ng'); return;
   }
   let ok = true;
-  if (!name) { document.getElementById('mName').classList.add('err'); ok=false; }
-  else document.getElementById('mName').classList.remove('err');
-  if (phone.length < 12) { document.getElementById('mPhone').classList.add('err'); ok=false; }
-  else document.getElementById('mPhone').classList.remove('err');
+  // v126: 이름/전화번호 미입력·오입력 시 명확한 안내
+  const nameErrEl  = document.getElementById('mNameErr');
+  const phoneErrEl = document.getElementById('mPhoneErr');
+  const nameEl  = document.getElementById('mName');
+  const phoneEl = document.getElementById('mPhone');
+  // 일단 초기화
+  if (nameErrEl) nameErrEl.style.display = 'none';
+  if (phoneErrEl) phoneErrEl.style.display = 'none';
+  nameEl.classList.remove('err');
+  phoneEl.classList.remove('err');
+
+  if (!name) {
+    nameEl.classList.add('err');
+    if (nameErrEl) {
+      nameErrEl.style.display = 'block';
+      setTimeout(() => nameErrEl.style.display = 'none', 3000);
+    }
+    showToast('이름을 입력해 주세요', 'ng');
+    ok = false;
+  }
+  if (phone.length < 12) {
+    phoneEl.classList.add('err');
+    if (phoneErrEl) {
+      phoneErrEl.style.display = 'block';
+      setTimeout(() => phoneErrEl.style.display = 'none', 3000);
+    }
+    // 이름 에러와 함께 표시될 경우 toast는 1회만
+    if (ok) showToast('올바른 전화번호를 입력해 주세요', 'ng');
+    ok = false;
+  }
   if (selectedCategories.length === 0) {
     document.querySelectorAll('.cat-btn').forEach(b => {
       b.style.borderColor = 'var(--error)';
       setTimeout(() => b.style.borderColor = '', 2000);
     });
-    showToast('관심사를 1개 이상 선택해 주세요', 'ng');
+    if (ok) showToast('관심사를 1개 이상 선택해 주세요', 'ng');
     ok = false;
   }
   if (!ok) return;

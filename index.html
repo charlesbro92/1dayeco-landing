@@ -1266,7 +1266,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v133</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v134</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -4245,8 +4245,22 @@ async function _populateDonePanel() {
     document.getElementById('doneName').textContent  = name || '-';
     document.getElementById('donePhone').textContent = phone || '-';
 
+    // v134: catId 다중 폴백 (selectedCategories → prepareMeta → sessionStorage billing_ctx)
+    let catId = selectedCategories[0] || '';
+    if (!catId && typeof prepareMeta !== 'undefined' && prepareMeta) {
+      catId = (prepareMeta.categories && prepareMeta.categories[0]) || '';
+    }
+    if (!catId) {
+      try {
+        const raw = sessionStorage.getItem('billing_ctx');
+        if (raw) {
+          const ctx = JSON.parse(raw);
+          catId = (ctx.categories && ctx.categories[0]) || '';
+        }
+      } catch (_) {}
+    }
+
     // 카테고리 한글명
-    const catId = selectedCategories[0] || '';
     let catName = catId;
     try {
       const data = await loadCategoriesFromAPI();
@@ -4257,7 +4271,7 @@ async function _populateDonePanel() {
     } catch (_) {}
     if (!catName || catName === catId) {
       // 영문 ID 노출 방지 — 폴백으로 화면에 표시된 카드 텍스트 사용
-      const activeCard = document.querySelector('.cat-btn.active');
+      const activeCard = document.querySelector('#catSelector .cat-btn.active');
       if (activeCard) {
         const txt = (activeCard.textContent || '').trim();
         if (txt) catName = txt;
@@ -4265,20 +4279,44 @@ async function _populateDonePanel() {
     }
     document.getElementById('doneCatName').textContent = catName || '-';
 
-    // 부제목
+    // v134: subtopic 다중 폴백 (전역변수 → prepareMeta → sessionStorage)
     const subRow = document.getElementById('doneSubtopicRow');
-    if (window._selectedSubtopicId) {
-      let subName = window._selectedSubtopicName || '';
-      if (!subName) {
-        const sel = document.querySelector('#modalSubtopicGrid .cat-btn.active');
-        if (sel) subName = (sel.textContent || '').trim();
-      }
-      if (subName) {
-        document.getElementById('doneSubName').textContent = subName;
-        subRow.style.display = 'flex';
-      } else {
-        subRow.style.display = 'none';
-      }
+    let subId = window._selectedSubtopicId || null;
+    let subName = window._selectedSubtopicName || '';
+    if (!subId && typeof prepareMeta !== 'undefined' && prepareMeta && prepareMeta.subtopic_id) {
+      subId = prepareMeta.subtopic_id;
+    }
+    if (!subId) {
+      try {
+        const raw = sessionStorage.getItem('billing_ctx');
+        if (raw) {
+          const ctx = JSON.parse(raw);
+          if (ctx.subtopic_id) subId = ctx.subtopic_id;
+        }
+      } catch (_) {}
+    }
+    if (subId && !subName) {
+      // 모달 그리드의 active 카드에서 추출
+      const sel = document.querySelector('#modalSubtopicGrid .cat-btn.active');
+      if (sel) subName = (sel.textContent || '').trim();
+    }
+    if (subId && !subName && catId) {
+      // 마지막 폴백 — DB에서 직접 조회
+      try {
+        if (typeof API_BASE !== 'undefined' && API_BASE) {
+          const r = await fetch(API_BASE + '/admin/subtopics?cat=' + encodeURIComponent(catId));
+          if (r.ok) {
+            const d = await r.json();
+            const rows = (d && Array.isArray(d.data)) ? d.data : [];
+            const found = rows.find(s => String(s.id) === String(subId));
+            if (found && found.name) subName = found.name;
+          }
+        }
+      } catch (_) {}
+    }
+    if (subId && subName) {
+      document.getElementById('doneSubName').textContent = subName;
+      subRow.style.display = 'flex';
     } else {
       subRow.style.display = 'none';
     }
@@ -4637,6 +4675,8 @@ async function submitStep2() {
       name:         buyerName,
       phone:        buyerTel,
       categories:   selectedCategories,
+      subtopic_id:  window._selectedSubtopicId || null,
+      subtopic_name: window._selectedSubtopicName || '',
       hour:         FIXED_SEND_HOUR,
       ts:           Date.now(),
     }));
@@ -4755,6 +4795,10 @@ async function submitStep2() {
       if (typeof subscriberId !== 'undefined')        subscriberId       = ctx.subscriberId;
       if (typeof customerUidRef !== 'undefined')      customerUidRef     = ctx.customerUid;
       if (typeof selectedCategories !== 'undefined')  selectedCategories = ctx.categories || [];
+      if (typeof prepareMeta !== 'undefined')         prepareMeta        = ctx.prepareMeta || null;
+      // v134: subtopic 변수도 복원
+      window._selectedSubtopicId   = ctx.subtopic_id   || null;
+      window._selectedSubtopicName = ctx.subtopic_name || '';
       openModal(ctx.plan);
       const nameEl  = document.getElementById('mName');
       const phoneEl = document.getElementById('mPhone');

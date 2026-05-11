@@ -1266,7 +1266,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v132</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v133</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -4250,10 +4250,20 @@ async function _populateDonePanel() {
     let catName = catId;
     try {
       const data = await loadCategoriesFromAPI();
-      const cat = (data.active || []).find(c => c.id === catId);
+      // v133: active + coming_soon + hidden 전체에서 검색
+      const allCats = [].concat(data.active || [], data.coming_soon || [], data.hidden || []);
+      const cat = allCats.find(c => c.id === catId);
       if (cat) catName = cat.name || catId;
     } catch (_) {}
-    document.getElementById('doneCatName').textContent = catName;
+    if (!catName || catName === catId) {
+      // 영문 ID 노출 방지 — 폴백으로 화면에 표시된 카드 텍스트 사용
+      const activeCard = document.querySelector('.cat-btn.active');
+      if (activeCard) {
+        const txt = (activeCard.textContent || '').trim();
+        if (txt) catName = txt;
+      }
+    }
+    document.getElementById('doneCatName').textContent = catName || '-';
 
     // 부제목
     const subRow = document.getElementById('doneSubtopicRow');
@@ -4384,10 +4394,20 @@ async function _populateConfirmPanel({ name, phone, plan, hour }) {
   let catName = catId;
   try {
     const data = await loadCategoriesFromAPI();
-    const cat = (data.active || []).find(c => c.id === catId);
+    // v133: active + coming_soon + hidden 전체에서 검색
+    const allCats = [].concat(data.active || [], data.coming_soon || [], data.hidden || []);
+    const cat = allCats.find(c => c.id === catId);
     if (cat) catName = cat.name || catId;
   } catch (_) {}
-  document.getElementById('cfmCategory').textContent = catName;
+  if (!catName || catName === catId) {
+    // 영문 ID 노출 방지 — 폴백으로 화면에 표시된 카드 텍스트 사용
+    const activeCard = document.querySelector('.cat-btn.active');
+    if (activeCard) {
+      const txt = (activeCard.textContent || '').trim();
+      if (txt) catName = txt;
+    }
+  }
+  document.getElementById('cfmCategory').textContent = catName || '-';
 
   // 부제목 (선택된 경우만)
   const subRow = document.getElementById('cfmSubtopicRow');

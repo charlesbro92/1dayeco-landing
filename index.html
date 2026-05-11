@@ -31,6 +31,48 @@
   --error: #F87171;
 }
 
+/* v137: 라이트 모드 — body.light-mode 클래스 적용 시 색상 토큰 오버라이드 */
+body.light-mode {
+  --gold:      #A88930;
+  --gold-light:#C9A84C;
+  --gold-dim:  rgba(168,137,48,0.10);
+  --dark:      #FAFAF7;   /* 페이지 배경 */
+  --dark2:     #F0EFE9;   /* 패널·카드 배경 */
+  --dark3:     #E8E7DF;   /* 입력창·강조 박스 */
+  --border:    rgba(168,137,48,0.30);
+  --text:      #1A1A17;   /* 메인 글자 */
+  --muted:     #6B6B5F;   /* 보조 글자 */
+}
+body.light-mode {
+  background: var(--dark);
+  color: var(--text);
+}
+/* 라이트 모드 — grain 노이즈 약하게 (어두운 점이 눈에 띄지 않도록) */
+body.light-mode::before { opacity: 0.15 !important; }
+
+/* 테마 토글 버튼 (우상단 nav 내부) */
+.theme-toggle {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:34px;
+  height:34px;
+  background:transparent;
+  border:1px solid var(--border);
+  border-radius:50%;
+  cursor:pointer;
+  color:var(--muted);
+  font-size:15px;
+  margin-right:8px;
+  transition:background .15s, border-color .15s, color .15s, transform .2s;
+}
+.theme-toggle:hover {
+  background:rgba(201,168,76,.08);
+  border-color:rgba(201,168,76,.5);
+  color:var(--text);
+  transform:rotate(15deg);
+}
+
 * { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior:smooth; }
 body { background:var(--dark); color:var(--text); font-family:var(--sans); overflow-x:hidden; word-break:keep-all; word-wrap:break-word; }
@@ -235,6 +277,14 @@ nav {
   .cs-info-box { flex-direction:column; gap:10px; }
   /* v136: category-page 모바일 패딩 조정 — 카드가 화면 중앙에 오도록 */
   .category-page { padding:90px 16px 60px; }
+  /* v138: category-page 안 컨테이너가 화면 가득 + 가운데 정렬 보장 */
+  .category-page > div:not(.category-page-bg) {
+    width:100% !important;
+    max-width:480px !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+    box-sizing:border-box;
+  }
 }
 
 /* 메인 카드 그리드 - 소개 페이지의 Coming Soon 미리보기 (3개만) */
@@ -318,6 +368,21 @@ nav {
     z-index:2;
     padding:6px 10px;
     font-size:12px;
+  }
+  /* v137: 모바일 테마 토글 — 디폴트는 우측 끝, 뒤로 버튼 표시 시 JS가 우측60px로 이동 */
+  .theme-toggle {
+    position:absolute;
+    right:16px;
+    top:50%;
+    transform:translateY(-50%);
+    margin:0;
+    z-index:2;
+    width:32px;
+    height:32px;
+    font-size:14px;
+  }
+  .theme-toggle.with-back-btn {
+    right:60px;
   }
   /* 로고: 화면 정 가운데 (햄버거와 무관) */
   .nav-logo-wrap {
@@ -1279,7 +1344,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v136</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v138</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1295,7 +1360,11 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     </button>
   </div>
   <!-- v124: 뒤로 버튼 — 데스크탑은 CTA 옆, 모바일은 우측 절대위치 -->
-  <button id="navBackBtn" class="nav-back-btn" onclick="goBackOnePage()" title="뒤로 가기">← 뒤로</button>
+  <button id="navBackBtn" class="nav-back-btn" onclick="goBackOnePage()" title="뒤로 가기">뒤로</button>
+  <!-- v137: 테마 토글 (다크/라이트) -->
+  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="다크/라이트 모드 전환" aria-label="테마 전환">
+    <span id="themeIcon">🌙</span>
+  </button>
   <button class="nav-cta" onclick="document.querySelector('.pricing-wrap').scrollIntoView({behavior:'smooth'})">지금 시작하기</button>
   <!-- 모바일 햄버거 버튼 (모바일에서만 표시) -->
   <button class="mobile-hamburger" onclick="toggleMobileMenu()" aria-label="메뉴 열기">
@@ -1768,7 +1837,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <!-- 1) 카드 리스트 페이지 (전체 / 대분류) -->
 <div class="category-page" id="category-list-page">
   <div class="category-page-bg"></div>
-  <div style="max-width:1100px;margin:0 auto;padding:60px 24px">
+  <div style="width:100%;max-width:1100px;margin:0 auto;padding:60px 24px;box-sizing:border-box">
     <div style="text-align:center;margin-bottom:36px">
       <div id="catListEyebrow" style="font-size:11px;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:14px">CATEGORIES</div>
       <h2 class="category-title" id="catListTitle" style="margin-bottom:14px">전체 카테고리</h2>
@@ -3455,6 +3524,11 @@ async function showCategory(category, btnEl) {
   if (backBtn) {
     backBtn.style.display = (pageTarget === 'intro-page') ? 'none' : 'inline-flex';
   }
+  // v137: 모바일 테마 토글 위치 동기화 — 뒤로 버튼 있을 때만 with-back-btn 클래스 적용
+  const themeBtn = document.getElementById('themeToggle');
+  if (themeBtn) {
+    themeBtn.classList.toggle('with-back-btn', pageTarget !== 'intro-page');
+  }
 
   // nav 활성화
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -3512,6 +3586,36 @@ function goBackOnePage() {
     showCategory('intro', null);
   }
 }
+
+// v137: 다크/라이트 테마 토글 ──────────────────────────────
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light-mode');
+  const icon = document.getElementById('themeIcon');
+  if (icon) icon.textContent = isLight ? '☀️' : '🌙';
+  try {
+    localStorage.setItem('1dayeco_theme', isLight ? 'light' : 'dark');
+  } catch (_) {}
+}
+
+// 페이지 로드 시 저장된 테마 복원
+(function _initTheme() {
+  try {
+    const saved = localStorage.getItem('1dayeco_theme');
+    if (saved === 'light') {
+      document.body.classList.add('light-mode');
+      // 아이콘은 DOM 준비 후 처리
+      const setIcon = () => {
+        const icon = document.getElementById('themeIcon');
+        if (icon) icon.textContent = '☀️';
+      };
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setIcon);
+      } else {
+        setIcon();
+      }
+    }
+  } catch (_) {}
+})();
 
 // ── 카테고리 정보 로드 (백엔드 API 또는 폴백) ──
 let _categoriesCache = null;

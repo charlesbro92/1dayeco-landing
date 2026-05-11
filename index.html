@@ -229,10 +229,12 @@ nav {
   .cs-stat-num { font-size:22px; }
 }
 @media (max-width: 480px) {
-  .cs-grid { grid-template-columns:1fr; }
+  .cs-grid { grid-template-columns:1fr; justify-items:stretch; max-width:480px; margin-left:auto; margin-right:auto; }
   .cs-hero-stats { flex-wrap:wrap; padding:12px 4px; }
   .cs-stat-divider { display:none; }
   .cs-info-box { flex-direction:column; gap:10px; }
+  /* v136: category-page 모바일 패딩 조정 — 카드가 화면 중앙에 오도록 */
+  .category-page { padding:90px 16px 60px; }
 }
 
 /* 메인 카드 그리드 - 소개 페이지의 Coming Soon 미리보기 (3개만) */
@@ -1277,7 +1279,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v135</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v136</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1850,6 +1852,12 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
       <div class="cat-final-cta-meta">카카오톡 채널 친구추가 후 자동 발송</div>
     </div>
   </section>
+
+  <!-- v136: 하단 네비게이션 — 소개 / 전체 카테고리 -->
+  <div style="text-align:center;margin:32px auto 60px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:0 24px">
+    <button class="category-back" onclick="showCategory('intro')">← 소개로 돌아가기</button>
+    <button class="category-back" onclick="showCategory('list-all')">📋 전체 카테고리</button>
+  </div>
 </div>
 
 <!-- 3) COMING SOON 페이지 -->
@@ -4987,6 +4995,8 @@ function toggleCat(cat) {
   if (selectEl) selectEl.value = selectedCategories[0] || '';
   updateModalBtn();
 
+  // v136: 카드 선택 시 forceOpen 해제 → 다시 접힘
+  window._catAccordionForceOpen = false;
   // v135: 카테고리 선택 시 자동 collapse (모바일 accordion)
   _applyCatAccordionState();
 

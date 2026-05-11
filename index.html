@@ -306,6 +306,17 @@ nav {
     flex-shrink:0;
     z-index:2;
   }
+  /* v124: 뒤로 버튼 — 모바일에서는 우측 절대위치 */
+  .nav-back-btn {
+    position:absolute;
+    right:16px;
+    top:50%;
+    transform:translateY(-50%);
+    margin:0;
+    z-index:2;
+    padding:6px 10px;
+    font-size:12px;
+  }
   /* 로고: 화면 정 가운데 (햄버거와 무관) */
   .nav-logo-wrap {
     position:absolute;
@@ -326,6 +337,28 @@ nav {
   }
   .category-title { font-size:36px; }
   .category-subtitle { font-size:15px; }
+}
+
+/* ── v124: 뒤로 버튼 (데스크탑 = CTA 옆, 모바일 = 우측 절대위치) ── */
+.nav-back-btn {
+  display:none; /* JS로 토글 — 카테고리 페이지에서만 표시 */
+  background:none;
+  border:1px solid var(--border);
+  color:var(--muted);
+  padding:7px 14px;
+  border-radius:8px;
+  font-size:13px;
+  cursor:pointer;
+  align-items:center;
+  gap:4px;
+  margin-right:8px;
+  transition:background .15s, border-color .15s, color .15s;
+  white-space:nowrap;
+}
+.nav-back-btn:hover {
+  background:rgba(201,168,76,.06);
+  border-color:rgba(201,168,76,.5);
+  color:var(--text);
 }
 
 /* ── 햄버거 버튼 (데스크톱에서는 숨김) ── */
@@ -1212,11 +1245,8 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <!-- NAV -->
 <nav>
   <div class="nav-logo-wrap">
-    <button id="navBackBtn" onclick="goBackOnePage()" 
-      style="display:none;background:none;border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;margin-right:8px;align-items:center;gap:4px"
-      title="뒤로 가기">← 뒤로</button>
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v123</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v124</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1231,6 +1261,8 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
       COMING SOON <span class="nav-tab-badge" id="navComingSoonBadge" style="display:none">0</span>
     </button>
   </div>
+  <!-- v124: 뒤로 버튼 — 데스크탑은 CTA 옆, 모바일은 우측 절대위치 -->
+  <button id="navBackBtn" class="nav-back-btn" onclick="goBackOnePage()" title="뒤로 가기">← 뒤로</button>
   <button class="nav-cta" onclick="document.querySelector('.pricing-wrap').scrollIntoView({behavior:'smooth'})">지금 시작하기</button>
   <!-- 모바일 햄버거 버튼 (모바일에서만 표시) -->
   <button class="mobile-hamburger" onclick="toggleMobileMenu()" aria-label="메뉴 열기">

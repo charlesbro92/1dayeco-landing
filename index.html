@@ -1012,6 +1012,9 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   /* v125: 모달 안 카테고리 그리드 gap 축소 */
   #catSelector, #modalSubtopicGrid { gap:6px !important; }
   .cat-btn { padding:11px 6px; font-size:12.5px; letter-spacing:.2px; }
+  /* v130: 모바일에서는 관심사를 드롭다운으로 (catSelector 숨김 + catSelectMobile 노출) */
+  #catSelector { display:none !important; }
+  #catSelectMobile { display:block !important; }
 }
 
 /* ── 카테고리 long-form 섹션 (v27 이식) ── */
@@ -1258,7 +1261,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v129</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v131</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1806,7 +1809,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     <h3 class="cat-section-title" id="cdpTopicsTitle">콘텐츠 주제 미리보기</h3>
     <p class="cat-section-sub">매일 새로운 주제로 깊이를 더해갑니다.</p>
     <div class="cat-topics-grid" id="cdpTopicsGrid"></div>
-    <div style="max-width:680px;margin:24px auto 0;padding:18px 20px;background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:10px;font-size:12px;color:var(--muted);line-height:1.75">
+    <div style="max-width:680px;margin:24px auto 0;padding:18px 20px;background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:10px;font-size:12px;color:var(--muted);line-height:1.75;text-align:left">
       <div style="font-weight:700;color:var(--text);margin-bottom:8px;letter-spacing:.3px">📌 콘텐츠 안내</div>
       <div style="margin-bottom:6px"><span style="color:var(--text);font-weight:600">·</span> 위 주제들은 <span style="color:var(--text);font-weight:600">카테고리 전체의 참고용 예시</span>입니다. 신청 단계에서 선택하시는 <span style="color:var(--text);font-weight:600">세부 주제(부제목)</span>에 따라 실제 받으시는 콘텐츠의 방향과 깊이가 달라집니다.</div>
       <div style="margin-bottom:6px"><span style="color:var(--text);font-weight:600">·</span> 매일 발송되는 콘텐츠는 <span style="color:var(--text);font-weight:600">시기·이슈·시장 동향</span>에 맞춰 AI가 자동으로 선정·작성합니다. 같은 주제라도 발송 시점에 따라 사례와 관점이 달라질 수 있어요.</div>
@@ -1896,7 +1899,8 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     <div class="foot-row"><span>상호</span> 원데이에코(1DAYECO) <span class="foot-sep">·</span> <span>대표</span> 박권호</div>
     <div class="foot-row"><span>사업자등록번호</span> 671-77-00518 <span style="color:var(--muted)">(간이과세자)</span> <span class="foot-sep">·</span> <span>통신판매업신고</span> 준비 중</div>
     <div class="foot-row"><span>주소</span> 인천광역시 서구 솔빛로 13</div>
-    <div class="foot-row"><span>고객센터</span> 카카오톡 채널 @1DAYECO <span class="foot-sep">·</span> <span>이메일</span> onedayeco@naver.com</div>
+    <div class="foot-row"><span>대표 전화</span> 010-4609-5957 <span class="foot-sep">·</span> <span>이메일</span> onedayeco@naver.com</div>
+    <div class="foot-row"><span>고객센터</span> 카카오톡 채널 @1DAYECO</div>
   </div>
   <div class="foot-copy">© 2026 1DAYECO. All rights reserved.</div>
 </footer>
@@ -2007,12 +2011,18 @@ HIDDEN_COMINGSOON_MODAL_END -->
       <!-- 관심사 선택 -->
       <div class="field">
         <label>💡 받아볼 관심사 선택 <span id="catLabelHint" style="font-size:11px;color:var(--gold);font-weight:500">(1개 선택 필수)</span></label>
+        <!-- 데스크탑: 그리드 카드 (CSS로 토글) -->
         <div id="catSelector" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
           <!-- 동적 렌더링: renderModalCategoryButtons() — visibility='active'만 표시 -->
           <div style="grid-column:1/-1;text-align:center;padding:18px;color:var(--muted);font-size:12px">
             카테고리 목록을 불러오는 중...
           </div>
         </div>
+        <!-- 모바일: 드롭다운 (CSS로 토글) -->
+        <select id="catSelectMobile" onchange="onCatSelectMobileChange(this.value)"
+          style="display:none;width:100%;margin-top:6px;background:var(--s3);border:1.5px solid var(--border);color:var(--text);padding:12px 14px;border-radius:8px;font-size:14px;font-family:var(--sans);box-sizing:border-box;outline:none;cursor:pointer;-webkit-appearance:menulist;appearance:menulist">
+          <option value="">관심사를 선택해주세요</option>
+        </select>
         <div id="catGuide" style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">
           관심 있는 카테고리를 1개 선택하면 매일 그 카테고리 콘텐츠를 받아볼 수 있습니다.
         </div>
@@ -2763,9 +2773,9 @@ const CATEGORY_CONTENT = {
       '디파이(DeFi)란?', '러그풀·피싱 사기 식별법', '... 그리고 매일 새로운 주제',
     ],
     personas: [
-      { i: '🪙', t: '코인 입문자', d: '관심은 있지만 어디서 시작할지 모르는, 안전한 첫걸음을 떼고 싶은 분.' },
-      { i: '🛡️', t: '보안이 걱정되는 분', d: '해킹·사기 뉴스를 보고 내 코인을 어떻게 지킬지 알고 싶은 분.' },
-      { i: '📜', t: '정책 흐름이 궁금한 분', d: '규제가 어떻게 가격에 영향을 주는지 큰 그림으로 이해하고 싶은 분.' },
+      { i: '🪙', t: '코인 입문자', d: '비트코인·이더리움 뉴스는 듣는데 막상 시작이 어려운 분. 지갑·거래소·시드 문구부터 안전하게 첫걸음을 떼고 싶은 분께.' },
+      { i: '🛡️', t: '보안이 걱정되는 분', d: '해킹·피싱·러그풀 뉴스를 자주 접하는 분. 내 자산을 지키는 실전 보안 노하우를 매일 한 가지씩 익히고 싶은 분께.' },
+      { i: '📜', t: '정책·시장 흐름을 놓치고 싶지 않은 분', d: '미국 SEC, 한국 가상자산법, 글로벌 규제 — 가격을 흔드는 거시 요인을 한눈에 정리해 받고 싶은 분께.' },
     ],
     finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능<br>매일 한 입씩, 1년이면 코인 시장이 보이기 시작합니다.',
   },
@@ -2801,9 +2811,9 @@ const CATEGORY_CONTENT = {
       '메일 효율적으로 쓰기', '온라인 회의 운영', '... 매일 새로운 도구',
     ],
     personas: [
-      { i: '🧑‍💻', t: '도구를 배우고 싶은 직장인', d: '회사에서 쓰는 도구를 더 효율적으로 활용하고 싶은 분.' },
-      { i: '⚙️', t: '반복 작업을 자동화하고 싶은 분', d: '같은 일을 매번 하기 싫어 자동화 도구가 궁금한 분.' },
-      { i: '🎯', t: '일잘러가 되고 싶은 분', d: '디지털 도구를 무기로 한 단계 위 업무력을 만들고 싶은 분.' },
+      { i: '🧑‍💻', t: '도구를 깊게 쓰고 싶은 직장인', d: '슬랙·노션·구글 워크스페이스를 기본 기능만 쓰고 있다면, 단축키·템플릿·고급 활용법을 매일 한 가지씩.' },
+      { i: '⚙️', t: '반복 작업이 지긋지긋한 분', d: '같은 업무를 매번 손으로 처리해서 답답한 분. 자피어·매크로·자동화 기법으로 시간을 되찾고 싶은 분께.' },
+      { i: '🎯', t: '디지털 무기고를 만들고 싶은 분', d: '하나의 도구만 잘 쓰는 게 아니라, 여러 도구를 조합해 자기만의 업무 시스템을 구축하고 싶은 분께.' },
     ],
     finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능<br>매일 한 가지 도구씩, 1년 후 디지털 무기고가 완성됩니다.',
   },
@@ -2839,9 +2849,9 @@ const CATEGORY_CONTENT = {
       '여행 비상 상황', 'JLPT 자주 나오는 단어', '... 매일 새로운 표현',
     ],
     personas: [
-      { i: '✈️', t: '일본 여행을 자주 가는 분', d: '현지에서 영어 말고 일본어로 한 마디씩 해보고 싶은 분.' },
-      { i: '💼', t: '일본 비즈니스 관계자', d: '일본 거래처와 격식 있게 소통하고 싶은 분.' },
-      { i: '🎌', t: '일본 콘텐츠 좋아하는 분', d: '애니·드라마·게임으로 익힌 일본어를 체계적으로 정리하고 싶은 분.' },
+      { i: '✈️', t: '일본을 자주 찾는 분', d: '도쿄·오사카·후쿠오카 — 매번 같은 영어 대신 일본어 한 마디씩 더해보고 싶은 분께. 호텔·식당·교통 표현 위주로.' },
+      { i: '💼', t: '일본 비즈니스 관계자', d: '일본 거래처와 메일·미팅 자리에서 정중한 톤이 어색한 분. 격식·경어·메일 첫 줄까지 실용적으로.' },
+      { i: '🎌', t: '일본 콘텐츠 팬', d: '애니·드라마·만화로 일본어가 익숙해진 분. 흩어진 표현을 체계적으로 정리해 회화로 연결하고 싶은 분께.' },
     ],
     finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능<br>매일 한 표현, 1년이면 일본인과 자연스럽게 통합니다.',
   },
@@ -2877,9 +2887,9 @@ const CATEGORY_CONTENT = {
       '발음 헷갈리는 단어', '문법 자주 틀리는 부분', '... 매일 새로운 표현',
     ],
     personas: [
-      { i: '💼', t: '영어로 일해야 하는 직장인', d: '회의·메일·발표에서 자연스러운 영어를 쓰고 싶은 분.' },
-      { i: '🌍', t: '해외여행 자주 가는 분', d: '여행지에서 부드럽게 통하는 영어 표현을 익히고 싶은 분.' },
-      { i: '📚', t: '문법·단어가 헷갈리는 분', d: '학교 영어 너머, 진짜로 통하는 영어를 다듬고 싶은 분.' },
+      { i: '💼', t: '영어로 일하는 직장인', d: '회의에서 의견 한 마디 던지기·메일 톤 고민·발표 자리에서 자연스럽게 — 학교 영어 너머 진짜 쓰는 영어가 필요한 분께.' },
+      { i: '🌍', t: '해외여행을 자주 다니는 분', d: '공항·호텔·식당·길찾기 — 짧지만 부드럽게 통하는 표현을 익혀 더 풍부한 여행을 만들고 싶은 분께.' },
+      { i: '📚', t: '문법·단어 함정에서 벗어나고 싶은 분', d: '"affect vs effect", "less vs fewer" — 매번 헷갈리는 부분을 한 번에 정리해서 자신감 있게 쓰고 싶은 분께.' },
     ],
     finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능<br>매일 한 표현, 1년이면 영어 자신감이 달라집니다.',
   },
@@ -2915,9 +2925,9 @@ const CATEGORY_CONTENT = {
       '기획서 한 장 정리법', '협상의 기본', '... 매일 새로운 성장 인사이트',
     ],
     personas: [
-      { i: '🌱', t: '주니어 직장인', d: '연차 1~3년차로 업무 기본기를 더 단단하게 다지고 싶은 분.' },
-      { i: '📈', t: '한 단계 올라가고 싶은 직장인', d: '같은 업무라도 더 효율적·세련되게 처리하고 싶은 분.' },
-      { i: '🎯', t: '커리어 성장을 진지하게 생각하는 분', d: '단순 노하우 너머 일하는 방식·시야를 다듬고 싶은 분.' },
+      { i: '🌱', t: '주니어 직장인 (1~3년차)', d: '실무는 익혔지만 보고·회의·커뮤니케이션에서 늘 머뭇거리는 분. 업무 기본기를 더 단단하게 다지고 싶은 분께.' },
+      { i: '📈', t: '한 단계 올라가고 싶은 직장인', d: '같은 업무라도 결론부터 보고하고, 한 줄 메일로 통하고, 짧은 시간에 더 깊이 일하는 사람들의 방식을 배우고 싶은 분께.' },
+      { i: '🎯', t: '커리어를 길게 보는 분', d: '단순 노하우를 넘어 "일하는 시야"와 "성장의 방향"을 다듬고 싶은 분. 매일 한 줄의 자극을 원하는 분께.' },
     ],
     finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능<br>매일 한 줄씩, 1년 후 일하는 시야가 완전히 달라집니다.',
   },
@@ -2953,9 +2963,9 @@ const CATEGORY_CONTENT = {
       '회의를 줄이는 법', '거절의 기술', '... 매일 새로운 시간 인사이트',
     ],
     personas: [
-      { i: '🏃', t: '늘 바쁘기만 한 분', d: '시간은 가는데 결과가 안 보이는, 일하는 방식을 점검하고 싶은 분.' },
-      { i: '🎯', t: '중요한 일에 집중하고 싶은 분', d: '급한 일에만 쫓기지 말고 진짜 중요한 일에 시간을 쓰고 싶은 분.' },
-      { i: '🧘', t: '집중력을 되찾고 싶은 분', d: '알림·SNS에 시간을 뺏기고 있다고 느끼는 분.' },
+      { i: '🏃', t: '하루 종일 바쁘기만 한 분', d: '아침부터 정신없이 일했는데 막상 끝난 일은 별로 없는 분. 시간 쓰는 방식을 근본적으로 점검하고 싶은 분께.' },
+      { i: '🎯', t: '중요한 일에 시간 쓰고 싶은 분', d: '급한 일에 쫓겨 정작 "중요한 일"엔 손도 못 대는 분. 우선순위를 다루는 기술과 시간 설계 원칙을 배우고 싶은 분께.' },
+      { i: '🧘', t: '집중력 회복이 필요한 분', d: 'SNS·알림·메신저에 시간을 뺏기는 자신이 답답한 분. 환경·습관·뇌과학 기반으로 깊은 집중을 되찾고 싶은 분께.' },
     ],
     finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능<br>매일 한 가지 전략씩, 1년 후 시간 쓰는 방식이 달라집니다.',
   },
@@ -2991,9 +3001,9 @@ const CATEGORY_CONTENT = {
       '계약서 체크포인트', '명예훼손과 모욕', '... 매일 새로운 법률 상식',
     ],
     personas: [
-      { i: '💼', t: '내 권리를 지키고 싶은 직장인', d: '근로계약·연차·수당 등 일터에서의 권리를 정확히 알고 싶은 분.' },
-      { i: '🏠', t: '세입자·집주인', d: '임대차 분쟁에서 흔들리지 않을 법률 기본기를 쌓고 싶은 분.' },
-      { i: '⚖️', t: '일상 분쟁이 걱정되는 분', d: '사고·소음·소비자 분쟁에서 어떻게 대응할지 미리 알아두고 싶은 분.' },
+      { i: '💼', t: '내 권리를 지키고 싶은 직장인', d: '연차 거부·야근수당 누락·직장 내 괴롭힘 — 회사에서 부당한 일을 겪고도 어떻게 대응할지 막막한 분께.' },
+      { i: '🏠', t: '세입자·집주인', d: '계약갱신·보증금 반환·임대료 분쟁 — 임대차 관계에서 흔들리지 않을 법률 기본기가 필요한 분께.' },
+      { i: '⚖️', t: '일상 분쟁이 걱정되는 분', d: '교통사고·층간소음·환불 거부·명예훼손 — 어느 날 갑자기 닥칠 분쟁에 미리 대비하고 싶은 분께.' },
     ],
     finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능<br>매일 한 줄씩, 1년 후 법률 자신감이 달라집니다.',
   },
@@ -3029,9 +3039,9 @@ const CATEGORY_CONTENT = {
       '《생각에 관한 생각》 — 빠른 사고 vs 느린 사고', '《1만 시간의 재발견》', '... 매일 한 권의 핵심',
     ],
     personas: [
-      { i: '📚', t: '책 읽을 시간이 없는 분', d: '관심은 있지만 끝까지 읽을 시간이 없어 핵심만 빠르게 만나고 싶은 분.' },
-      { i: '🎯', t: '책을 일에 적용하고 싶은 분', d: '자기계발 책의 원칙을 실무에 어떻게 녹일지 알고 싶은 분.' },
-      { i: '🏛️', t: '고전이 궁금한 분', d: '두껍고 어려운 고전의 핵심을 짧고 부드럽게 만나고 싶은 분.' },
+      { i: '📚', t: '책 읽을 시간이 부족한 분', d: '사두고 끝까지 못 읽은 책이 책장에 쌓여 있는 분. 베스트셀러의 핵심을 매일 한 권씩 빠르게 만나고 싶은 분께.' },
+      { i: '🎯', t: '책을 일에 적용하고 싶은 분', d: '자기계발 책의 원칙을 머리로만 알고 끝나는 게 아쉬운 분. 실무에 바로 녹일 수 있는 형태로 정리해 받고 싶은 분께.' },
+      { i: '🏛️', t: '고전이 궁금한 분', d: '《논어》·《장자》·《사피엔스》 같은 두꺼운 책의 핵심 문장만 부드럽게 만나, 시대를 견딘 지혜를 일상에 들이고 싶은 분께.' },
     ],
     finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능<br>매일 한 권씩, 1년이면 책장 한 칸이 머릿속에 들어옵니다.',
   },
@@ -3067,9 +3077,9 @@ const CATEGORY_CONTENT = {
       '허리 통증 예방 스트레칭', '하체 근육의 중요성', '... 매일 새로운 동작과 지식',
     ],
     personas: [
-      { i: '🏋️', t: '헬스장 안 가도 되는 분', d: '바쁘거나 헬스장이 부담스러워 집에서 5분이라도 운동하고 싶은 분.' },
-      { i: '🧠', t: '운동 효과를 올리고 싶은 분', d: '단백질·회복·근비대 같은 지식으로 운동 효율을 높이고 싶은 분.' },
-      { i: '😣', t: '책상에 오래 앉는 분', d: '거북목·라운드숄더·허리 통증을 매일 짧게 풀어주고 싶은 분.' },
+      { i: '🏋️', t: '집에서 5분 운동 하고 싶은 분', d: '헬스장 가기 부담스럽고 시간도 없는 분. 집 거실에서 5분이면 할 수 있는 동작을 매일 하나씩 익히고 싶은 분께.' },
+      { i: '🧠', t: '운동 효과를 끌어올리고 싶은 분', d: '운동은 하는데 결과가 더딘 분. 단백질·회복·수면·근비대 메커니즘 같은 지식으로 효율을 두 배로 만들고 싶은 분께.' },
+      { i: '😣', t: '책상에 오래 앉아 일하는 분', d: '거북목·라운드숄더·허리 통증을 매일 느끼는 분. 부위별 스트레칭과 자세 교정으로 굳은 몸을 풀어주고 싶은 분께.' },
     ],
     finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능<br>매일 5분씩, 1년 후 몸과 자세가 달라집니다.',
   },
@@ -3105,9 +3115,9 @@ const CATEGORY_CONTENT = {
       '간소한 식단 디자인', '미니멀리스트 사고방식', '... 매일 새로운 덜어내기',
     ],
     personas: [
-      { i: '🏠', t: '집을 정돈하고 싶은 분', d: '물건이 많아 답답한데, 어디서부터 비울지 막막한 분.' },
-      { i: '💰', t: '소비를 줄이고 싶은 분', d: '카드값을 보면 "왜 샀지?" 싶은 게 많아 소비 습관을 바꾸고 싶은 분.' },
-      { i: '🧘', t: '일상을 가볍게 만들고 싶은 분', d: '물건뿐 아니라 일정·관계·디지털까지 간소화하고 싶은 분.' },
+      { i: '🏠', t: '집을 정돈하고 싶은 분', d: '옷장·서랍·책장이 꽉 차서 답답한데 어디서부터 비울지 막막한 분. 한 칸씩 차근차근 정돈하는 방법을 배우고 싶은 분께.' },
+      { i: '💰', t: '소비 습관을 바꾸고 싶은 분', d: '월말 카드 명세서를 보면 "왜 샀지?" 싶은 게 절반인 분. 충동구매·구독료를 줄이고 가치 있는 소비로 옮겨가고 싶은 분께.' },
+      { i: '🧘', t: '일상 자체를 간소화하고 싶은 분', d: '물건뿐 아니라 일정·관계·디지털까지 — 덜 가지고도 풍요로워지는 라이프스타일에 끌리는 분께.' },
     ],
     finalSub: '3일 무료 체험 후 결제 · 언제든 해지 가능<br>매일 한 칸씩, 1년 후 집과 일상이 가벼워집니다.',
   },
@@ -3132,12 +3142,11 @@ async function _renderDetailSubtopics(catId) {
 
   grid.innerHTML = list.map(s => `
     <div onclick="openModalWithCategoryAndSubtopic('${catId}', ${s.id}, '${(s.name || '').replace(/'/g, "\\'")}')"
-      style="cursor:pointer;background:rgba(255,255,255,.025);border:1px solid rgba(201,168,76,.18);border-radius:14px;padding:24px 22px;transition:all .2s;text-align:center"
+      style="cursor:pointer;background:rgba(255,255,255,.025);border:1px solid rgba(201,168,76,.18);border-radius:14px;padding:28px 22px;transition:all .2s;text-align:center;display:flex;flex-direction:column;justify-content:center;min-height:160px"
       onmouseover="this.style.borderColor='rgba(201,168,76,.5)'; this.style.background='rgba(201,168,76,.06)'; this.style.transform='translateY(-2px)'"
       onmouseout="this.style.borderColor='rgba(201,168,76,.18)'; this.style.background='rgba(255,255,255,.025)'; this.style.transform='translateY(0)'">
-      <div style="font-size:11px;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;font-weight:700">CHOOSE</div>
-      <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:10px;line-height:1.4">${s.name}</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:14px;padding-top:12px;border-top:1px solid rgba(201,168,76,.1)">신청하기 →</div>
+      <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:14px;line-height:1.4">${s.name}</div>
+      <div style="font-size:11px;color:var(--muted);padding-top:14px;border-top:1px solid rgba(201,168,76,.1)">신청하기 →</div>
     </div>
   `).join('');
 }
@@ -4766,6 +4775,7 @@ async function submitStep2() {
 // 어드민에서 hidden 처리한 카테고리는 자동으로 안 보임
 async function renderModalCategoryButtons() {
   const sel = document.getElementById('catSelector');
+  const selectEl = document.getElementById('catSelectMobile');
   if (!sel) return;
 
   const data = await loadCategoriesFromAPI();
@@ -4773,6 +4783,7 @@ async function renderModalCategoryButtons() {
 
   if (activeCats.length === 0) {
     sel.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:18px;color:var(--muted);font-size:12px">현재 신청 가능한 카테고리가 없습니다.</div>';
+    if (selectEl) selectEl.innerHTML = '<option value="">신청 가능한 카테고리가 없습니다</option>';
     return;
   }
 
@@ -4786,6 +4797,19 @@ async function renderModalCategoryButtons() {
     return `<button type="button" class="cat-btn" data-cat="${id}" onclick="toggleCat('${id}')">${emoji} ${name}</button>`;
   }).join('');
 
+  // v130: 모바일 select 옵션도 함께 렌더
+  if (selectEl) {
+    const opts = ['<option value="">관심사를 선택해주세요</option>'].concat(
+      activeCats.map(c => {
+        const id    = c.id;
+        const name  = c.name || id;
+        const emoji = c.emoji || '📌';
+        return `<option value="${id}">${emoji} ${name}</option>`;
+      })
+    );
+    selectEl.innerHTML = opts.join('');
+  }
+
   // 이전에 선택한 카테고리가 active 목록에 없으면 해제
   if (selectedCategories.length > 0) {
     const allowedIds = new Set(activeCats.map(c => c.id));
@@ -4793,7 +4817,33 @@ async function renderModalCategoryButtons() {
     document.querySelectorAll('.cat-btn').forEach(btn => {
       btn.classList.toggle('active', selectedCategories.includes(btn.dataset.cat));
     });
+    if (selectEl) selectEl.value = selectedCategories[0] || '';
     updateModalBtn();
+  } else if (selectEl) {
+    selectEl.value = '';
+  }
+}
+
+// v130: 모바일 드롭다운 변경 핸들러 — toggleCat과 동일 동작
+function onCatSelectMobileChange(value) {
+  if (!value) {
+    selectedCategories = [];
+  } else {
+    selectedCategories = [value];
+  }
+  // 데스크탑용 카드도 동기화 (있을 경우)
+  document.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.classList.toggle('active', selectedCategories.includes(btn.dataset.cat));
+  });
+  updateModalBtn();
+  if (selectedCategories.length === 1) {
+    _renderModalSubtopics(selectedCategories[0]);
+  } else {
+    _hideModalSubtopics();
+  }
+  // 가격도 동일하게 갱신
+  if (selectedCategories.length === 1 && typeof _updatePricesForCategory === 'function') {
+    _updatePricesForCategory(selectedCategories[0]);
   }
 }
 
@@ -4807,6 +4857,9 @@ function toggleCat(cat) {
     const c = btn.dataset.cat;
     btn.classList.toggle('active', selectedCategories.includes(c));
   });
+  // v130: 모바일 select 동기화
+  const selectEl = document.getElementById('catSelectMobile');
+  if (selectEl) selectEl.value = selectedCategories[0] || '';
   updateModalBtn();
 
   // 카테고리 변경 → 부제목 영역 갱신
@@ -4902,6 +4955,9 @@ async function openModalWithCategory(cat) {
   document.querySelectorAll('.cat-btn').forEach(btn => {
     btn.classList.toggle('active', selectedCategories.includes(btn.dataset.cat));
   });
+  // v130: 모바일 select 디폴트 동기화
+  const selectEl = document.getElementById('catSelectMobile');
+  if (selectEl) selectEl.value = cat;
   updateModalBtn();
 
   // 선택한 카테고리 가격으로 _PLAN_PRICES 교체
@@ -5012,7 +5068,7 @@ const INFO_CONTENT = {
     <div class="highlight"><strong style="color:var(--gold)">1DAYECO</strong>는 경제·부동산·영어·상식 등 다양한 분야의 지식을 매일 아침 카카오톡으로 정기 발송하는 지식 구독 서비스입니다. 관심 분야를 원하는 만큼 골라 구독할 수 있습니다.</div>
     <h3>서비스 특징</h3><ul><li>매일 오전 8시 카테고리 콘텐츠 발송 (카카오톡 정책상 8시 이후 순차 발송)</li><li>1년 365일, 매일 새로운 콘텐츠 (중복 없음)</li><li>관심 분야를 자유롭게 다중 구독 가능</li><li>카카오톡으로 수신 — 앱 설치 불필요</li><li>3일 무료 체험 후 선택하신 플랜으로 자동 결제 (3일 이내 해지 시 무료)</li><li><strong>구독 기간 만료 후 자동 갱신·연장 없음</strong></li></ul>
     <h3>발송 규칙</h3><ul><li>신청 당일 어느 시각이든 → 다음 날(D+1) 오전 8시에 첫 발송</li><li>발송 시간은 카카오톡 알림톡 정책에 따라 <strong>오전 8시로 고정</strong>되어 있어 개별 변경이 불가합니다.</li></ul>
-    <h3>운영 주체</h3><p>상호: 원데이에코(1DAYECO) | 대표자: 박권호<br>사업자등록번호: 671-77-00518 (간이과세자) | 통신판매신고: 준비 중<br>주소: 인천광역시 서구 솔빛로 13<br>고객센터: 카카오톡 @1DAYECO | 이메일: onedayeco@naver.com</p>` },
+    <h3>운영 주체</h3><p>상호: 원데이에코(1DAYECO) | 대표자: 박권호<br>사업자등록번호: 671-77-00518 (간이과세자) | 통신판매신고: 준비 중<br>주소: 인천광역시 서구 솔빛로 13<br>대표 전화: 010-4609-5957 | 이메일: onedayeco@naver.com<br>고객센터: 카카오톡 @1DAYECO</p>` },
   terms: { title:'이용약관 및 환불정책', html:`
     <p style="color:var(--gold);font-size:11px">시행일: 2026.05.08 | 전자상거래법 제17조·제18조 준거</p>
 
@@ -5077,7 +5133,7 @@ const INFO_CONTENT = {
       <tr><td>네이버파이낸셜(주)</td><td>결제 처리</td><td>성명, 결제 정보</td></tr>
       <tr><td>카카오(주) / Solapi</td><td>메시지 발송</td><td>휴대전화번호</td></tr></table>
     <h3>3. 이용자 권리</h3><ul><li>개인정보 열람·수정·삭제 요청 가능</li><li>요청: 카카오톡 @1DAYECO 또는 onedayeco@naver.com</li><li>개인정보보호위원회(182) 신고 가능</li></ul>
-    <h3>4. 개인정보 보호책임자</h3><p>연락처: onedayeco@naver.com | 카카오톡: @1DAYECO</p>` },
+    <h3>4. 개인정보 보호책임자</h3><p>대표 전화: 010-4609-5957 | 이메일: onedayeco@naver.com | 카카오톡: @1DAYECO</p>` },
   cs: { title:'고객센터', html:`
     <div class="kakao-cs-box">
       <div class="kc-icon">💬</div>

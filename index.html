@@ -1258,7 +1258,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v126</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v127</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2070,6 +2070,56 @@ HIDDEN_COMINGSOON_MODAL_END -->
       </button>
     </div>
 
+    <!-- v127: STEP 1.5 — 신청 내역 확인 -->
+    <div id="confirmPanel" style="display:none">
+      <div class="modal-title">📋 신청 내역 확인</div>
+      <p class="modal-desc">입력하신 정보를 확인해주세요. 잘못된 정보로 신청 시 알림이 전송되지 않습니다.</p>
+
+      <!-- 신청 요약 카드 -->
+      <div style="background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.25);border-radius:12px;padding:18px 20px;margin:16px 0;font-size:13px;line-height:1.95">
+        <div style="display:flex;justify-content:space-between;align-items:start;padding:8px 0;border-bottom:1px dashed rgba(201,168,76,.15)">
+          <span style="color:var(--muted);font-size:12px;min-width:90px">이름</span>
+          <span id="cfmName" style="color:var(--text);font-weight:600;text-align:right">-</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:start;padding:8px 0;border-bottom:1px dashed rgba(201,168,76,.15)">
+          <span style="color:var(--muted);font-size:12px;min-width:90px">전화번호</span>
+          <span id="cfmPhone" style="color:var(--text);font-weight:600;text-align:right;font-family:var(--mono,monospace)">-</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:start;padding:8px 0;border-bottom:1px dashed rgba(201,168,76,.15)">
+          <span style="color:var(--muted);font-size:12px;min-width:90px">카테고리</span>
+          <span id="cfmCategory" style="color:var(--text);font-weight:600;text-align:right">-</span>
+        </div>
+        <div id="cfmSubtopicRow" style="display:none;justify-content:space-between;align-items:start;padding:8px 0;border-bottom:1px dashed rgba(201,168,76,.15)">
+          <span style="color:var(--muted);font-size:12px;min-width:90px">컨텐츠 그룹</span>
+          <span id="cfmSubtopic" style="color:var(--text);font-weight:600;text-align:right">-</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:start;padding:8px 0;border-bottom:1px dashed rgba(201,168,76,.15)">
+          <span style="color:var(--muted);font-size:12px;min-width:90px">플랜</span>
+          <span id="cfmPlan" style="color:var(--text);font-weight:600;text-align:right">-</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:start;padding:8px 0">
+          <span style="color:var(--muted);font-size:12px;min-width:90px">결제 예정 금액</span>
+          <span id="cfmAmount" style="color:var(--gold);font-weight:700;text-align:right">-</span>
+        </div>
+      </div>
+
+      <!-- 경고 박스 -->
+      <div style="background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.35);border-radius:10px;padding:14px 16px;margin:14px 0;font-size:12.5px;line-height:1.75;color:var(--text)">
+        <div style="font-weight:700;color:#fbbf24;margin-bottom:6px">⚠️ 입력 정보를 다시 한 번 확인해주세요</div>
+        <div style="color:var(--muted);font-size:12px">
+          이름·전화번호가 실제와 다를 경우 카카오톡 알림이 정상 전송되지 않으며, 환불 처리도 어려울 수 있습니다. 입력 정보가 정확한지 다시 확인해주세요.
+        </div>
+      </div>
+
+      <button class="modal-btn" id="confirmBtn" onclick="submitConfirm()">
+        <span id="confirmBtnTxt">결제 진행 →</span>
+        <span id="confirmSpin" style="display:none"><span class="spinner"></span></span>
+      </button>
+      <button class="modal-btn" onclick="backToStep1()" style="margin-top:8px;background:transparent;border:1px solid var(--border);color:var(--muted)">
+        ← 입력 수정
+      </button>
+    </div>
+
     <!-- STEP 2: 카드 등록 (BillingKey) -->
     <div id="step2Panel" style="display:none">
       <div class="modal-title" id="step2Title">💳 카드 등록</div>
@@ -2133,6 +2183,32 @@ HIDDEN_COMINGSOON_MODAL_END -->
           ✓ 해지: 홈페이지 하단 "체험 취소" 또는 고객센터(@1DAYECO)
         </div>
       </div>
+
+      <!-- v127: 신청 내역 요약 -->
+      <div style="background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin:14px 0;text-align:left">
+        <div style="font-weight:700;color:var(--text);margin-bottom:10px;font-size:12.5px;text-align:center">📋 신청 내역</div>
+        <div style="display:flex;justify-content:space-between;align-items:start;padding:6px 0;font-size:12px;border-bottom:1px dashed var(--border)">
+          <span style="color:var(--muted);min-width:80px">이름</span>
+          <span id="doneName" style="color:var(--text);font-weight:600;text-align:right">-</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:start;padding:6px 0;font-size:12px;border-bottom:1px dashed var(--border)">
+          <span style="color:var(--muted);min-width:80px">전화번호</span>
+          <span id="donePhone" style="color:var(--text);font-weight:600;text-align:right;font-family:var(--mono,monospace)">-</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:start;padding:6px 0;font-size:12px;border-bottom:1px dashed var(--border)">
+          <span style="color:var(--muted);min-width:80px">카테고리</span>
+          <span id="doneCatName" style="color:var(--text);font-weight:600;text-align:right">-</span>
+        </div>
+        <div id="doneSubtopicRow" style="display:none;justify-content:space-between;align-items:start;padding:6px 0;font-size:12px;border-bottom:1px dashed var(--border)">
+          <span style="color:var(--muted);min-width:80px">컨텐츠 그룹</span>
+          <span id="doneSubName" style="color:var(--text);font-weight:600;text-align:right">-</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:start;padding:6px 0;font-size:12px">
+          <span style="color:var(--muted);min-width:80px">플랜</span>
+          <span id="donePlanName" style="color:var(--text);font-weight:600;text-align:right">-</span>
+        </div>
+      </div>
+
       <button class="modal-btn" id="doneConfirmBtn" style="margin-top:8px;opacity:.45;cursor:not-allowed" onclick="if(window._kakaoChannelAdded)closeModal()" disabled>
         채널 추가 후 확인 가능합니다
       </button>
@@ -4138,11 +4214,72 @@ document.addEventListener('keydown', e => { if(e.key==='Escape') { closeModal();
 
 function showStep(n) {
   document.getElementById('step1Panel').style.display  = n===1 ? 'block' : 'none';
+  // v127: confirm 단계 (1.5)
+  const cfm = document.getElementById('confirmPanel');
+  if (cfm) cfm.style.display = n===1.5 ? 'block' : 'none';
   document.getElementById('step2Panel').style.display  = n===2 ? 'block' : 'none';
   document.getElementById('donePanel').style.display   = n===3 ? 'block' : 'none';
   document.getElementById('stepsInd').style.display    = n===3 ? 'none'  : 'flex';
   document.getElementById('si1').className = 'si done';
-  document.getElementById('si2').className = 'si' + (n===2 ? ' done' : '');
+  document.getElementById('si2').className = 'si' + (n===2 || n===1.5 ? ' done' : '');
+  // v127: 완료 단계 진입 시 신청 요약 채우기
+  if (n===3 && typeof _populateDonePanel === 'function') {
+    _populateDonePanel();
+  }
+}
+
+// v127: 완료 패널 신청 요약 채우기 — confirm 패널과 같은 정보 노출
+async function _populateDonePanel() {
+  try {
+    const name  = document.getElementById('mName')?.value.trim() || '';
+    const phone = document.getElementById('mPhone')?.value || '';
+    document.getElementById('doneName').textContent  = name || '-';
+    document.getElementById('donePhone').textContent = phone || '-';
+
+    // 카테고리 한글명
+    const catId = selectedCategories[0] || '';
+    let catName = catId;
+    try {
+      const data = await loadCategoriesFromAPI();
+      const cat = (data.active || []).find(c => c.id === catId);
+      if (cat) catName = cat.name || catId;
+    } catch (_) {}
+    document.getElementById('doneCatName').textContent = catName;
+
+    // 부제목
+    const subRow = document.getElementById('doneSubtopicRow');
+    if (window._selectedSubtopicId) {
+      let subName = window._selectedSubtopicName || '';
+      if (!subName) {
+        const sel = document.querySelector('#modalSubtopicGrid .cat-btn.active');
+        if (sel) subName = (sel.textContent || '').trim();
+      }
+      if (subName) {
+        document.getElementById('doneSubName').textContent = subName;
+        subRow.style.display = 'flex';
+      } else {
+        subRow.style.display = 'none';
+      }
+    } else {
+      subRow.style.display = 'none';
+    }
+
+    // 플랜
+    let plan = currentPlan;
+    if (plan === 'free') plan = 'monthly';
+    if (plan === 'monthly' || plan === 'yearly') {
+      const selPlan = document.getElementById('mPlan')?.value;
+      if (selPlan) plan = selPlan === 'yearly' ? 'pkg1y' : selPlan;
+    }
+    const planLabels = {
+      monthly: '월 정액',
+      pkg3m:   '3개월 일시불',
+      pkg6m:   '6개월 일시불',
+      pkg1y:   '1년 일시불',
+      yearly:  '1년 일시불',
+    };
+    document.getElementById('donePlanName').textContent = planLabels[plan] || plan;
+  } catch (_) {}
 }
 
 // ── STEP 1: 가입 정보 검증 + payment_prepare 호출 → Step 2로 ─────
@@ -4222,17 +4359,89 @@ async function submitStep1() {
     return;
   }
 
+  // v127: 신청 내역 확인 패널로 전환 (API 호출은 confirmBtn 클릭 시)
+  // confirm 패널 데이터 채우기
+  _populateConfirmPanel({ name, phone, plan, hour });
+  showStep(1.5);
+}
+
+// v127: 신청 내역 확인 패널 데이터 채우기
+async function _populateConfirmPanel({ name, phone, plan, hour }) {
+  document.getElementById('cfmName').textContent  = name;
+  document.getElementById('cfmPhone').textContent = phone;
+
+  // 카테고리 한글명
+  const catId = selectedCategories[0] || '';
+  let catName = catId;
+  try {
+    const data = await loadCategoriesFromAPI();
+    const cat = (data.active || []).find(c => c.id === catId);
+    if (cat) catName = cat.name || catId;
+  } catch (_) {}
+  document.getElementById('cfmCategory').textContent = catName;
+
+  // 부제목 (선택된 경우만)
+  const subRow = document.getElementById('cfmSubtopicRow');
+  if (window._selectedSubtopicId) {
+    let subName = window._selectedSubtopicName || '';
+    if (!subName) {
+      // 폴백: 모달 그리드에서 selected 찾기
+      const sel = document.querySelector('#modalSubtopicGrid .cat-btn.active');
+      if (sel) subName = (sel.textContent || '').trim();
+    }
+    if (subName) {
+      document.getElementById('cfmSubtopic').textContent = subName;
+      subRow.style.display = 'flex';
+    } else {
+      subRow.style.display = 'none';
+    }
+  } else {
+    subRow.style.display = 'none';
+  }
+
+  // 플랜 + 결제 금액
+  const planLabels = {
+    monthly: '월 정액 (매달 결제)',
+    pkg3m:   '3개월 일시불',
+    pkg6m:   '6개월 일시불',
+    pkg1y:   '1년 일시불',
+    yearly:  '1년 일시불',
+  };
+  const planAmounts = {
+    monthly: '₩9,900 / 월',
+    pkg3m:   '₩14,900 (3개월)',
+    pkg6m:   '₩24,900 (6개월)',
+    pkg1y:   '₩41,900 (1년)',
+    yearly:  '₩41,900 (1년)',
+  };
+  document.getElementById('cfmPlan').textContent   = planLabels[plan] || plan;
+  document.getElementById('cfmAmount').textContent = planAmounts[plan] || '-';
+}
+
+// v127: 신청 내역 확인 후 결제 진행 — 기존 payment_prepare 호출 분리
+async function submitConfirm() {
+  const name   = document.getElementById('mName').value.trim();
+  const phone  = document.getElementById('mPhone').value;
+  let plan;
+  if (currentPlan === 'free') {
+    plan = 'monthly';
+  } else if (currentPlan === 'monthly' || currentPlan === 'yearly') {
+    plan = document.getElementById('mPlan').value;
+    if (plan === 'yearly') plan = 'pkg1y';
+  } else {
+    plan = currentPlan;
+  }
+  const hour = FIXED_SEND_HOUR;
   const finalCats = [selectedCategories[0]];
 
-  setLoading('step1Btn','step1Spin','step1BtnTxt', true);
+  setLoading('confirmBtn','confirmSpin','confirmBtnTxt', true);
 
   try {
-    // payment_prepare: 가입 정보 검증 + subscriber row 생성 (status=pending_payment) + merchant_uid 발급
     const preparePayload = {
       name, phone, plan,
       send_hour:   hour,
       categories:  finalCats,
-      notify_d1:   true,  // D-1 만료 안내 디폴트 동의
+      notify_d1:   true,
     };
     if (window._selectedSubtopicId) {
       preparePayload.subtopic_id = window._selectedSubtopicId;
@@ -4243,16 +4452,15 @@ async function submitStep1() {
     }
     subscriberId   = res.subscriber_id || res.temp_id;
     customerUidRef = res.customer_uid;
-    prepareMeta    = res._meta || null;   // [v51] verify 시 DB INSERT용 가입정보
+    prepareMeta    = res._meta || null;
     paymentReady   = true;
 
-    // Step 2로 이동 (결제창 안내)
     showStep(2);
     updateStep2Display(res);
   } catch(err) {
     showToast(err.message || '오류가 발생했습니다', 'ng');
   } finally {
-    setLoading('step1Btn','step1Spin','step1BtnTxt', false);
+    setLoading('confirmBtn','confirmSpin','confirmBtnTxt', false);
   }
 }
 
@@ -4316,6 +4524,13 @@ function updateStep2Display(prepareRes) {
 }
 
 async function backToStep1() {
+  // v127: confirm 패널 → step1 복귀는 API 호출 없이 바로
+  const cfm = document.getElementById('confirmPanel');
+  const fromConfirm = cfm && cfm.style.display !== 'none' && !subscriberId;
+  if (fromConfirm) {
+    showStep(1);
+    return;
+  }
   if (!confirm('이전 단계로 돌아가면 신청 내역이 삭제되고 처음부터 다시 진행해야 합니다. 계속하시겠습니까?')) {
     return;
   }

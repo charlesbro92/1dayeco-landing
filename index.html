@@ -297,19 +297,32 @@ nav {
   .cs-stat-num { font-size:22px; }
 }
 @media (max-width: 480px) {
-  .cs-grid { grid-template-columns:1fr; justify-items:stretch; max-width:480px; margin-left:auto; margin-right:auto; }
+  .cs-grid { grid-template-columns:1fr; }
   .cs-hero-stats { flex-wrap:wrap; padding:12px 4px; }
   .cs-stat-divider { display:none; }
   .cs-info-box { flex-direction:column; gap:10px; }
-  /* v136: category-page 모바일 패딩 조정 — 카드가 화면 중앙에 오도록 */
-  .category-page { padding:90px 16px 60px; }
-  /* v138: category-page 안 컨테이너가 화면 가득 + 가운데 정렬 보장 */
+  /* v140: 모바일에서 category-page를 block으로 변경 — flex 정렬 영향 제거 */
+  .category-page {
+    display:block !important;
+    padding:90px 16px 60px;
+    text-align:center;
+  }
+  .category-page.active {
+    display:block !important;
+  }
+  /* 내부 직계 div(컨텐츠 컨테이너)는 화면 가득 + 가운데 정렬 */
   .category-page > div:not(.category-page-bg) {
     width:100% !important;
-    max-width:480px !important;
-    margin-left:auto !important;
-    margin-right:auto !important;
+    max-width:100% !important;
+    margin:0 auto !important;
+    padding:0 !important;
     box-sizing:border-box;
+  }
+  /* 카드 그리드는 1열 + max-width 제한으로 가운데 */
+  #catListGrid, #introActiveGrid, #introComingSoonGrid {
+    max-width:380px;
+    margin-left:auto;
+    margin-right:auto;
   }
 }
 
@@ -395,12 +408,12 @@ nav {
     padding:6px 10px;
     font-size:12px;
   }
-  /* v139: 모바일 테마 토글 — 항상 우측 절대위치, 뒤로 버튼 있을 때 좌측으로 이동 */
+  /* v140: 모바일 테마 토글 — nav 안에서 우측 절대위치, 뒤로 버튼 좌측에 배치 */
   .theme-toggle {
-    position:absolute;
-    right:16px;        /* 디폴트: 뒤로 버튼 없을 때 우측 끝 */
-    top:50%;
-    transform:translateY(-50%);
+    position:absolute !important;
+    right:16px !important;     /* 디폴트: 뒤로 버튼 없을 때 우측 끝 */
+    top:50% !important;
+    transform:translateY(-50%) !important;
     margin:0 !important;
     z-index:2;
     width:32px;
@@ -409,10 +422,10 @@ nav {
     flex-shrink:0;
   }
   .theme-toggle.with-back-btn {
-    right:68px;        /* 뒤로 버튼이 있을 때 그 왼쪽 */
+    right:68px !important;        /* 뒤로 버튼이 있을 때 그 왼쪽 */
   }
   .theme-toggle:hover {
-    transform:translateY(-50%);  /* 모바일에선 회전 제거 (위치 변경 방지) */
+    transform:translateY(-50%) !important;  /* 모바일 회전 제거 */
   }
   /* 로고: 화면 정 가운데 (햄버거와 무관) */
   .nav-logo-wrap {
@@ -1374,7 +1387,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v139</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v140</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -3631,6 +3644,11 @@ function toggleTheme() {
 (function _initTheme() {
   try {
     const saved = localStorage.getItem('1dayeco_theme');
+    // v140: saved 없으면 다크 명시 (디폴트는 항상 다크)
+    if (saved === null) {
+      localStorage.setItem('1dayeco_theme', 'dark');
+      return;
+    }
     if (saved === 'light') {
       document.body.classList.add('light-mode');
       // 아이콘은 DOM 준비 후 처리

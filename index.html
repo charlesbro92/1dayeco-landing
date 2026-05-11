@@ -1213,7 +1213,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v118</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v119</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2918,14 +2918,18 @@ async function loadSubtopicsForCategory(catId, force) {
   if (!catId) return [];
   if (!force && _SUBTOPIC_CACHE[catId]) return _SUBTOPIC_CACHE[catId];
 
+  // v119: 비활성 부제목 필터링 헬퍼
+  const filterActive = (list) => (Array.isArray(list) ? list.filter(s => s.active !== false) : []);
+
   // 1순위: 카테고리 응답에 포함된 subtopics 사용 (백엔드 v89+)
   try {
     const catData = await loadCategoriesFromAPI();
     const allCats = [...(catData.active || []), ...(catData.coming_soon || []), ...(catData.hidden || [])];
     const cat = allCats.find(c => c.id === catId);
     if (cat && Array.isArray(cat.subtopics) && cat.subtopics.length > 0) {
-      _SUBTOPIC_CACHE[catId] = cat.subtopics;
-      return cat.subtopics;
+      const filtered = filterActive(cat.subtopics);
+      _SUBTOPIC_CACHE[catId] = filtered;
+      return filtered;
     }
   } catch (e) { /* 폴백으로 진행 */ }
 
@@ -2936,8 +2940,9 @@ async function loadSubtopicsForCategory(catId, force) {
     if (!res.ok) return [];
     const data = await res.json();
     if (data && data.success && Array.isArray(data.data)) {
-      _SUBTOPIC_CACHE[catId] = data.data;
-      return data.data;
+      const filtered = filterActive(data.data);
+      _SUBTOPIC_CACHE[catId] = filtered;
+      return filtered;
     }
   } catch (e) {
     // 로그 노이즈 줄이기 — 카테고리 응답에 subtopics 없으면 그냥 빈 배열로

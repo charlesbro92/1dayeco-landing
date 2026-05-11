@@ -1009,12 +1009,17 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   /* v125: 모바일 모달 좌우 잘림 방지 — overlay padding + modal padding 축소 */
   .overlay { padding:12px; }
   .modal { max-height:90vh; overflow-y:auto; padding:28px 16px; }
-  /* v125: 모달 안 카테고리 그리드 gap 축소 */
-  #catSelector, #modalSubtopicGrid { gap:6px !important; }
-  .cat-btn { padding:11px 6px; font-size:12.5px; letter-spacing:.2px; }
-  /* v130: 모바일에서는 관심사를 드롭다운으로 (catSelector 숨김 + catSelectMobile 노출) */
-  #catSelector { display:none !important; }
-  #catSelectMobile { display:block !important; }
+  /* v132: 모달 안 카테고리 — 모바일은 부제목 카드와 동일한 1열 큰 카드 */
+  #catSelector { 
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:8px !important;
+  }
+  #modalSubtopicGrid { gap:8px !important; }
+  /* v132: 모바일에서 cat-btn 크기 키움 (데스크탑은 컴팩트 유지) */
+  .cat-btn { padding:14px 16px !important; font-size:14px !important; letter-spacing:.2px; min-height:48px; }
+  /* v132: 모바일에서는 드롭다운 숨김 (1열 카드 사용) */
+  #catSelectMobile { display:none !important; }
 }
 
 /* ── 카테고리 long-form 섹션 (v27 이식) ── */
@@ -1261,7 +1266,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v131</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v132</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2011,18 +2016,13 @@ HIDDEN_COMINGSOON_MODAL_END -->
       <!-- 관심사 선택 -->
       <div class="field">
         <label>💡 받아볼 관심사 선택 <span id="catLabelHint" style="font-size:11px;color:var(--gold);font-weight:500">(1개 선택 필수)</span></label>
-        <!-- 데스크탑: 그리드 카드 (CSS로 토글) -->
+        <!-- 데스크탑 + 모바일 공통: 카테고리 카드 그리드 (모바일은 CSS로 1열) -->
         <div id="catSelector" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
           <!-- 동적 렌더링: renderModalCategoryButtons() — visibility='active'만 표시 -->
           <div style="grid-column:1/-1;text-align:center;padding:18px;color:var(--muted);font-size:12px">
             카테고리 목록을 불러오는 중...
           </div>
         </div>
-        <!-- 모바일: 드롭다운 (CSS로 토글) -->
-        <select id="catSelectMobile" onchange="onCatSelectMobileChange(this.value)"
-          style="display:none;width:100%;margin-top:6px;background:var(--s3);border:1.5px solid var(--border);color:var(--text);padding:12px 14px;border-radius:8px;font-size:14px;font-family:var(--sans);box-sizing:border-box;outline:none;cursor:pointer;-webkit-appearance:menulist;appearance:menulist">
-          <option value="">관심사를 선택해주세요</option>
-        </select>
         <div id="catGuide" style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">
           관심 있는 카테고리를 1개 선택하면 매일 그 카테고리 콘텐츠를 받아볼 수 있습니다.
         </div>

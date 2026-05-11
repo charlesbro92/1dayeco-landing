@@ -1020,6 +1020,17 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   .cat-btn { padding:14px 16px !important; font-size:14px !important; letter-spacing:.2px; min-height:48px; }
   /* v132: 모바일에서는 드롭다운 숨김 (1열 카드 사용) */
   #catSelectMobile { display:none !important; }
+  /* v135: 모바일 accordion — collapsed 상태일 때 active 아닌 카드 숨김, 토글 버튼 노출 */
+  #catSelector.collapsed .cat-btn:not(.active) { display:none !important; }
+  #catAccordionToggle { display:block !important; }
+  /* collapsed일 때 active 카드는 골드 더 진하게 강조 */
+  #catSelector.collapsed .cat-btn.active {
+    background:rgba(201,168,76,.18) !important;
+    border-color:var(--gold) !important;
+    min-height:56px;
+    font-size:15px !important;
+    font-weight:700 !important;
+  }
 }
 
 /* ── 카테고리 long-form 섹션 (v27 이식) ── */
@@ -1266,7 +1277,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v134</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v135</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2023,6 +2034,11 @@ HIDDEN_COMINGSOON_MODAL_END -->
             카테고리 목록을 불러오는 중...
           </div>
         </div>
+        <!-- v135: 모바일 accordion 토글 (선택 후 나머지 펼치기) -->
+        <button type="button" id="catAccordionToggle" onclick="toggleCatAccordion()"
+          style="display:none;width:100%;margin-top:8px;background:transparent;border:1px dashed var(--border);color:var(--muted);padding:10px 14px;border-radius:8px;font-size:12.5px;cursor:pointer;font-family:var(--sans);transition:all .15s">
+          <span id="catAccordionLabel">▼ 다른 카테고리 보기</span>
+        </button>
         <div id="catGuide" style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">
           관심 있는 카테고리를 1개 선택하면 매일 그 카테고리 콘텐츠를 받아볼 수 있습니다.
         </div>
@@ -4217,6 +4233,8 @@ function closeModal() {
   const mAgreeEl = document.getElementById('modalAgree');
   if (mAgreeEl) { mAgreeEl.checked = false; updateModalBtn(); }
   subscriberId = null; customerKey = null; prepareMeta = null;
+  // v135: accordion 펼침 상태 초기화 (다음번엔 디폴트 collapsed)
+  window._catAccordionForceOpen = false;
 }
 function closeOut(e) { if (e.target.id==='overlay') closeModal(); }
 document.addEventListener('keydown', e => { if(e.key==='Escape') { closeModal(); if(typeof closeInfo==='function') closeInfo(); if(typeof closeCancelFlow==='function') closeCancelFlow(); } });
@@ -4886,6 +4904,49 @@ async function renderModalCategoryButtons() {
   } else if (selectEl) {
     selectEl.value = '';
   }
+  // v135: accordion 상태 적용 (선택된 게 있으면 자동 collapse)
+  _applyCatAccordionState();
+}
+
+// v135: 모바일 accordion 상태 적용
+// — 선택된 카테고리 있고, 카테고리 총개수 > 3개면 collapsed (활성 카드만 표시)
+// — 선택 해제 또는 카드 개수 적으면 expanded (모두 표시)
+function _applyCatAccordionState() {
+  const sel    = document.getElementById('catSelector');
+  const toggle = document.getElementById('catAccordionToggle');
+  const label  = document.getElementById('catAccordionLabel');
+  if (!sel || !toggle) return;
+
+  const total = sel.querySelectorAll('.cat-btn').length;
+  const hasSelection = selectedCategories.length > 0;
+
+  // 선택 없거나 카드 개수 적으면 모두 펼침
+  if (!hasSelection || total <= 3) {
+    sel.classList.remove('collapsed');
+    toggle.style.display = 'none';
+    if (label) label.textContent = '▼ 다른 카테고리 보기';
+    window._catAccordionForceOpen = false;
+    return;
+  }
+
+  // 사용자가 명시적으로 펼친 상태면 유지
+  if (window._catAccordionForceOpen) {
+    sel.classList.remove('collapsed');
+    toggle.style.display = '';
+    if (label) label.textContent = '▲ 다른 카테고리 접기';
+    return;
+  }
+
+  // 디폴트: 선택된 거 있으면 접힘
+  sel.classList.add('collapsed');
+  toggle.style.display = '';
+  if (label) label.textContent = `▼ 다른 카테고리 보기 (${total - 1}개)`;
+}
+
+// v135: 토글 버튼 클릭
+function toggleCatAccordion() {
+  window._catAccordionForceOpen = !window._catAccordionForceOpen;
+  _applyCatAccordionState();
 }
 
 // v130: 모바일 드롭다운 변경 핸들러 — toggleCat과 동일 동작
@@ -4925,6 +4986,9 @@ function toggleCat(cat) {
   const selectEl = document.getElementById('catSelectMobile');
   if (selectEl) selectEl.value = selectedCategories[0] || '';
   updateModalBtn();
+
+  // v135: 카테고리 선택 시 자동 collapse (모바일 accordion)
+  _applyCatAccordionState();
 
   // 카테고리 변경 → 부제목 영역 갱신
   if (selectedCategories.length === 1) {
@@ -5033,6 +5097,9 @@ async function openModalWithCategory(cat) {
 
   // 부제목 영역 노출 + 첫 번째 자동 선택
   await _renderModalSubtopics(cat);
+
+  // v135: accordion 상태 적용 (카테고리 상세 페이지에서 진입 시 디폴트 collapsed)
+  _applyCatAccordionState();
 }
 
 // 카테고리 + 부제목을 동시에 지정해서 모달 열기 (상세 페이지의 부제목 카드 클릭 시)

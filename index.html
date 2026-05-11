@@ -1212,8 +1212,11 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <!-- NAV -->
 <nav>
   <div class="nav-logo-wrap">
+    <button id="navBackBtn" onclick="goBackOnePage()" 
+      style="display:none;background:none;border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;margin-right:8px;align-items:center;gap:4px"
+      title="뒤로 가기">← 뒤로</button>
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v121</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v122</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -3282,6 +3285,12 @@ async function showCategory(category, btnEl) {
     if (target) target.classList.add('active');
   }
 
+  // v122: 뒤로 버튼 표시/숨김 (intro 페이지에선 숨김)
+  const backBtn = document.getElementById('navBackBtn');
+  if (backBtn) {
+    backBtn.style.display = (pageTarget === 'intro-page') ? 'none' : 'inline-flex';
+  }
+
   // nav 활성화
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   if (btnEl && btnEl.classList.contains('nav-tab')) {
@@ -3292,6 +3301,51 @@ async function showCategory(category, btnEl) {
   }
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // v122: history API — popstate 호출인 경우 push 생략 (무한루프 방지)
+  if (!window._navigatingFromPopstate) {
+    try {
+      const url = (category === 'intro') ? '/' : '?p=' + encodeURIComponent(category);
+      history.pushState({ category }, '', url);
+    } catch (_) {}
+  }
+}
+
+// v122: 브라우저 뒤로/앞으로 가기 처리
+window.addEventListener('popstate', async (e) => {
+  window._navigatingFromPopstate = true;
+  try {
+    const state = e.state || {};
+    const cat = state.category || _getCategoryFromURL() || 'intro';
+    await showCategory(cat, null);
+  } finally {
+    window._navigatingFromPopstate = false;
+  }
+});
+
+// v122: URL 쿼리에서 카테고리 추출
+function _getCategoryFromURL() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('p');
+  } catch (_) { return null; }
+}
+
+// v122: 페이지 첫 로드 시 URL 의 p 파라미터가 있으면 해당 카테고리로 진입
+document.addEventListener('DOMContentLoaded', () => {
+  const cat = _getCategoryFromURL();
+  if (cat && cat !== 'intro') {
+    setTimeout(() => showCategory(cat, null), 50);
+  }
+});
+
+// v122: 좌상단 뒤로 버튼 — 카테고리 상세/리스트 페이지에서만 표시
+function goBackOnePage() {
+  if (window.history.length > 1) {
+    window.history.back();
+  } else {
+    showCategory('intro', null);
+  }
 }
 
 // ── 카테고리 정보 로드 (백엔드 API 또는 폴백) ──

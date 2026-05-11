@@ -885,6 +885,13 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   font-family:var(--sans); cursor:pointer; transition:all .2s;
   background:rgba(255,255,255,.04); border:1.5px solid var(--border); color:var(--muted);
   text-align:center; letter-spacing:.3px; position:relative;
+  /* v125: 모바일 카드 잘림 방지 */
+  box-sizing:border-box;
+  word-break:keep-all;
+  overflow-wrap:break-word;
+  line-height:1.4;
+  min-width:0;
+  width:100%;
 }
 .cat-btn.active {
   background:rgba(201,168,76,.14); border-color:var(--gold); color:var(--gold);
@@ -999,7 +1006,12 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   .stats-bar { grid-template-columns:1fr; }
   .stat + .stat::before { display:none; }
   .input-row { flex-direction:column; }
-  .modal { max-height:90vh; overflow-y:auto; padding:32px 22px; }
+  /* v125: 모바일 모달 좌우 잘림 방지 — overlay padding + modal padding 축소 */
+  .overlay { padding:12px; }
+  .modal { max-height:90vh; overflow-y:auto; padding:28px 16px; }
+  /* v125: 모달 안 카테고리 그리드 gap 축소 */
+  #catSelector, #modalSubtopicGrid { gap:6px !important; }
+  .cat-btn { padding:11px 6px; font-size:12.5px; letter-spacing:.2px; }
 }
 
 /* ── 카테고리 long-form 섹션 (v27 이식) ── */
@@ -1246,7 +1258,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v124</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v125</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>

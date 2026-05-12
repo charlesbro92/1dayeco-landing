@@ -1108,6 +1108,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 .steps-ind { display:flex; gap:6px; margin-top:8px; margin-bottom:24px; padding-right:36px; }
 .si { flex:1; height:3px; border-radius:2px; background:var(--border); transition:background .4s; }
 .si.done { background:var(--gold); }
+.si.active { background:var(--gold); box-shadow:0 0 8px rgba(201,168,76,.5); }
 
 @keyframes fadeUp { from{opacity:0;transform:translateY(18px)} to{opacity:1;transform:translateY(0)} }
 
@@ -1390,7 +1391,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v143</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v144</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2064,10 +2065,12 @@ HIDDEN_COMINGSOON_MODAL_END -->
   <div class="modal" id="modal">
     <button class="modal-x" onclick="closeModal()">✕</button>
 
-    <!-- 단계 표시 -->
+    <!-- 단계 표시 — Step 1 / 1.5 (확인) / 2 (결제) / 3 (완료) -->
     <div class="steps-ind" id="stepsInd">
       <div class="si done" id="si1"></div>
       <div class="si" id="si2"></div>
+      <div class="si" id="si3"></div>
+      <div class="si" id="si4"></div>
     </div>
 
     <!-- STEP 1: 회원정보 -->
@@ -4391,8 +4394,21 @@ function showStep(n) {
   document.getElementById('step2Panel').style.display  = n===2 ? 'block' : 'none';
   document.getElementById('donePanel').style.display   = n===3 ? 'block' : 'none';
   document.getElementById('stepsInd').style.display    = n===3 ? 'none'  : 'flex';
-  document.getElementById('si1').className = 'si done';
-  document.getElementById('si2').className = 'si' + (n===2 || n===1.5 ? ' done' : '');
+
+  // [v143] 4단계 인디케이터 (Step 1 / 1.5 / 2 / 3)
+  // - done: 완료된 단계 (노랑)
+  // - active: 현재 단계 (노랑, 살짝 강조)
+  // - 빈: 대기 (회색)
+  const dots = { 1: 'si1', 1.5: 'si2', 2: 'si3', 3: 'si4' };
+  const order = [1, 1.5, 2, 3];
+  order.forEach(step => {
+    const el = document.getElementById(dots[step]);
+    if (!el) return;
+    if (step < n)      el.className = 'si done';
+    else if (step===n) el.className = 'si active';
+    else               el.className = 'si';
+  });
+
   // v127: 완료 단계 진입 시 신청 요약 채우기
   if (n===3 && typeof _populateDonePanel === 'function') {
     _populateDonePanel();

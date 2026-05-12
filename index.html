@@ -842,8 +842,9 @@ body.menu-open {
 
 /* 정가 (줄긋기) */
 .plan-price-original {
-  font-family:var(--mono); font-size:13px; color:var(--muted);
-  text-decoration:line-through; margin-bottom:4px; height:16px;
+  font-family:var(--mono); font-size:16px; color:#999;
+  text-decoration:line-through; margin-bottom:4px; height:20px;
+  font-weight:500;
 }
 .plan-price { font-family:var(--serif); font-size:42px; font-weight:900; letter-spacing:-2px; line-height:1; }
 .plan-price .w { font-size:20px; vertical-align:top; margin-top:8px; display:inline-block; }
@@ -1013,6 +1014,15 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 .cat-btn.active::after {
   content:'✓'; position:absolute; top:4px; right:8px; font-size:11px; color:var(--gold); font-weight:900;
 }
+
+/* [v145] 데스크탑/모바일 공통 — collapsed 상태일 때 active 아닌 카드 숨김 */
+#catSelector.collapsed .cat-btn:not(.active) { display:none !important; }
+#catSelector.collapsed .cat-btn.active {
+  background:rgba(201,168,76,.18) !important;
+  border-color:var(--gold) !important;
+  font-weight:700 !important;
+}
+#catAccordionToggle { display:block; }
 .cat-btn:hover:not(.active) { border-color:rgba(201,168,76,.4); color:var(--text); }
 
 /* ── 동의 체크박스 ── */
@@ -1134,16 +1144,10 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   .cat-btn { padding:14px 16px !important; font-size:14px !important; letter-spacing:.2px; min-height:48px; }
   /* v132: 모바일에서는 드롭다운 숨김 (1열 카드 사용) */
   #catSelectMobile { display:none !important; }
-  /* v135: 모바일 accordion — collapsed 상태일 때 active 아닌 카드 숨김, 토글 버튼 노출 */
-  #catSelector.collapsed .cat-btn:not(.active) { display:none !important; }
-  #catAccordionToggle { display:block !important; }
-  /* collapsed일 때 active 카드는 골드 더 진하게 강조 */
+  /* v145: 모바일 collapsed 카드 키움 */
   #catSelector.collapsed .cat-btn.active {
-    background:rgba(201,168,76,.18) !important;
-    border-color:var(--gold) !important;
     min-height:56px;
     font-size:15px !important;
-    font-weight:700 !important;
   }
 }
 
@@ -1349,7 +1353,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 }
 .cat-final-cta-btn {
   background:var(--gold); border:none; color:var(--dark);
-  padding:14px 32px; font-size:15px; font-weight:700;
+  padding:16px 36px; font-size:20px; font-weight:700;
   border-radius:10px; cursor:pointer; font-family:var(--sans);
   letter-spacing:.3px; transition:all .2s;
 }
@@ -1391,7 +1395,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v144</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v145</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1749,7 +1753,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   <div class="steps">
     <div class="step"><div class="step-n">01</div><span class="step-ico">📱</span><div class="step-t">신청 후 결제</div><div class="step-d">이름, 전화번호 입력 후 카드로 1회 결제하면 가입이 완료됩니다.</div></div>
     <div class="step"><div class="step-n">02</div><span class="step-ico">☀️</span><div class="step-t">매일 아침 정기 수신</div><div class="step-d">신청 후엔 가만히 두세요. 매일 오전 8시, 구독한 분야의 새로운 지식이 카카오톡으로 자동 도착합니다.</div></div>
-    <div class="step"><div class="step-n">03</div><span class="step-ico">🛡️</span><div class="step-t">환불 보장 안심</div><div class="step-d">플랜별 환불 보장 기간 내 해지 시 결제 금액 100% 환불됩니다. 이후 해지도 미발송분 일할 환불 가능합니다.</div></div>
+    <div class="step"><div class="step-n">03</div><span class="step-ico">🛡️</span><div class="step-t">환불 보장 안심</div><div class="step-d">플랜별 환불 보장 기간 내 해지 시 결제 금액 100% 환불됩니다. 미발송분은 약관에 따라 일할 환불 가능합니다.</div></div>
   </div>
 </section>
 
@@ -1769,17 +1773,20 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 
       <!-- 3개월 -->
       <div class="plan">
-        <div class="plan-name">3개월</div>
+        <div class="plan-name">3개월 <span style="font-size:14px;color:var(--muted);font-weight:600">(90일)</span></div>
         <div class="plan-trial-badge">🛡️ 3일 환불 보장</div>
         <div class="plan-price-original" id="price-pkg3m-original">정가 ₩29,700</div>
         <div class="plan-price"><span class="w">₩</span><span id="price-pkg3m">19,900</span></div>
-        <div class="plan-mo" id="price-pkg3m-mo">월 환산 약 ₩6,633 · <span style="color:#ff7676;font-weight:700">33.0% 할인</span></div>
+        <div class="plan-mo" id="price-pkg3m-mo">
+          <strong style="color:var(--gold);font-size:15px">하루 ₩222</strong> · 
+          <span style="color:#ff7676;font-weight:700">33% 할인</span>
+        </div>
         <ul class="plan-feats">
           <li>매일 1편 카테고리 콘텐츠</li>
           <li>선택한 카테고리 집중 발송</li>
-          <li>오늘 결제 ₩19,900 · 90일 발송</li>
+          <li>90일 발송 · 일시불 ₩19,900</li>
           <li>3일 이내 100% 환불 보장</li>
-          <li>일 단가 약 ₩222</li>
+          <li>약관에 따라 일할 환불 가능</li>
         </ul>
         <button class="plan-btn" onclick="openModal('pkg3m')">지금 시작하기</button>
       </div>
@@ -1787,34 +1794,40 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
       <!-- 6개월 (HOT) -->
       <div class="plan hot">
         <div class="plan-badge">🔥 가장 인기</div>
-        <div class="plan-name">6개월</div>
+        <div class="plan-name">6개월 <span style="font-size:14px;color:var(--muted);font-weight:600">(180일)</span></div>
         <div class="plan-trial-badge">🛡️ 5일 환불 보장</div>
         <div class="plan-price-original" id="price-pkg6m-original">정가 ₩59,400</div>
         <div class="plan-price"><span class="w">₩</span><span id="price-pkg6m">24,900</span></div>
-        <div class="plan-mo" id="price-pkg6m-mo">월 환산 ₩4,150 · <span style="color:#ff7676;font-weight:700">58.1% 할인</span></div>
+        <div class="plan-mo" id="price-pkg6m-mo">
+          <strong style="color:var(--gold);font-size:15px">하루 ₩138</strong> · 
+          <span style="color:#ff7676;font-weight:700">58% 할인</span>
+        </div>
         <ul class="plan-feats">
           <li>매일 1편 카테고리 콘텐츠</li>
           <li>선택한 카테고리 집중 발송</li>
-          <li>오늘 결제 ₩24,900 · 180일 발송</li>
+          <li>180일 발송 · 일시불 ₩24,900</li>
           <li>5일 이내 100% 환불 보장</li>
-          <li>일 단가 약 ₩138</li>
+          <li>약관에 따라 일할 환불 가능</li>
         </ul>
         <button class="plan-btn" onclick="openModal('pkg6m')">지금 시작하기</button>
       </div>
 
       <!-- 1년 -->
       <div class="plan">
-        <div class="plan-name">1년</div>
+        <div class="plan-name">1년 <span style="font-size:14px;color:var(--muted);font-weight:600">(365일)</span></div>
         <div class="plan-trial-badge">🛡️ 7일 환불 보장</div>
         <div class="plan-price-original" id="price-pkg1y-original">정가 ₩118,800</div>
         <div class="plan-price"><span class="w">₩</span><span id="price-pkg1y">41,900</span></div>
-        <div class="plan-mo" id="price-pkg1y-mo">월 환산 약 ₩3,492 · <span style="color:#ff7676;font-weight:700">64.7% 할인</span></div>
+        <div class="plan-mo" id="price-pkg1y-mo">
+          <strong style="color:var(--gold);font-size:15px">하루 ₩115</strong> · 
+          <span style="color:#ff7676;font-weight:700">65% 할인 (최대)</span>
+        </div>
         <ul class="plan-feats">
           <li>매일 1편 카테고리 콘텐츠</li>
           <li>선택한 카테고리 집중 발송</li>
-          <li>오늘 결제 ₩41,900 · 365일 발송</li>
-          <li>7일 이내 100% 환불 보장</li>
-          <li>일 단가 약 ₩115</li>
+          <li>365일 발송 · 일시불 ₩41,900</li>
+          <li>7일 이내 100% 환불 보장 (최장)</li>
+          <li>약관에 따라 일할 환불 가능</li>
         </ul>
         <button class="plan-btn" onclick="openModal('pkg1y')">지금 시작하기</button>
       </div>
@@ -1841,13 +1854,13 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <section class="final">
   <div class="eyebrow" style="display:inline-flex;margin-bottom:28px">지금 신청하면 내일 아침 첫 메시지 발송</div>
   <h2 class="hero-title" style="font-size:clamp(30px,5vw,58px)">가만히 있어도<br><span class="gold">매일 새로운 지식</span><br class="br-desktop"><span class="thin"> 환불 보장으로 시작하세요</span></h2>
-  <p style="color:var(--muted);margin:18px 0 36px;font-size:15px">최대 7일 100% 환불 보장 · 월 ₩9,900부터 · 미발송분 일할 환불</p>
+  <p style="color:var(--muted);margin:18px 0 36px;font-size:15px">최대 7일 100% 환불 보장 · 월 ₩9,900부터 · 약관에 따라 일할 환불</p>
   <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-    <button class="submit-btn" style="font-size:15px;padding:16px 44px;border-radius:10px" onclick="openModalWithCategory('economy')">
-      🛡️ 지금 시작하기 →
-    </button>
     <button class="submit-btn" style="font-size:15px;padding:16px 44px;border-radius:10px;background:none;border:1px solid var(--gold);color:var(--gold)" onclick="document.querySelector('.pricing-wrap').scrollIntoView({behavior:'smooth'})">
       💳 요금제 보기
+    </button>
+    <button class="submit-btn" style="font-size:15px;padding:16px 44px;border-radius:10px" onclick="openModalWithCategory('economy')">
+      지금 시작하기
     </button>
   </div>
 </section>
@@ -1887,11 +1900,11 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     </div>
   </div>
 
-  <!-- 부제목 선택 섹션 (어떤 컨텐츠 그룹으로 시작할까요?) -->
+  <!-- 부제목 선택 섹션 (어떤 컨텐츠으로 시작할까요?) -->
   <section class="cat-section" id="cdpSubtopicSection" style="display:none">
     <div class="cat-section-eyebrow">Choose</div>
     <h3 class="cat-section-title">어떤 컨텐츠로 시작할까요?</h3>
-    <p class="cat-section-sub">한 카테고리 안에서도 다양한 컨텐츠 그룹이 있어요. 관심 있는 그룹을 선택해 신청하세요.</p>
+    <p class="cat-section-sub">한 카테고리 안에서도 다양한 컨텐츠이 있어요. 관심 있는 그룹을 선택해 신청하세요.</p>
     <div id="cdpSubtopicGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;max-width:880px;margin:24px auto 0;padding:0 20px"></div>
   </section>
 
@@ -1938,7 +1951,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     <div class="cat-final-cta">
       <div class="cat-final-cta-title" id="cdpFinalTitle">📬 매일 아침, 콘텐츠가 도착합니다</div>
       <div class="cat-final-cta-sub" id="cdpFinalSub">최대 7일 100% 환불 보장 · 언제든 해지 가능</div>
-      <button class="cat-final-cta-btn" onclick="openModalWithCategory(window._currentCatId)">🛡️ 지금 시작하기 →</button>
+      <button class="cat-final-cta-btn" onclick="openModalWithCategory(window._currentCatId)">지금 시작하기</button>
       <div class="cat-final-cta-meta">카카오톡 채널 친구추가 후 자동 발송</div>
     </div>
   </section>
@@ -2082,9 +2095,9 @@ HIDDEN_COMINGSOON_MODAL_END -->
       <div class="field" id="planField">
         <label>구독 플랜 선택 <span style="font-size:11px;color:var(--muted);font-weight:400">(카테고리 1개당)</span></label>
         <select id="mPlan" onchange="onPlanChange()">
-          <option value="pkg3m">90일 구독</option>
-          <option value="pkg6m" selected>180일 구독 ⭐ 인기</option>
-          <option value="pkg1y">365일 구독</option>
+          <option value="pkg3m">3개월 (90일)</option>
+          <option value="pkg6m" selected>6개월 (180일) ⭐ 인기</option>
+          <option value="pkg1y">1년 (365일)</option>
         </select>
 
         <!-- 결제 요약 카드 (플랜 선택 시 표시) -->
@@ -2094,7 +2107,7 @@ HIDDEN_COMINGSOON_MODAL_END -->
               <div style="font-size:11px;color:var(--muted);margin-bottom:2px">오늘 결제 금액</div>
               <div style="display:flex;align-items:baseline;gap:6px">
                 <span id="planFinalPrice" style="color:var(--gold);font-weight:900;font-size:22px"></span>
-                <span id="planOriginalLine" style="color:var(--muted);text-decoration:line-through;font-size:12px"></span>
+                <span id="planOriginalLine" style="color:#999;text-decoration:line-through;font-size:14px;font-weight:500"></span>
               </div>
             </div>
             <div style="text-align:right">
@@ -2145,10 +2158,10 @@ HIDDEN_COMINGSOON_MODAL_END -->
 
       <!-- 부제목 선택 (카테고리 선택 후 노출) -->
       <div class="field" id="modalSubtopicField" style="display:none">
-        <label>📑 컨텐츠 그룹 선택 <span style="font-size:11px;color:var(--gold);font-weight:500">(1개 선택 필수)</span></label>
+        <label>📑 컨텐츠 선택 <span style="font-size:11px;color:var(--gold);font-weight:500">(1개 선택 필수)</span></label>
         <div id="modalSubtopicGrid" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
         <div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">
-          한 카테고리 안에서도 다양한 컨텐츠 그룹이 있어요. 선택한 그룹의 콘텐츠가 매일 발송됩니다.
+          한 카테고리 안에서도 다양한 컨텐츠이 있어요. 선택한 그룹의 콘텐츠가 매일 발송됩니다.
         </div>
       </div>
 
@@ -2156,9 +2169,9 @@ HIDDEN_COMINGSOON_MODAL_END -->
       <div class="field">
         <label>📬 발송 시간 안내</label>
         <div style="background:rgba(201,168,76,.06);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-top:6px">
-          <div style="font-size:14px;color:var(--gold);font-weight:700;margin-bottom:4px">매일 오전 8시 발송</div>
+          <div style="font-size:14px;color:var(--gold);font-weight:700;margin-bottom:4px">신청 다음날부터 매일 오전 8시 발송</div>
           <div style="font-size:11.5px;color:var(--muted);line-height:1.6">
-            카카오톡 발송 정책에 따라 <strong style="color:var(--text)">8시 이후 순차 발송</strong>되어 약간의 오차(최대 5분)가 발생할 수 있습니다.
+            카카오톡 발송 정책에 따라 오전 8시 이후 순차 발송되어 약간의 오차(<strong style="color:var(--text)">최대 10분</strong>)가 발생할 수 있습니다.
           </div>
         </div>
         <div style="font-size:11px;color:var(--muted);margin-top:6px">
@@ -2215,7 +2228,7 @@ HIDDEN_COMINGSOON_MODAL_END -->
           <span id="cfmCategory" style="color:var(--text);font-weight:600;text-align:right">-</span>
         </div>
         <div id="cfmSubtopicRow" style="display:none;justify-content:space-between;align-items:start;padding:8px 0;border-bottom:1px dashed rgba(201,168,76,.15)">
-          <span style="color:var(--muted);font-size:12px;min-width:90px">컨텐츠 그룹</span>
+          <span style="color:var(--muted);font-size:12px;min-width:90px">컨텐츠</span>
           <span id="cfmSubtopic" style="color:var(--text);font-weight:600;text-align:right">-</span>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:start;padding:8px 0;border-bottom:1px dashed rgba(201,168,76,.15)">
@@ -2257,14 +2270,14 @@ HIDDEN_COMINGSOON_MODAL_END -->
           <div><span style="display:inline-block;width:18px;color:#5eea91;font-weight:700">✓</span> <strong>오늘 결제</strong>: <span id="step2Amount" style="color:var(--gold);font-weight:700">₩24,900</span></div>
           <div><span style="display:inline-block;width:18px;color:#5eea91;font-weight:700">✓</span> <strong>내일 아침 8시부터</strong>: 매일 카카오톡 발송</div>
           <div><span style="display:inline-block;width:18px;color:#5eea91;font-weight:700">✓</span> <strong id="step2RefundPeriod">보장 기간 이내</strong> 해지: 100% 환불 보장</div>
-          <div><span style="display:inline-block;width:18px;color:#5eea91;font-weight:700">✓</span> <strong>이후 해지</strong>: 미발송 일수 일할 환불</div>
+          <div><span style="display:inline-block;width:18px;color:#5eea91;font-weight:700">✓</span> <strong>이후 해지</strong>: 약관에 따라 일할 환불</div>
         </div>
       </div>
 
       <!-- 환불 정책 요약 (작은 글씨) -->
       <div style="font-size:11px;color:var(--muted);line-height:1.5;margin:8px 0 14px;padding:8px 12px;background:rgba(255,255,255,.02);border-radius:6px">
         <a href="#" onclick="event.preventDefault();openRefundPolicyModal();" style="color:var(--gold);text-decoration:underline">전체 환불 정책 보기</a> ·
-        결제 후 7일 초과 시 미발송분 40% 일할 환불, 구독 기간 절반 이후 5% 일할 환불
+        결제 후 보장 기간 초과 시 약관에 따라 일할 환불됩니다
       </div>
 
       <!-- 포트원 위젯 영역 -->
@@ -2285,10 +2298,10 @@ HIDDEN_COMINGSOON_MODAL_END -->
     <!-- STEP 완료 -->
     <div id="donePanel" style="display:none;text-align:center;padding:20px 0">
       <div style="font-size:52px;margin-bottom:16px">🎉</div>
-      <div class="modal-title">결제 완료!</div>
+      <div class="modal-title">축하드립니다!</div>
       <p class="modal-desc" style="margin-top:8px">
-        내일 아침부터 <strong id="doneCategory" style="color:var(--gold)">선택하신 카테고리</strong>를 받아보세요.<br>
-        매일 오전 <span id="doneHour" style="color:var(--gold);font-weight:700">8시</span> 카카오톡 발송.
+        <strong style="color:var(--gold)">최대 할인 적용 완료</strong>되었습니다.<br>
+        내일 아침부터 <strong id="doneCategory" style="color:var(--gold)">선택하신 카테고리</strong>를 받아보세요.
       </p>
 
       <!-- 카카오톡 채널 추가 (필수) -->
@@ -2309,9 +2322,9 @@ HIDDEN_COMINGSOON_MODAL_END -->
         <div style="font-weight:700;color:var(--gold);margin-bottom:8px;text-align:center">📅 첫 발송: <strong id="doneFirstSend" style="color:var(--gold)">내일 오전 8시</strong></div>
         <div style="font-size:11.5px;line-height:1.7;border-top:1px solid var(--border);padding-top:10px;margin-top:8px">
           ✓ <strong style="color:var(--text)" id="donePaidAmount">결제 완료</strong><br>
-          ✓ 내일 아침 8시 첫 발송 · 매일 오전 8시 카카오톡 발송됩니다<br>
-          ✓ <span id="doneRefundPolicy">보장 기간 내 해지 시 100% 환불</span> · 이후 일할 환불<br>
-          ✓ 환불 신청: 홈페이지 "구독 관리" 또는 카카오톡 채널 @1DAYECO
+          ✓ 내일 아침 8시부터 매일 카카오톡 발송<br>
+          ✓ <span id="doneRefundPolicy">보장 기간 내 해지 시 100% 환불</span> · 약관에 따라 일할 환불<br>
+          ✓ 환불 신청: 홈페이지 하단 <strong style="color:var(--text)">"취소 / 환불 요청"</strong> 버튼
         </div>
       </div>
 
@@ -2331,7 +2344,7 @@ HIDDEN_COMINGSOON_MODAL_END -->
           <span id="doneCatName" style="color:var(--text);font-weight:600;text-align:right">-</span>
         </div>
         <div id="doneSubtopicRow" style="display:none;justify-content:space-between;align-items:start;padding:6px 0;font-size:12px;border-bottom:1px dashed var(--border)">
-          <span style="color:var(--muted);min-width:80px">컨텐츠 그룹</span>
+          <span style="color:var(--muted);min-width:80px">컨텐츠</span>
           <span id="doneSubName" style="color:var(--text);font-weight:600;text-align:right">-</span>
         </div>
         <div style="display:flex;justify-content:space-between;align-items:start;padding:6px 0;font-size:12px">
@@ -3268,9 +3281,40 @@ async function _renderDetailSubtopics(catId) {
       onmouseover="this.style.borderColor='rgba(201,168,76,.5)'; this.style.background='rgba(201,168,76,.06)'; this.style.transform='translateY(-2px)'"
       onmouseout="this.style.borderColor='rgba(201,168,76,.18)'; this.style.background='rgba(255,255,255,.025)'; this.style.transform='translateY(0)'">
       <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:14px;line-height:1.4">${s.name}</div>
-      <div style="font-size:11px;color:var(--muted);padding-top:14px;border-top:1px solid rgba(201,168,76,.1)">신청하기 →</div>
+      <div style="font-size:11px;color:var(--muted);padding-top:14px;border-top:1px solid rgba(201,168,76,.1)">신청하기</div>
     </div>
   `).join('');
+}
+
+// [v145] 카테고리 → 6개 그룹 매핑 (솔라피 v12와 동일)
+const _CAT_TO_GROUP_LABEL = {
+  // 일·업무
+  'career':        '일·업무',
+  'productivity':  '일·업무',
+  // 외국어
+  'english':       '외국어',
+  'daily_english': '외국어',
+  'japanese':      '외국어',
+  'vietnamese':    '외국어',
+  // 테크·디지털
+  'it_news':       '테크·디지털',
+  'digital_tools': '테크·디지털',
+  // 금융·투자
+  'economy':       '금융·투자',
+  'kr_stock':      '금융·투자',
+  'us_stock':      '금융·투자',
+  'crypto':        '금융·투자',
+  'realestate':    '금융·투자',
+  // 건강·일상
+  'fitness':       '건강·일상',
+  'minimal':       '건강·일상',
+  // 교양·지식
+  'trivia':        '교양·지식',
+  'reading':       '교양·지식',
+  'law':           '교양·지식',
+};
+function _catGroupLabel(catId) {
+  return _CAT_TO_GROUP_LABEL[catId] || '카테고리';
 }
 
 function renderCategoryDetailPage(catId) {
@@ -3282,7 +3326,7 @@ function renderCategoryDetailPage(catId) {
   document.getElementById('cdpTitle').textContent = data.title;
   document.getElementById('cdpSubtitle').innerHTML = data.subtitle;
   document.getElementById('cdpDelivery').textContent = data.delivery;
-  document.getElementById('cdpHeroCta').textContent = `📬 ${data.title} 신청하기 →`;
+  document.getElementById('cdpHeroCta').textContent = `📬 ${data.title} 신청하기`;
 
   // 부제목 선택 섹션 (비동기로 채움)
   _renderDetailSubtopics(catId);
@@ -3293,17 +3337,19 @@ function renderCategoryDetailPage(catId) {
     `<div class="cat-pain-card"><div class="cat-pain-emoji">${p.e}</div><div class="cat-pain-text">${p.t}</div></div>`
   ).join('');
 
-  // 미리보기
+  // 미리보기 — [1DAYECO] 새 알림톡 템플릿 양식 (name/subtopic/body 변수)
+  // 카테고리 ID로 6개 그룹 라벨 매핑
+  const _groupLabel = _catGroupLabel(catId);
   document.getElementById('cdpPreviewGrid').innerHTML = data.previews.map(p => `
     <div class="cat-msg-preview">
       <div class="cat-msg-date-wrap"><span class="cat-msg-date">${p.day}</span></div>
       <div class="cat-msg-scroll">
         <div class="cat-msg-bubble">
-          [1DAYECO] 오늘의 1분<br><br>
-          ${p.title}<br><br>
+          [1DAYECO] 오늘의 한 줄 학습 메시지<br><br>
+          홍길동님이 구독하신 [${_groupLabel}] ${p.title} 콘텐츠입니다.<br><br>
           ${p.body}<br><br>
-          ──────────────<br>
-          ※ 본 메시지는 1DAYECO 구독 콘텐츠로, 매일 아침 8시에 발송됩니다.
+          본 메시지는 고객님이 구독 신청하신 1DAYECO 학습 콘텐츠로, 매일 아침 발송됩니다.<br><br>
+          문의: 카카오톡 @1DAYECO
         </div>
       </div>
     </div>
@@ -4054,10 +4100,10 @@ async function _updatePlanPrices() {
     const mPlan = document.getElementById('mPlan');
     if (mPlan) {
       const labels = {
-        monthly: '30일 구독',
-        pkg3m:   '90일 구독',
-        pkg6m:   '180일 구독 ⭐ 인기',
-        pkg1y:   '365일 구독',
+        monthly: '1개월 (30일)',
+        pkg3m:   '3개월 (90일)',
+        pkg6m:   '6개월 (180일) ⭐ 인기',
+        pkg1y:   '1년 (365일)',
       };
       mPlan.querySelectorAll('option').forEach(opt => {
         if (labels[opt.value]) opt.textContent = labels[opt.value];
@@ -4507,11 +4553,11 @@ async function _populateDonePanel() {
       if (selPlan) plan = selPlan === 'yearly' ? 'pkg1y' : selPlan;
     }
     const planLabels = {
-      monthly: '30일 구독',
-      pkg3m:   '90일 구독',
-      pkg6m:   '180일 구독',
-      pkg1y:   '365일 구독',
-      yearly:  '365일 구독',
+      monthly: '1개월 (30일)',
+      pkg3m:   '3개월 (90일)',
+      pkg6m:   '6개월 (180일)',
+      pkg1y:   '1년 (365일)',
+      yearly:  '1년 (365일)',
     };
     document.getElementById('donePlanName').textContent = planLabels[plan] || plan;
   } catch (_) {}
@@ -4590,7 +4636,7 @@ async function submitStep1() {
   const subtopicField = document.getElementById('modalSubtopicField');
   const subtopicVisible = subtopicField && subtopicField.style.display !== 'none';
   if (subtopicVisible && !window._selectedSubtopicId) {
-    showToast('컨텐츠 그룹을 1개 선택해주세요', 'ng');
+    showToast('컨텐츠을 1개 선택해주세요', 'ng');
     return;
   }
 
@@ -4646,11 +4692,11 @@ async function _populateConfirmPanel({ name, phone, plan, hour }) {
 
   // 플랜 + 결제 금액
   const planLabels = {
-    monthly: '30일 구독',
-    pkg3m:   '90일 구독',
-    pkg6m:   '180일 구독',
-    pkg1y:   '365일 구독',
-    yearly:  '365일 구독',
+    monthly: '1개월 (30일)',
+    pkg3m:   '3개월 (90일)',
+    pkg6m:   '6개월 (180일)',
+    pkg1y:   '1년 (365일)',
+    yearly:  '1년 (365일)',
   };
   const planAmounts = {
     monthly: '₩9,900',
@@ -5523,7 +5569,7 @@ const INFO_CONTENT = {
       <tr><td>주말·공휴일</td><td>휴무</td></tr></table>
     <h3>자주 묻는 질문</h3>
     <div class="highlight"><strong>Q. 메시지가 오지 않아요</strong><br>카카오톡에서 @1DAYECO 채널 친구 추가 여부를 확인해 주세요.</div>
-    <div class="highlight" style="margin-top:8px"><strong>Q. 결제 후 환불할 수 있나요?</strong><br>네. 플랜별 환불 보장 기간(3개월: 3일 / 6개월: 5일 / 12개월: 7일) 이내 해지 시 100% 환불됩니다. 이후에도 미발송분에 대해 일할 환불이 가능합니다.</div>
+    <div class="highlight" style="margin-top:8px"><strong>Q. 결제 후 환불할 수 있나요?</strong><br>네. 플랜별 환불 보장 기간(3개월: 3일 / 6개월: 5일 / 12개월: 7일) 이내 해지 시 100% 환불됩니다. 미발송분은 약관에 따라 일할 환불 가능합니다.</div>
     <div class="highlight" style="margin-top:8px"><strong>Q. 발송 시간을 변경하고 싶어요</strong><br>카카오톡 정책상 8시 이후 발송 가능합니다. 이후 발송 옵션에 대하여는 개발중이오니, 빠른 시일 내 서비스 제공하도록 노력하겠습니다.</div>` }
 };
 let currentInfoTab = 'intro';

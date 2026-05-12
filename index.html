@@ -1395,7 +1395,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v145</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v146</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2477,8 +2477,10 @@ HIDDEN_COMINGSOON_MODAL_END -->
             <div>• 카드사 입금까지 <strong>영업일 5~7일</strong> 소요됩니다</div>
             <div>• 문의: 카카오톡 <strong>@1DAYECO</strong></div>
           </div>
-          <!-- 환불 계좌 입력 -->
-          <div style="margin-bottom:16px">
+          <!-- [v146] 환불 계좌 입력 — 테스트 기간 비활성화 (auto refund 모드)
+               실 운영 시 display:none → display:block으로 변경 + REFUND_AUTO_COMPLETE=false 설정
+          -->
+          <div style="display:none;margin-bottom:16px">
             <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:10px">💳 환불 받으실 계좌 정보</div>
             <div style="display:flex;flex-direction:column;gap:8px">
               <div style="display:flex;gap:8px">
@@ -2509,8 +2511,8 @@ HIDDEN_COMINGSOON_MODAL_END -->
           </div>
           <div style="display:flex;gap:8px">
             <button onclick="cancelGoToStep2()" style="flex:1;background:none;border:1px solid var(--border);color:var(--muted);padding:11px;border-radius:8px;font-size:13px;font-weight:600;font-family:var(--sans);cursor:pointer">돌아가기</button>
-            <button onclick="refundRequest()" id="refundRequestBtn" disabled
-              style="flex:2;background:var(--error);color:#fff;border:none;padding:11px;border-radius:8px;font-size:13px;font-weight:700;font-family:var(--sans);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;opacity:.5">
+            <button onclick="refundRequest()" id="refundRequestBtn"
+              style="flex:2;background:var(--error);color:#fff;border:none;padding:11px;border-radius:8px;font-size:13px;font-weight:700;font-family:var(--sans);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
               <span id="refundRequestTxt">환불 요청 접수하기</span>
               <span id="refundRequestSpin" style="display:none"><span class="spinner" style="border-top-color:#fff"></span></span>
             </button>
@@ -3771,27 +3773,47 @@ async function loadCategoriesFromAPI() {
   if (_categoriesCache) return _categoriesCache;
   if (_categoriesCachePromise) return _categoriesCachePromise;
 
-  _categoriesCachePromise = (async () => {
-    // 폴백 (API 실패 시): 정식 4개를 active로 가정, coming_soon 7개 하드코딩
+  // [v146] 모바일 호환성 개선 — promise를 변수에 보관 후 캐시에 저장
+  const promise = (async () => {
+    // 폴백 (API 실패 시): 18개 카테고리 전부 active로 가정
     const fallback = {
       active: [
-        { id: 'economy',    name: '경제',    emoji: '📊' },
-        { id: 'realestate', name: '부동산', emoji: '🏠' },
-        { id: 'english',    name: '영어',    emoji: '🇬🇧' },
-        { id: 'trivia',     name: '상식',    emoji: '🧠' },
+        { id: 'career',        name: '커리어',        emoji: '💼', super_category: 'work' },
+        { id: 'productivity',  name: '생산성',        emoji: '⏱️', super_category: 'work' },
+        { id: 'english',       name: '영어',          emoji: '🇬🇧', super_category: 'language' },
+        { id: 'daily_english', name: '데일리 영어',   emoji: '🗣️', super_category: 'language' },
+        { id: 'japanese',      name: '일본어',        emoji: '🇯🇵', super_category: 'language' },
+        { id: 'vietnamese',    name: '베트남어',      emoji: '🇻🇳', super_category: 'language' },
+        { id: 'it_news',       name: 'IT 뉴스',       emoji: '💻', super_category: 'tech' },
+        { id: 'digital_tools', name: '디지털 도구',   emoji: '🛠️', super_category: 'tech' },
+        { id: 'economy',       name: '경제',          emoji: '📊', super_category: 'finance' },
+        { id: 'kr_stock',      name: '한국 증시',     emoji: '🇰🇷', super_category: 'finance' },
+        { id: 'us_stock',      name: '미국 증시',     emoji: '🇺🇸', super_category: 'finance' },
+        { id: 'crypto',        name: '암호화폐',      emoji: '₿',  super_category: 'finance' },
+        { id: 'realestate',    name: '부동산',        emoji: '🏠', super_category: 'finance' },
+        { id: 'fitness',       name: '피트니스',      emoji: '💪', super_category: 'wellness' },
+        { id: 'minimal',       name: '미니멀',        emoji: '🌱', super_category: 'wellness' },
+        { id: 'trivia',        name: '상식',          emoji: '🧠', super_category: 'knowledge' },
+        { id: 'reading',       name: '독서',          emoji: '📚', super_category: 'knowledge' },
+        { id: 'law',           name: '법률·생활',     emoji: '⚖️', super_category: 'knowledge' },
       ],
-      coming_soon: [],  // 백엔드 응답 없으면 빈 배열 (랜딩의 정적 7개 카드는 별개)
+      coming_soon: [],
       hidden: [],
     };
 
     try {
-      if (!API_BASE) return fallback;
+      if (!API_BASE) {
+        console.log('[카테고리] API_BASE 없음 → 18개 폴백 사용');
+        return fallback;
+      }
 
-      // 백엔드 실제 엔드포인트: /admin/categories
-      // 응답: { data: [{id, name, emoji, active, visibility, ...}] }
-      // visibility 값: 'active' | 'coming_soon' | 'hidden'
-      // (visibility가 없는 옛 row는 active 필드로 폴백: active=true → 'active', false → 'hidden')
-      const r = await fetch(API_BASE + '/admin/categories');
+      // [v146] timeout 추가 — 모바일에서 fetch 무한 대기 방지
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000);  // 8초
+
+      const r = await fetch(API_BASE + '/admin/categories', { signal: controller.signal });
+      clearTimeout(timeoutId);
+
       if (!r.ok) {
         console.warn('[카테고리] /admin/categories HTTP', r.status, '- 폴백 사용');
         return fallback;
@@ -3799,13 +3821,13 @@ async function loadCategoriesFromAPI() {
       const d = await r.json();
       const rows = (d && Array.isArray(d.data)) ? d.data : [];
       if (rows.length === 0) {
+        console.log('[카테고리] 응답 0건 → 폴백 사용');
         return fallback;
       }
 
       const buckets = { active: [], coming_soon: [], hidden: [] };
       rows.forEach(c => {
         if (!c || !c.id) return;
-        // visibility 우선, 없으면 active 폴백
         let vis = c.visibility;
         if (!vis || !['active','coming_soon','hidden'].includes(vis)) {
           vis = (c.active === false) ? 'hidden' : 'active';
@@ -3817,23 +3839,25 @@ async function loadCategoriesFromAPI() {
           subtitle:       c.subtitle || '',
           description:    c.description || '',
           super_category: c.super_category || 'finance',
-          // v113: 백엔드가 내려주는 부제목 정보 함께 보존
           subtopic_count: c.subtopic_count || 0,
           subtopics:      Array.isArray(c.subtopics) ? c.subtopics : [],
         });
       });
 
-      _categoriesCache = buckets;
-      return _categoriesCache;
+      console.log(`[카테고리] 로드 완료: active=${buckets.active.length}, coming_soon=${buckets.coming_soon.length}`);
+      return buckets;
     } catch (e) {
-      console.warn('[카테고리] 로드 실패, 폴백 사용:', e);
+      console.warn('[카테고리] 로드 실패 (timeout/network), 폴백 사용:', e?.message || e);
       return fallback;
-    } finally {
-      _categoriesCachePromise = null;
     }
   })();
 
-  _categoriesCache = await _categoriesCachePromise;
+  _categoriesCachePromise = promise;
+  try {
+    _categoriesCache = await promise;
+  } finally {
+    _categoriesCachePromise = null;
+  }
   return _categoriesCache;
 }
 
@@ -4737,9 +4761,40 @@ async function submitConfirm() {
     if (window._selectedSubtopicId) {
       preparePayload.subtopic_id = window._selectedSubtopicId;
     }
-    const res = await apiPost('/api/payment/prepare', preparePayload);
+    let res;
+    try {
+      res = await apiPost('/api/payment/prepare', preparePayload);
+    } catch (apiErr) {
+      // [v146] apiPost가 400 응답에 throw — 본문 메시지 확인해서 중복 가입 처리
+      const errMsg = apiErr?.message || '';
+      // HTTP 400: {"error":"already_subscribed","duplicate_warning":true,...} 형식 매칭
+      if (errMsg.includes('already_subscribed') || errMsg.includes('다른 플랜을 구독')) {
+        const proceed = confirm('동일한 콘텐츠의 다른 플랜을 구독중입니다.\n결제창으로 이동할까요?');
+        if (!proceed) {
+          throw new Error('가입 취소');
+        }
+        // 중복 확인 후 재호출
+        preparePayload.confirm_duplicate = true;
+        res = await apiPost('/api/payment/prepare', preparePayload);
+      } else {
+        throw apiErr;
+      }
+    }
     if (res && res.success === false) {
-      throw new Error(res.message || '신청 처리 중 오류가 발생했습니다');
+      // duplicate_warning 케이스 — apiPost가 200 응답을 받았을 경우 (이론적으론 안 옴)
+      if (res.duplicate_warning) {
+        const proceed = confirm('동일한 콘텐츠의 다른 플랜을 구독중입니다.\n결제창으로 이동할까요?');
+        if (!proceed) {
+          throw new Error('가입 취소');
+        }
+        preparePayload.confirm_duplicate = true;
+        res = await apiPost('/api/payment/prepare', preparePayload);
+        if (res && res.success === false) {
+          throw new Error(res.message || '신청 처리 중 오류가 발생했습니다');
+        }
+      } else {
+        throw new Error(res.message || '신청 처리 중 오류가 발생했습니다');
+      }
     }
     subscriberId   = res.subscriber_id || res.temp_id;
     customerUidRef = res.customer_uid;
@@ -5618,8 +5673,32 @@ const PLAN_MAP = {
 function planLabel(p) { return PLAN_MAP[p] || p || '—'; }
 
 // ── 카테고리 한글 ─────────────────────────────────────────────
+// [v146] 18개 카테고리 한글 라벨 매핑 (환불 모달 등에서 사용)
 const CAT_MAP = {
-  economy:'경제', realestate:'부동산', english:'영어', trivia:'상식'
+  // 일·업무
+  career:        '커리어',
+  productivity:  '생산성',
+  // 외국어
+  english:        '영어',
+  daily_english:  '데일리 영어',
+  japanese:       '일본어',
+  vietnamese:     '베트남어',
+  // 테크·디지털
+  it_news:        'IT 뉴스',
+  digital_tools:  '디지털 도구',
+  // 금융·투자
+  economy:        '경제',
+  kr_stock:       '한국 증시',
+  us_stock:       '미국 증시',
+  crypto:         '암호화폐',
+  realestate:     '부동산',
+  // 건강·일상
+  fitness:        '피트니스',
+  minimal:        '미니멀',
+  // 교양·지식
+  trivia:         '상식',
+  reading:        '독서',
+  law:            '법률·생활',
 };
 function catLabels(cats) {
   if (!cats || !cats.length) return '';
@@ -5952,12 +6031,15 @@ function checkRefundAccount() {
 async function refundRequest() {
   if (!cancelCurrentSub) return;
 
-  // 계좌 검증
+  // [v146] 테스트 기간: 계좌 입력 비활성화 — 계좌 검증 우회
+  // 실 운영 시 계좌 입력 div의 display:none → display:block 변경 + 아래 if 블록 활성화
   const bank     = (document.getElementById('refundBankName')?.value    || '').trim();
   const acctName = (document.getElementById('refundAccountName')?.value || '').trim();
   const acct     = (document.getElementById('refundBankAccount')?.value  || '').trim();
   const accErr   = document.getElementById('refundAccountErr');
 
+  // [v146] 계좌 검증 주석 처리 — 테스트 기간
+  /*
   const subName   = (cancelCurrentSub?.name || '').replace(/\s/g, '').toLowerCase();
   const inputName = acctName.replace(/\s/g, '').toLowerCase();
 
@@ -5969,6 +6051,7 @@ async function refundRequest() {
     if (accErr) { accErr.textContent = '예금주 성명이 구독자 이름과 일치하지 않습니다. 본인 명의 계좌만 가능합니다.'; accErr.style.display = 'block'; }
     return;
   }
+  */
   if (accErr) accErr.style.display = 'none';
 
   const btn  = document.getElementById('refundRequestBtn');
@@ -5988,12 +6071,11 @@ async function refundRequest() {
     } else {
       await new Promise(r => setTimeout(r, 700));
     }
-    document.getElementById('cancelDoneEmoji').textContent = '📩';
-    document.getElementById('cancelDoneTitle').textContent = '환불 요청 접수 완료';
+    document.getElementById('cancelDoneEmoji').textContent = '✅';
+    document.getElementById('cancelDoneTitle').textContent = '환불 처리 완료';
     document.getElementById('cancelDoneMsg').innerHTML =
-      '환불 요청이 접수되었습니다.<br>콘텐츠 발송이 즉시 중단됩니다.<br><br>' +
-      `입력하신 계좌 <strong style="color:var(--gold)">${bank} ${acct}</strong>로<br>` +
-      '영업일 3일 이내 환불 처리됩니다.<br><br>' +
+      '환불이 정상 처리되었습니다.<br>콘텐츠 발송이 즉시 중단됩니다.<br><br>' +
+      '결제하신 카드사로 영업일 3~7일 내 환불됩니다.<br><br>' +
       '문의: 카카오톡 <strong style="color:var(--gold)">@1DAYECO</strong>';
     document.getElementById('cancelStep3').style.display = 'none';
     document.getElementById('cancelStep4').style.display = 'block';

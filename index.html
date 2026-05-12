@@ -1395,7 +1395,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v147</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v148</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -4311,7 +4311,18 @@ async function apiPost(path, body) {
   });
   if (!r.ok) {
     const e = await r.json().catch(()=>({}));
-    throw new Error(e.detail || `HTTP ${r.status}`);
+    // [v148] 백엔드의 error 코드/메시지 모두 throw 메시지에 포함 (분기 처리용)
+    // 예: {error: 'already_subscribed', message: '...', duplicate_warning: true}
+    // 랜딩 코드가 e.includes('already_subscribed') 같은 매칭 가능하도록 합침
+    const parts = [];
+    if (e.error)   parts.push(e.error);
+    if (e.message) parts.push(e.message);
+    if (e.detail)  parts.push(e.detail);
+    const finalMsg = parts.length ? parts.join(' — ') : `HTTP ${r.status}`;
+    const err = new Error(finalMsg);
+    err.responseBody = e;       // 원본 응답 객체도 보존
+    err.status = r.status;
+    throw err;
   }
   return r.json();
 }

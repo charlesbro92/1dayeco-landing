@@ -324,6 +324,41 @@ nav {
     margin-left:auto;
     margin-right:auto;
   }
+  /* [v152] 모바일 — 카테고리 목록 페이지 헤더 컴팩트화 (카드 바로 보이게) */
+  #category-list-page {
+    padding:70px 12px 40px !important;
+  }
+  #category-list-page > div:not(.category-page-bg) {
+    padding:0 4px !important;
+  }
+  #catListEyebrow {
+    font-size:10px !important;
+    letter-spacing:2px !important;
+    margin-bottom:6px !important;
+  }
+  #catListTitle {
+    font-size:22px !important;
+    margin-bottom:6px !important;
+  }
+  #catListSubtitle {
+    font-size:12px !important;
+    margin-bottom:0 !important;
+  }
+  /* category-list-page 헤더 영역 마진 축소 */
+  #category-list-page > div > div:first-child {
+    margin-bottom:18px !important;
+  }
+  /* 카테고리 카드 자체 — 클릭 영역 확보 + 모바일 사이즈 */
+  .cat-card {
+    cursor:pointer !important;
+    -webkit-tap-highlight-color: rgba(201,168,76,.2) !important;
+    touch-action: manipulation !important;
+    min-height: 110px !important;
+    padding: 16px 14px !important;
+  }
+  .cat-card-icon { font-size:28px !important; margin-bottom:6px !important; }
+  .cat-card-name { font-size:15px !important; margin-bottom:4px !important; }
+  .cat-card-desc { font-size:12px !important; }
 }
 
 /* 메인 카드 그리드 - 소개 페이지의 Coming Soon 미리보기 (3개만) */
@@ -1395,7 +1430,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v151</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v153</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1814,7 +1849,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 
       <!-- 1년 -->
       <div class="plan">
-        <div class="plan-name">1년 <span style="font-size:14px;color:var(--muted);font-weight:600">(365일)</span></div>
+        <div class="plan-name">1년 <span style="font-size:14px;color:var(--muted);font-weight:600">(364일)</span></div>
         <div class="plan-trial-badge">🛡️ 7일 환불 보장</div>
         <div class="plan-price-original" id="price-pkg1y-original">정가 ₩118,800</div>
         <div class="plan-price"><span class="w">₩</span><span id="price-pkg1y">41,900</span></div>
@@ -1825,10 +1860,11 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
         <ul class="plan-feats">
           <li>매일 1편 카테고리 콘텐츠</li>
           <li>선택한 카테고리 집중 발송</li>
-          <li>365일 발송 · 일시불 ₩41,900</li>
+          <li>364일 발송 · 일시불 ₩41,900</li>
           <li>7일 이내 100% 환불 보장 (최장)</li>
           <li>약관에 따라 일할 환불 가능</li>
         </ul>
+        <p style="font-size:10px;color:var(--muted);text-align:center;line-height:1.5;margin:6px 0 10px;padding:0 4px">※ 결제 프로그램 정책상 1년 이내 제공 가능하여 364일 발송됩니다.</p>
         <button class="plan-btn" onclick="openModal('pkg1y')">지금 시작하기</button>
       </div>
 
@@ -2097,7 +2133,7 @@ HIDDEN_COMINGSOON_MODAL_END -->
         <select id="mPlan" onchange="onPlanChange()">
           <option value="pkg3m">3개월 (90일)</option>
           <option value="pkg6m" selected>6개월 (180일) ⭐ 인기</option>
-          <option value="pkg1y">1년 (365일)</option>
+          <option value="pkg1y">1년 (364일)</option>
         </select>
 
         <!-- 결제 요약 카드 (플랜 선택 시 표시) -->
@@ -3485,15 +3521,16 @@ function _renderCategoryDetailFallback(catId) {
 
 // 카드 리스트 페이지 렌더 (전체 / 대분류별)
 async function renderCategoryListPage(filter) {
+  // [v152] 모바일 친화 — 헤더 컴팩트화 + 카테고리만 평면 표시
   // filter: 'all' | 'finance' | 'tech' | 'language' | 'work' | 'knowledge' | 'wellness'
   const SUPER_CATS = {
-    all:       { eyebrow: 'ALL CATEGORIES', title: '전체 카테고리',     sub: '관심 있는 카테고리를 선택하면 자세한 소개를 확인할 수 있어요.' },
-    finance:   { eyebrow: 'FINANCE',         title: '💰 금융·투자',     sub: '경제 흐름과 시장 움직임을 짧게 정리해드려요.' },
-    tech:      { eyebrow: 'TECH',            title: '💻 테크·디지털',   sub: 'IT·AI·디지털 도구 — 직장인을 위한 트렌드.' },
-    language:  { eyebrow: 'LANGUAGE',        title: '🌐 외국어',         sub: '비즈니스부터 여행까지, 매일 한 표현씩.' },
-    work:      { eyebrow: 'WORK',            title: '💼 일·업무',       sub: '회사에서 한 단계 올라가는 한 줄 인사이트.' },
-    knowledge: { eyebrow: 'KNOWLEDGE',       title: '📚 교양·지식',     sub: '내 삶에 직접 도움 되는 실용 지식.' },
-    wellness:  { eyebrow: 'WELLNESS',        title: '🌱 건강·일상',     sub: '몸과 일상을 가볍게 정돈하는 한 걸음.' },
+    all:       { eyebrow: 'ALL',             title: '전체 카테고리',     sub: '관심 있는 카테고리를 선택해주세요.' },
+    finance:   { eyebrow: 'FINANCE',         title: '💰 금융·투자',     sub: '경제 흐름과 시장 움직임을 짧게.' },
+    tech:      { eyebrow: 'TECH',            title: '💻 테크·디지털',   sub: 'IT·AI·디지털 도구 트렌드.' },
+    language:  { eyebrow: 'LANGUAGE',        title: '🌐 외국어',         sub: '비즈니스부터 여행까지.' },
+    work:      { eyebrow: 'WORK',            title: '💼 일·업무',       sub: '회사에서 한 단계 올라가는 인사이트.' },
+    knowledge: { eyebrow: 'KNOWLEDGE',       title: '📚 교양·지식',     sub: '내 삶에 도움 되는 실용 지식.' },
+    wellness:  { eyebrow: 'WELLNESS',        title: '🌱 건강·일상',     sub: '몸과 일상을 가볍게 정돈.' },
   };
   const meta = SUPER_CATS[filter] || SUPER_CATS.all;
   document.getElementById('catListEyebrow').textContent = meta.eyebrow;
@@ -3508,7 +3545,7 @@ async function renderCategoryListPage(filter) {
     comingSoonCats = data.coming_soon || [];
   } catch (e) {}
 
-  // filter 적용
+  // filter 적용 — 대분류별 카테고리만 노출
   let filteredActive = activeCats;
   let filteredComing = comingSoonCats;
   if (filter !== 'all') {
@@ -3551,7 +3588,8 @@ async function renderCategoryListPage(filter) {
       </div>`;
   };
 
-  // 전체 탭: 대분류별 그룹핑 / 대분류 탭: 평면 표시
+  // [v152] 단순화: 대분류 선택 시 그 그룹의 카테고리만 평면 표시 (소그룹 헤더 제거)
+  // 전체 탭: 대분류별 그룹핑 유지
   if (filter === 'all') {
     const SUPER_CATS_LIST = [
       { id: 'finance',   emoji: '💰', label: '금융·투자' },
@@ -3561,7 +3599,6 @@ async function renderCategoryListPage(filter) {
       { id: 'knowledge', emoji: '📚', label: '교양·지식' },
       { id: 'wellness',  emoji: '🌱', label: '건강·일상' },
     ];
-    // 대분류별로 active + coming_soon 함께 그룹핑
     const grouped = {};
     SUPER_CATS_LIST.forEach(s => { grouped[s.id] = { active: [], coming: [] }; });
     const ungrouped = { active: [], coming: [] };
@@ -3597,11 +3634,18 @@ async function renderCategoryListPage(filter) {
       : '';
     grid.innerHTML = html + ungroupedHtml;
   } else {
-    // 대분류 탭: 평면 표시 (active 먼저, coming_soon 뒤)
+    // 대분류 탭: 평면 표시 (active 먼저, coming_soon 뒤) — 그룹 헤더 없이 카테고리만
     grid.innerHTML = filteredActive.map(buildActiveCard).join('') + filteredComing.map(buildComingCard).join('');
   }
   // 부제목 채우기 (비동기)
   _hydrateCardSubtopics();
+
+  // [v152] 페이지 진입 시 자동 상단 스크롤 (모바일에서 카드 바로 보이게)
+  setTimeout(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    const page = document.getElementById('category-list-page');
+    if (page) page.scrollTop = 0;
+  }, 50);
 }
 
 // ── 모바일 햄버거 메뉴 토글 ────────────────────────
@@ -5652,8 +5696,9 @@ const INFO_CONTENT = {
       <tr><td>1개월</td><td>₩9,900</td><td>30일</td></tr>
       <tr><td>3개월</td><td>₩14,900</td><td>93일 (3일 보너스 포함)</td></tr>
       <tr><td>6개월</td><td>₩24,900</td><td>183일 (3일 보너스 포함)</td></tr>
-      <tr><td>1년</td><td>₩41,900</td><td>368일 (3일 보너스 포함)</td></tr>
+      <tr><td>1년</td><td>₩41,900</td><td>364일</td></tr>
     </table>
+    <p style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.6">※ 1년 플랜의 경우 결제 프로그램(KG이니시스/카카오페이 등) 정책상 1년 이내 제공만 가능하여 <strong>총 364일</strong> 콘텐츠가 발송됩니다.</p>
 
     <h3>제4조 (만료 안내)</h3>
     <p>만료 1일 전(D-1) 카카오톡으로 안내 메시지가 발송됩니다. 사용자가 별도 행동을 하지 않으면 만료일에 자동 종료되며 추가 결제는 발생하지 않습니다. 계속 받아보시려면 사이트에서 재신청하실 수 있습니다.</p>

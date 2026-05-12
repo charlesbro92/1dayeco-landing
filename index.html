@@ -1395,7 +1395,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v146</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v147</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -5816,7 +5816,14 @@ async function cancelVerifyPhone() {
       );
     }
 
-    const actionable = rows.filter(s => !['cancelled','expired'].includes(s.status));
+    // [v147] 환불 진행 중/완료 가입자도 표시 (사용자가 처리 과정 조회 가능)
+    // active: 환불 신청 가능
+    // refund_requested / refund_protected_ended / refunded: 진행 상태 조회만
+    const REFUND_STATUSES = ['refund_requested', 'refund_protected_ended', 'refunded'];
+    const actionable = rows.filter(s =>
+      ['active','trial','pending_payment','pending_charge'].includes(s.status)
+      || REFUND_STATUSES.includes(s.status)
+    );
     if (!actionable.length) {
       errEl.textContent = rows.length
         ? '이미 취소되었거나 만료된 구독입니다'
@@ -5829,9 +5836,15 @@ async function cancelVerifyPhone() {
     const hasActive  = actionable.some(s => s.status === 'active');
     const totalSteps = hasActive ? 4 : 3;
 
-    if (actionable.length === 1) {
+    // [v147] 환불 진행/완료 상태인 가입자만 있을 때 — 자동 step3 진입하지 않고 진행 상태 표시
+    const REFUND_STATUSES_INNER = ['refund_requested','refund_protected_ended','refunded'];
+    const onlyViewOnly = actionable.every(s => REFUND_STATUSES_INNER.includes(s.status));
+
+    if (actionable.length === 1 && !onlyViewOnly) {
+      // 활성 구독자 1명만 있는 경우 — 기존 흐름 (자동 step3)
       await selectCancelSub(actionable[0], totalSteps, true);
     } else {
+      // 다중 구독 OR 환불 진행 중/완료 — 목록으로 표시
       renderSubList(actionable, totalSteps);
       showCancelStep(2, totalSteps);
     }
@@ -5850,25 +5863,72 @@ function renderSubList(rows, totalSteps) {
   const listEl = document.getElementById('cancelSubList');
   listEl.innerHTML = rows.map((sub, i) => {
     const isTrial = sub.status === 'trial';
+    const isRefundReq = ['refund_requested','refund_protected_ended'].includes(sub.status);
+    const isRefunded  = sub.status === 'refunded';
+    const isViewOnly  = isRefundReq || isRefunded;  // 조회 전용 (재처리 불가)
+
     const endKey  = isTrial ? (sub.trial_end || sub.trialEnd) : sub.end_date;
     const endStr  = fmtDate(endKey);
     const cats    = catLabels(sub.categories);
-    const statusBadge = isTrial
-      ? '<span style="background:rgba(251,191,36,.15);color:#F59E0B;border:1px solid rgba(251,191,36,.3);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700">체험 기간 중</span>'
-      : '<span style="background:rgba(16,185,129,.12);color:#10B981;border:1px solid rgba(16,185,129,.3);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700">구독 중</span>';
-    const endLabel = isTrial ? `체험 종료일: ${endStr}` : `만료일: ${endStr}`;
+
+    // 상태별 배지 (v147)
+    let statusBadge;
+    if (isTrial) {
+      statusBadge = '<span style="background:rgba(251,191,36,.15);color:#F59E0B;border:1px solid rgba(251,191,36,.3);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700">체험 기간 중</span>';
+    } else if (isRefundReq) {
+      statusBadge = '<span style="background:rgba(245,158,11,.15);color:#F59E0B;border:1px solid rgba(245,158,11,.3);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700">환불 요청</span>';
+    } else if (isRefunded) {
+      statusBadge = '<span style="background:rgba(139,92,246,.15);color:#8B5CF6;border:1px solid rgba(139,92,246,.3);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700">환불 완료</span>';
+    } else {
+      statusBadge = '<span style="background:rgba(16,185,129,.12);color:#10B981;border:1px solid rgba(16,185,129,.3);padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700">구독 중</span>';
+    }
+
+    let endLabel;
+    if (isTrial) endLabel = `체험 종료일: ${endStr}`;
+    else if (isRefunded) endLabel = '환불 완료 — 발송 중단됨';
+    else if (isRefundReq) endLabel = '환불 처리 중 — 발송 중단됨';
+    else endLabel = `만료일: ${endStr}`;
+
     const catLine  = cats ? `<div style="font-size:13px;font-weight:600;color:var(--text);margin-top:5px">📌 ${cats}</div>` : '';
+
+    // 환불 진행 상태 표시 (v147)
+    let refundProgressLine = '';
+    if (isViewOnly) {
+      refundProgressLine = `
+        <div style="margin-top:10px;padding:10px;background:rgba(255,255,255,.03);border-radius:8px;border:1px dashed var(--border)">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px">환불 진행 상태</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:11px">
+            <span style="color:${isRefundReq || isRefunded ? '#F59E0B' : 'var(--muted)'};font-weight:700">${isRefundReq || isRefunded ? '①' : '○'} 환불 요청</span>
+            <span style="color:var(--muted)">→</span>
+            <span style="color:${isRefunded ? '#8B5CF6' : 'var(--muted)'};font-weight:${isRefunded ? '700' : '400'}">${isRefunded ? '②' : '○'} 환불 완료</span>
+          </div>
+          <div style="font-size:10px;color:var(--muted);margin-top:6px;line-height:1.5">
+            ${isRefunded
+              ? '✅ 카드사로 환불 처리되었습니다. 영업일 3~7일 내 입금됩니다.'
+              : '🔄 환불 처리 중입니다. 처리 완료 시 알림톡으로 안내드립니다.'}
+          </div>
+        </div>`;
+    }
+
+    // 조회 전용 (refunded/refund_requested) — 클릭 비활성화
+    const clickAttr = isViewOnly
+      ? ''
+      : `onclick="selectCancelSub(cancelFoundList[${i}], ${totalSteps}, false)"`;
+    const cursorStyle = isViewOnly ? 'default' : 'pointer';
+    const hoverStyle  = isViewOnly ? '' :
+      `onmouseover="this.style.borderColor='var(--gold)';this.style.background='rgba(201,168,76,.06)'"
+       onmouseout="this.style.borderColor='var(--border)';this.style.background='rgba(255,255,255,.03)'"`;
+
     return `
-      <button onclick="selectCancelSub(cancelFoundList[${i}], ${totalSteps}, false)"
-        style="width:100%;background:rgba(255,255,255,.03);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;text-align:left;cursor:pointer;transition:all .2s;font-family:var(--sans)"
-        onmouseover="this.style.borderColor='var(--gold)';this.style.background='rgba(201,168,76,.06)'"
-        onmouseout="this.style.borderColor='var(--border)';this.style.background='rgba(255,255,255,.03)'">
+      <button ${clickAttr} ${hoverStyle}
+        style="width:100%;background:rgba(255,255,255,.03);border:1.5px solid var(--border);border-radius:10px;padding:14px 16px;text-align:left;cursor:${cursorStyle};transition:all .2s;font-family:var(--sans)">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
           <span style="font-size:14px;font-weight:700;color:var(--text)">${planLabel(sub.plan)} 플랜</span>
           ${statusBadge}
         </div>
         <div style="font-size:12px;color:var(--muted)">${endLabel}</div>
         ${catLine}
+        ${refundProgressLine}
       </button>`;
   }).join('');
 }

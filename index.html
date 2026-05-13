@@ -301,9 +301,9 @@ nav {
   .cs-hero-stats { flex-wrap:wrap; padding:12px 4px; }
   .cs-stat-divider { display:none; }
   .cs-info-box { flex-direction:column; gap:10px; }
-  /* v140: 모바일에서 category-page를 block으로 변경 — flex 정렬 영향 제거 */
+  /* [v157] 모바일: 비활성 페이지는 숨김. active일 때만 block (이전엔 모든 페이지가 보이는 버그) */
   .category-page {
-    display:block !important;
+    display:none !important;
     padding:90px 16px 60px;
     text-align:center;
   }
@@ -1430,7 +1430,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v156</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v157</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>

@@ -1430,7 +1430,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v155</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v156</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -3306,12 +3306,24 @@ async function _renderDetailSubtopics(catId) {
   const grid = document.getElementById('cdpSubtopicGrid');
   if (!section || !grid) return;
 
+  // [v156] 로딩 표시 — 모바일에서 늦어도 빈 화면 X
+  section.style.display = '';
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:24px;color:var(--muted);font-size:13px">부제목을 불러오는 중...</div>';
+
   const list = await loadSubtopicsForCategory(catId, false);
   if (list.length === 0) {
-    section.style.display = 'none';
+    // [v156] 부제목 없어도 섹션 숨기지 않고 "전체 신청하기" 옵션 표시
+    section.style.display = '';
+    grid.innerHTML = `
+      <div onclick="openModalWithCategory('${catId}')"
+        style="grid-column:1/-1;cursor:pointer;background:rgba(255,255,255,.025);border:1px solid rgba(201,168,76,.18);border-radius:14px;padding:28px 22px;text-align:center;display:flex;flex-direction:column;justify-content:center;min-height:160px"
+        onmouseover="this.style.borderColor='rgba(201,168,76,.5)'; this.style.background='rgba(201,168,76,.06)'"
+        onmouseout="this.style.borderColor='rgba(201,168,76,.18)'; this.style.background='rgba(255,255,255,.025)'">
+        <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:14px;line-height:1.4">신청하기</div>
+        <div style="font-size:11px;color:var(--muted);padding-top:14px;border-top:1px solid rgba(201,168,76,.1)">바로 신청</div>
+      </div>`;
     return;
   }
-  section.style.display = '';
 
   grid.innerHTML = list.map(s => `
     <div onclick="openModalWithCategoryAndSubtopic('${catId}', ${s.id}, '${(s.name || '').replace(/'/g, "\\'")}')"
@@ -3877,10 +3889,24 @@ async function loadSubtopicsForCategory(catId, force) {
   } catch (e) { /* 폴백으로 진행 */ }
 
   // 2순위: 직접 API 호출 (백엔드 구버전 호환)
-  if (!API_BASE) return [];
+  if (!API_BASE) {
+    _SUBTOPIC_CACHE[catId] = [];
+    return [];
+  }
   try {
-    const res = await fetch(API_BASE + '/admin/subtopics?category_id=' + encodeURIComponent(catId));
-    if (!res.ok) return [];
+    // [v156] timeout 추가 — 모바일 무한로딩 방지
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000);  // 6초
+
+    const res = await fetch(API_BASE + '/admin/subtopics?category_id=' + encodeURIComponent(catId), {
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+
+    if (!res.ok) {
+      _SUBTOPIC_CACHE[catId] = [];
+      return [];
+    }
     const data = await res.json();
     if (data && data.success && Array.isArray(data.data)) {
       const filtered = filterActive(data.data);
@@ -3888,36 +3914,20 @@ async function loadSubtopicsForCategory(catId, force) {
       return filtered;
     }
   } catch (e) {
-    // 로그 노이즈 줄이기 — 카테고리 응답에 subtopics 없으면 그냥 빈 배열로
+    console.warn('[부제목] 로드 실패 (timeout/network):', catId, e?.message || e);
   }
   _SUBTOPIC_CACHE[catId] = [];
   return [];
 }
 
 // 화면에 노출된 모든 [data-cat-subtopics] placeholder를 부제목 이름으로 채움
+// [v156] NO-OP — 본인 요청: 대분류 페이지에선 카테고리 카드만 보여주고, 부제목은 상세 페이지에서만
 async function _hydrateCardSubtopics() {
-  const els = document.querySelectorAll('[data-cat-subtopics]');
-  // 카테고리 ID 모음 (중복 제거)
-  const catIds = new Set();
-  els.forEach(el => {
-    const id = el.dataset.catSubtopics;
-    if (id) catIds.add(id);
-  });
-  // 카테고리별로 부제목 fetch
-  await Promise.all(Array.from(catIds).map(id => loadSubtopicsForCategory(id, false)));
-  // 채우기
-  els.forEach(el => {
-    const id = el.dataset.catSubtopics;
-    const list = _SUBTOPIC_CACHE[id] || [];
-    if (list.length === 0) {
-      el.style.display = 'none';
-      return;
-    }
-    // 한 줄에 한 부제목씩 — 칩 형태로 분리
-    el.innerHTML = list.map(s =>
-      '<span class="card-subtopic-chip">' + (s.name || '').replace(/</g,'&lt;') + '</span>'
-    ).join('');
-    el.style.display = '';
+  // 카드 안 부제목 칩 표시 비활성화 (대분류 페이지 단순화)
+  // 카드 안에는 카테고리 이름 + 설명만 표시
+  document.querySelectorAll('[data-cat-subtopics]').forEach(el => {
+    el.style.display = 'none';
+    el.innerHTML = '';
   });
 }
 

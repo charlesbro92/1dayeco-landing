@@ -1430,7 +1430,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v158</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v159</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -3533,32 +3533,21 @@ function _renderCategoryDetailFallback(catId) {
 
 // 카드 리스트 페이지 렌더 (전체 / 대분류별)
 async function renderCategoryListPage(filter) {
-  // [v158] 대분류 메타를 DB에서 동적 fetch (이전에는 SUPER_CATS 하드코딩)
-  // filter: 'all' | <super_category id> (예: 'finance', 'tech', 'language', 'work', 'knowledge', 'wellness')
-  const superCats = await loadSuperCategoriesFromAPI();  // [{id, name, emoji, subtitle, eyebrow, display_order, active}]
-  const superById = {};
-  superCats.forEach(s => { superById[s.id] = s; });
-
-  // 헤더 메타 결정
-  let headerMeta;
-  if (filter === 'all') {
-    headerMeta = { eyebrow: 'ALL', title: '전체 카테고리', sub: '관심 있는 카테고리를 선택해주세요.' };
-  } else {
-    const s = superById[filter];
-    if (s) {
-      headerMeta = {
-        eyebrow: s.eyebrow || (filter || '').toUpperCase(),
-        title:   `${s.emoji || '📌'} ${s.name}`,
-        sub:     s.subtitle || '',
-      };
-    } else {
-      // 알 수 없는 대분류 → 전체와 동일 처리
-      headerMeta = { eyebrow: (filter || '').toUpperCase(), title: '카테고리', sub: '' };
-    }
-  }
-  document.getElementById('catListEyebrow').textContent = headerMeta.eyebrow;
-  document.getElementById('catListTitle').innerHTML = headerMeta.title;
-  document.getElementById('catListSubtitle').textContent = headerMeta.sub;
+  // [v152] 모바일 친화 — 헤더 컴팩트화 + 카테고리만 평면 표시
+  // filter: 'all' | 'finance' | 'tech' | 'language' | 'work' | 'knowledge' | 'wellness'
+  const SUPER_CATS = {
+    all:       { eyebrow: 'ALL',             title: '전체 카테고리',     sub: '관심 있는 카테고리를 선택해주세요.' },
+    finance:   { eyebrow: 'FINANCE',         title: '💰 금융·투자',     sub: '경제 흐름과 시장 움직임을 짧게.' },
+    tech:      { eyebrow: 'TECH',            title: '💻 테크·디지털',   sub: 'IT·AI·디지털 도구 트렌드.' },
+    language:  { eyebrow: 'LANGUAGE',        title: '🌐 외국어',         sub: '비즈니스부터 여행까지.' },
+    work:      { eyebrow: 'WORK',            title: '💼 일·업무',       sub: '회사에서 한 단계 올라가는 인사이트.' },
+    knowledge: { eyebrow: 'KNOWLEDGE',       title: '📚 교양·지식',     sub: '내 삶에 도움 되는 실용 지식.' },
+    wellness:  { eyebrow: 'WELLNESS',        title: '🌱 건강·일상',     sub: '몸과 일상을 가볍게 정돈.' },
+  };
+  const meta = SUPER_CATS[filter] || SUPER_CATS.all;
+  document.getElementById('catListEyebrow').textContent = meta.eyebrow;
+  document.getElementById('catListTitle').innerHTML = meta.title;
+  document.getElementById('catListSubtitle').textContent = meta.sub;
 
   let activeCats = [];
   let comingSoonCats = [];
@@ -3611,15 +3600,19 @@ async function renderCategoryListPage(filter) {
       </div>`;
   };
 
-  // [v158] 전체 탭: 대분류 메타를 DB에서 받아 그룹 헤더 동적 생성
+  // [v152] 단순화: 대분류 선택 시 그 그룹의 카테고리만 평면 표시 (소그룹 헤더 제거)
+  // 전체 탭: 대분류별 그룹핑 유지
   if (filter === 'all') {
-    // active한 대분류만 display_order 순으로 정렬
-    const sortedSupers = superCats
-      .filter(s => s.active !== false)
-      .sort((a, b) => (a.display_order || 999) - (b.display_order || 999));
-
+    const SUPER_CATS_LIST = [
+      { id: 'finance',   emoji: '💰', label: '금융·투자' },
+      { id: 'tech',      emoji: '💻', label: '테크·디지털' },
+      { id: 'language',  emoji: '🌐', label: '외국어' },
+      { id: 'work',      emoji: '💼', label: '일·업무' },
+      { id: 'knowledge', emoji: '📚', label: '교양·지식' },
+      { id: 'wellness',  emoji: '🌱', label: '건강·일상' },
+    ];
     const grouped = {};
-    sortedSupers.forEach(s => { grouped[s.id] = { active: [], coming: [] }; });
+    SUPER_CATS_LIST.forEach(s => { grouped[s.id] = { active: [], coming: [] }; });
     const ungrouped = { active: [], coming: [] };
     filteredActive.forEach(c => {
       const sc = c.super_category || 'finance';
@@ -3632,13 +3625,13 @@ async function renderCategoryListPage(filter) {
       else ungrouped.coming.push(c);
     });
 
-    const html = sortedSupers.map(s => {
+    const html = SUPER_CATS_LIST.map(s => {
       const g = grouped[s.id];
       const total = g.active.length + g.coming.length;
       if (total === 0) return '';
       const header = `<div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:18px 0 6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.15)">
-        <span style="font-size:18px">${s.emoji || '📌'}</span>
-        <span style="font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px">${s.name}</span>
+        <span style="font-size:18px">${s.emoji}</span>
+        <span style="font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px">${s.label}</span>
         <span style="font-size:11px;color:var(--muted);margin-left:auto">${total}개</span>
       </div>`;
       return header + g.active.map(buildActiveCard).join('') + g.coming.map(buildComingCard).join('');
@@ -3873,56 +3866,6 @@ function toggleTheme() {
 // ── 카테고리 정보 로드 (백엔드 API 또는 폴백) ──
 let _categoriesCache = null;
 let _categoriesCachePromise = null;
-
-// [v158] 대분류 메타 캐시 (DB의 super_categories 테이블 → /admin/super-categories)
-let _superCategoriesCache = null;
-let _superCategoriesCachePromise = null;
-
-async function loadSuperCategoriesFromAPI() {
-  if (_superCategoriesCache) return _superCategoriesCache;
-  if (_superCategoriesCachePromise) return _superCategoriesCachePromise;
-
-  // 폴백 (API 실패 시 사용) — 기본 6개 대분류
-  const fallback = [
-    { id: 'finance',   name: '금융·투자',   emoji: '💰', subtitle: '경제 흐름과 시장 움직임을 짧게.',     eyebrow: 'FINANCE',   display_order: 1, active: true },
-    { id: 'tech',      name: '테크·디지털', emoji: '💻', subtitle: 'IT·AI·디지털 도구 트렌드.',           eyebrow: 'TECH',      display_order: 2, active: true },
-    { id: 'language',  name: '외국어',       emoji: '🌐', subtitle: '비즈니스부터 여행까지.',                eyebrow: 'LANGUAGE',  display_order: 3, active: true },
-    { id: 'work',      name: '일·업무',     emoji: '💼', subtitle: '회사에서 한 단계 올라가는 인사이트.', eyebrow: 'WORK',      display_order: 4, active: true },
-    { id: 'knowledge', name: '교양·지식',   emoji: '📚', subtitle: '내 삶에 도움 되는 실용 지식.',        eyebrow: 'KNOWLEDGE', display_order: 5, active: true },
-    { id: 'wellness',  name: '건강·일상',   emoji: '🌱', subtitle: '몸과 일상을 가볍게 정돈.',            eyebrow: 'WELLNESS',  display_order: 6, active: true },
-  ];
-
-  const promise = (async () => {
-    try {
-      if (!API_BASE) return fallback;
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 6000);
-      const r = await fetch(API_BASE + '/admin/super-categories', { signal: controller.signal });
-      clearTimeout(timeoutId);
-      if (!r.ok) return fallback;
-      const d = await r.json();
-      const rows = (d && Array.isArray(d.data)) ? d.data : [];
-      if (rows.length === 0) return fallback;
-      // 응답 정규화 (필드 누락 시 폴백 값으로 보강)
-      return rows.map(r => ({
-        id:            r.id,
-        name:          r.name || r.id,
-        emoji:         r.emoji || '📌',
-        subtitle:      r.subtitle || '',
-        eyebrow:       r.eyebrow || (r.id || '').toUpperCase(),
-        display_order: r.display_order ?? 999,
-        active:        r.active !== false,
-      }));
-    } catch (e) {
-      console.warn('[대분류] 로드 실패, 폴백 사용:', e?.message || e);
-      return fallback;
-    }
-  })();
-
-  _superCategoriesCachePromise = promise;
-  promise.then(d => { _superCategoriesCache = d; });
-  return promise;
-}
 
 // 부제목 캐시 (카테고리별)
 const _SUBTOPIC_CACHE = {};
@@ -6220,6 +6163,8 @@ async function cancelConfirm() {
     let refundAmount = 0;
     let refundPhase = 0;
     let refundMessage = '';
+    let autoProcessed = true;     // [v159] 백엔드 응답으로 결정
+    let requiresAdmin = false;
     if (API_BASE) {
       // subscriber_id 기준으로 특정 구독만 환불 (다중 구독 안전)
       const res = await apiPost('/api/cancel/' + cancelCurrentSub.id, {});
@@ -6227,25 +6172,50 @@ async function cancelConfirm() {
       refundAmount  = res.refund_amount || 0;
       refundPhase   = res.phase || 0;
       refundMessage = res.message || '';
+      // [v159] 자동/수동 모드 정보
+      if (typeof res.auto_processed !== 'undefined') autoProcessed = !!res.auto_processed;
+      if (typeof res.requires_admin !== 'undefined') requiresAdmin = !!res.requires_admin;
     } else {
       await new Promise(r => setTimeout(r, 700));
     }
     document.getElementById('cancelDoneEmoji').textContent = '✅';
-    document.getElementById('cancelDoneTitle').textContent = '환불 신청 완료';
-    // 환불액에 따라 동적 메시지
-    let msg = '';
-    if (refundAmount > 0) {
-      msg = `환불 금액 <strong style="color:var(--gold)">₩${refundAmount.toLocaleString()}</strong>이 영업일 기준 3~7일 내 카드사를 통해 환불됩니다.<br>` +
-            `카카오톡 콘텐츠 발송은 즉시 중단되었습니다.`;
+
+    // [v159] 모드별 화면 분기
+    let title, msg;
+    if (autoProcessed) {
+      // 자동 모드: 카드사 환불 처리 진행됨
+      title = '환불 처리 완료';
+      if (refundAmount > 0) {
+        msg = `환불 금액 <strong style="color:var(--gold)">₩${refundAmount.toLocaleString()}</strong>이 카드사로 환불 처리되었습니다.<br>` +
+              `영업일 기준 <strong>3~7일 내</strong> 카드 명세서에 반영됩니다.<br>` +
+              `카카오톡 콘텐츠 발송은 즉시 중단되었습니다.`;
+      } else {
+        msg = '환불 가능 금액이 없습니다.<br>카카오톡 콘텐츠 발송은 즉시 중단되었습니다.<br>언제든지 다시 신청하실 수 있습니다.';
+      }
     } else {
-      msg = '환불 가능 금액이 없습니다. 카카오톡 콘텐츠 발송은 즉시 중단되었습니다.<br>언제든지 다시 신청하실 수 있습니다.';
+      // 수동 모드: 어드민 검토 대기
+      title = '환불 요청 접수 완료';
+      msg = '환불 요청이 정상적으로 접수되었습니다.<br>' +
+            '카카오톡 콘텐츠 발송은 즉시 중단되었습니다.<br><br>' +
+            '<strong style="color:var(--gold)">고객센터에서 빠르게 검토</strong>한 후 처리하며,<br>' +
+            '카드사에서 영업일 <strong>3~7일</strong> 내 환불됩니다.<br><br>' +
+            '문의: 카카오톡 <strong style="color:var(--gold)">@1DAYECO</strong>';
     }
+    document.getElementById('cancelDoneTitle').textContent = title;
     document.getElementById('cancelDoneMsg').innerHTML = msg;
     document.getElementById('cancelStep3').style.display = 'none';
     document.getElementById('cancelStep4').style.display = 'block';
   } catch(e) {
     console.error('cancelConfirm error:', e);
-    showToast((e && e.message) || '환불 처리 중 오류. 카카오톡 @1DAYECO로 문의해 주세요', 'ng');
+    // [v159] 자동 모드에서 실패 시 명확하게 안내
+    document.getElementById('cancelDoneEmoji').textContent = '⚠️';
+    document.getElementById('cancelDoneTitle').textContent = '환불 처리 실패';
+    document.getElementById('cancelDoneMsg').innerHTML =
+      '환불 처리 중 오류가 발생했습니다.<br>' +
+      `<span style="color:var(--muted);font-size:13px">${(e && e.message) || '카드사 연동 오류'}</span><br><br>` +
+      '카카오톡 <strong style="color:var(--gold)">@1DAYECO</strong>로 문의해 주세요. 빠르게 도와드립니다.';
+    document.getElementById('cancelStep3').style.display = 'none';
+    document.getElementById('cancelStep4').style.display = 'block';
   } finally {
     btn.disabled = false;
     spin.style.display = 'none';

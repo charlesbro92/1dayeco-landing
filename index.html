@@ -1434,7 +1434,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v161</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v162</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -6202,7 +6202,8 @@ async function cancelConfirm() {
       title = '환불 요청 접수 완료';
       msg = '환불 요청이 정상적으로 접수되었습니다.<br>' +
             '카카오톡 콘텐츠 발송은 즉시 중단되었습니다.<br><br>' +
-            '<strong style="color:var(--gold)">고객센터에서 빠르게 검토</strong>한 후 처리하며,<br>' +
+            '<strong style="color:var(--gold)">환불 보장 기간</strong>인 경우 즉시 환불 처리됩니다.<br>' +
+            '그 외에는 <strong style="color:var(--gold)">고객센터에서 순차적으로 검토</strong>한 후 처리하며,<br>' +
             '카드사에서 영업일 <strong>3~7일</strong> 내 환불됩니다.<br><br>' +
             '문의: 카카오톡 <strong style="color:var(--gold)">@1DAYECO</strong>';
     }
@@ -6210,25 +6211,6 @@ async function cancelConfirm() {
     document.getElementById('cancelDoneMsg').innerHTML = msg;
     document.getElementById('cancelStep3').style.display = 'none';
     document.getElementById('cancelStep4').style.display = 'block';
-
-    // [v160 진단] 응답에 어떤 정보가 왔는지 화면 하단에 표시
-    try {
-      let dbg = document.getElementById('__v160_refund_dbg');
-      if (!dbg) {
-        dbg = document.createElement('div');
-        dbg.id = '__v160_refund_dbg';
-        dbg.style.cssText = 'margin-top:16px;padding:10px 12px;background:rgba(0,0,0,.4);border:1px dashed #555;border-radius:6px;font-family:monospace;font-size:10px;line-height:1.6;color:#aaa;text-align:left;letter-spacing:0';
-        document.getElementById('cancelStep4').appendChild(dbg);
-      }
-      dbg.innerHTML =
-        '<strong style="color:#fbbf24">[v160 진단]</strong><br>' +
-        'autoProcessed: <strong>' + autoProcessed + '</strong><br>' +
-        'requiresAdmin: <strong>' + requiresAdmin + '</strong><br>' +
-        '표시 화면: <strong>' + (autoProcessed ? '환불 처리 완료 (자동)' : '환불 요청 접수 완료 (수동)') + '</strong><br>' +
-        'api_version: ' + (window.__last_cancel_response?._debug?.api_version || '?') + '<br>' +
-        'auto_refund_enabled_db: ' + (window.__last_cancel_response?._debug?.auto_refund_enabled_db ?? '?') + '<br>' +
-        '(이 박스는 진단용. 다음 버전에서 제거)';
-    } catch(_dbg_e) {}
   } catch(e) {
     console.error('cancelConfirm error:', e);
     document.getElementById('cancelDoneEmoji').textContent = '⚠️';
@@ -6345,7 +6327,7 @@ async function refundRequest() {
       title = '환불 요청 접수 완료';
       msg = '환불 요청이 정상적으로 접수되었습니다.<br>' +
             '카카오톡 콘텐츠 발송이 즉시 중단되었습니다.<br><br>' +
-            '<strong style="color:var(--gold)">고객센터에서 빠르게 검토</strong>한 후 처리하며,<br>' +
+            '<strong style="color:var(--gold)">고객센터에서 순차적으로 검토</strong>한 후 처리하며,<br>' +
             '카드사에서 영업일 <strong>3~7일</strong> 내 환불됩니다.<br><br>' +
             '문의: 카카오톡 <strong style="color:var(--gold)">@1DAYECO</strong>';
     }

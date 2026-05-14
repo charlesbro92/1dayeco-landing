@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- [v161] 캐시 방지 — GitHub Pages 캐시 강제 무효화 -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>1DAYECO — 매일 아침 카카오톡으로 받는 1분 인사이트</title>
 <script src="https://cdn.portone.io/v2/browser-sdk.js"></script>
 <style>
@@ -1430,7 +1434,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v159</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v161</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -6168,6 +6172,7 @@ async function cancelConfirm() {
     if (API_BASE) {
       // subscriber_id 기준으로 특정 구독만 환불 (다중 구독 안전)
       const res = await apiPost('/api/cancel/' + cancelCurrentSub.id, {});
+      window.__last_cancel_response = res;  // [v160] 진단 박스용
       if (res && res.success === false) throw new Error(res.message || '환불 처리 실패');
       refundAmount  = res.refund_amount || 0;
       refundPhase   = res.phase || 0;
@@ -6205,9 +6210,27 @@ async function cancelConfirm() {
     document.getElementById('cancelDoneMsg').innerHTML = msg;
     document.getElementById('cancelStep3').style.display = 'none';
     document.getElementById('cancelStep4').style.display = 'block';
+
+    // [v160 진단] 응답에 어떤 정보가 왔는지 화면 하단에 표시
+    try {
+      let dbg = document.getElementById('__v160_refund_dbg');
+      if (!dbg) {
+        dbg = document.createElement('div');
+        dbg.id = '__v160_refund_dbg';
+        dbg.style.cssText = 'margin-top:16px;padding:10px 12px;background:rgba(0,0,0,.4);border:1px dashed #555;border-radius:6px;font-family:monospace;font-size:10px;line-height:1.6;color:#aaa;text-align:left;letter-spacing:0';
+        document.getElementById('cancelStep4').appendChild(dbg);
+      }
+      dbg.innerHTML =
+        '<strong style="color:#fbbf24">[v160 진단]</strong><br>' +
+        'autoProcessed: <strong>' + autoProcessed + '</strong><br>' +
+        'requiresAdmin: <strong>' + requiresAdmin + '</strong><br>' +
+        '표시 화면: <strong>' + (autoProcessed ? '환불 처리 완료 (자동)' : '환불 요청 접수 완료 (수동)') + '</strong><br>' +
+        'api_version: ' + (window.__last_cancel_response?._debug?.api_version || '?') + '<br>' +
+        'auto_refund_enabled_db: ' + (window.__last_cancel_response?._debug?.auto_refund_enabled_db ?? '?') + '<br>' +
+        '(이 박스는 진단용. 다음 버전에서 제거)';
+    } catch(_dbg_e) {}
   } catch(e) {
     console.error('cancelConfirm error:', e);
-    // [v159] 자동 모드에서 실패 시 명확하게 안내
     document.getElementById('cancelDoneEmoji').textContent = '⚠️';
     document.getElementById('cancelDoneTitle').textContent = '환불 처리 실패';
     document.getElementById('cancelDoneMsg').innerHTML =
@@ -6289,6 +6312,8 @@ async function refundRequest() {
   btn.style.opacity = '.7';
   spin.style.display = 'inline-flex';
   try {
+    let autoProcessed = false;  // [v159] 어드민 환불 경로는 기본 수동
+    let refundAmount = 0;
     if (API_BASE) {
       const res = await apiPost('/api/admin/refund-request', {
         subscriber_id: cancelCurrentSub.id,
@@ -6297,15 +6322,35 @@ async function refundRequest() {
         account_name:  acctName,
       });
       if (res && res.success === false) throw new Error(res.message || '요청 처리 실패');
+      // [v159] 응답에서 모드 정보 받기 (admin_refund_request는 항상 auto_processed:false)
+      if (res && typeof res.auto_processed !== 'undefined') autoProcessed = !!res.auto_processed;
+      if (res && typeof res.refund_amount !== 'undefined') refundAmount = res.refund_amount || 0;
     } else {
       await new Promise(r => setTimeout(r, 700));
     }
     document.getElementById('cancelDoneEmoji').textContent = '✅';
-    document.getElementById('cancelDoneTitle').textContent = '환불 처리 완료';
-    document.getElementById('cancelDoneMsg').innerHTML =
-      '환불이 정상 처리되었습니다.<br>콘텐츠 발송이 즉시 중단됩니다.<br><br>' +
-      '결제하신 카드사로 영업일 3~7일 내 환불됩니다.<br><br>' +
-      '문의: 카카오톡 <strong style="color:var(--gold)">@1DAYECO</strong>';
+
+    // [v159] 모드별 화면 분기
+    let title, msg;
+    if (autoProcessed) {
+      title = '환불 처리 완료';
+      msg = (refundAmount > 0
+              ? `환불 금액 <strong style="color:var(--gold)">₩${refundAmount.toLocaleString()}</strong>이 카드사로 환불 처리되었습니다.<br>` +
+                `영업일 기준 <strong>3~7일 내</strong> 카드 명세서에 반영됩니다.<br>`
+              : '환불이 정상 처리되었습니다.<br>'
+            ) +
+            '카카오톡 콘텐츠 발송이 즉시 중단되었습니다.';
+    } else {
+      // 수동 모드: 어드민 검토 대기 (계좌 입력 케이스 — 보장기간 외)
+      title = '환불 요청 접수 완료';
+      msg = '환불 요청이 정상적으로 접수되었습니다.<br>' +
+            '카카오톡 콘텐츠 발송이 즉시 중단되었습니다.<br><br>' +
+            '<strong style="color:var(--gold)">고객센터에서 빠르게 검토</strong>한 후 처리하며,<br>' +
+            '카드사에서 영업일 <strong>3~7일</strong> 내 환불됩니다.<br><br>' +
+            '문의: 카카오톡 <strong style="color:var(--gold)">@1DAYECO</strong>';
+    }
+    document.getElementById('cancelDoneTitle').textContent = title;
+    document.getElementById('cancelDoneMsg').innerHTML = msg;
     document.getElementById('cancelStep3').style.display = 'none';
     document.getElementById('cancelStep4').style.display = 'block';
     for (let n = 1; n <= 4; n++) {
@@ -6317,7 +6362,15 @@ async function refundRequest() {
     }
   } catch(e) {
     console.error('refundRequest error:', e);
-    showToast((e && e.message) || '요청 처리 중 오류. 카카오톡 @1DAYECO로 문의해 주세요', 'ng');
+    // [v159] 실패 시도 화면 분기로 — 토스트만 띄우면 무한루프
+    document.getElementById('cancelDoneEmoji').textContent = '⚠️';
+    document.getElementById('cancelDoneTitle').textContent = '환불 처리 실패';
+    document.getElementById('cancelDoneMsg').innerHTML =
+      '환불 요청 처리 중 오류가 발생했습니다.<br>' +
+      `<span style="color:var(--muted);font-size:13px">${(e && e.message) || '서버 통신 오류'}</span><br><br>` +
+      '카카오톡 <strong style="color:var(--gold)">@1DAYECO</strong>로 문의해 주세요. 빠르게 도와드립니다.';
+    document.getElementById('cancelStep3').style.display = 'none';
+    document.getElementById('cancelStep4').style.display = 'block';
   } finally {
     btn.disabled = false;
     btn.style.opacity = '1';

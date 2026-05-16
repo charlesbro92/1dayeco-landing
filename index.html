@@ -1434,7 +1434,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v170</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v171</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -6363,6 +6363,8 @@ async function refundRequest() {
     if (API_BASE) {
       const res = await apiPost('/api/admin/refund-request', {
         subscriber_id: cancelCurrentSub.id,
+        source:        'landing',          // [v171] 출처 명시 (랜딩 고객 직접 요청)
+        reason:        '고객 환불 요청',    // [v171] 사유 명시
         bank_name:     bank,
         bank_account:  acct,
         account_name:  acctName,

@@ -1434,7 +1434,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v169</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v170</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -6051,6 +6051,7 @@ function renderSubList(rows, totalSteps) {
 
     const endKey  = isTrial ? (sub.trial_end || sub.trialEnd) : sub.end_date;
     const endStr  = fmtDate(endKey);
+    const startStr = fmtDate(sub.start_date);  // [v170] 시작일
     // [v168] 카테고리 이름 — 백엔드 /api/lookup이 category_name 제공 (api-v152+)
     //  어드민이 표시하는 DB의 실제 카테고리 이름 (예: "시트콤 영어") 사용
     //  하드코딩 catLabels는 fallback으로만 사용 (옛 응답 호환)
@@ -6074,7 +6075,7 @@ function renderSubList(rows, totalSteps) {
     if (isTrial) endLabel = `체험 종료일: ${endStr}`;
     else if (isRefunded) endLabel = '환불 완료 — 발송 중단됨';
     else if (isRefundReq) endLabel = '환불 처리 중 — 발송 중단됨';
-    else endLabel = `만료일: ${endStr}`;
+    else endLabel = `시작일: ${startStr} ~ 만료일: ${endStr}`;  // [v170] 시작일 추가
 
     // [v168] 카테고리 / 부제목 — 분리 표시 (만료일 위)
     //  순서: 플랜명 → 카테고리(DB name) → 부제목(DB name) → 만료일
@@ -6133,26 +6134,33 @@ async function selectCancelSub(sub, totalSteps, skipStep2) {
   cancelCurrentSub._inputName = _cancelInputName;
   const isTrial = sub.status === 'trial';
   const ts = totalSteps || (isTrial ? 3 : 4);
-  const cats = catLabels(sub.categories);
+  // [v170] 카테고리/부제목 — DB의 실제 이름 사용 (어드민과 동기화)
+  const catName = (sub.category_name || '').trim() || catLabels(sub.categories);
+  const subtopicName = (sub.subtopic_name || '').trim();
+  const startStr = fmtDate(sub.start_date);  // [v170] 시작일
 
   if (isTrial) {
     document.getElementById('cancelStep3Trial').style.display  = 'block';
     document.getElementById('cancelStep3Refund').style.display = 'none';
     document.getElementById('cancelSubName').textContent = (sub.name || '고객') + ' 님';
     const endStr = fmtDate(sub.trial_end || sub.trialEnd);
+    // [v170] 카테고리(DB) + 부제목 + 시작일~체험종료일
     document.getElementById('cancelSubDetail').innerHTML =
       '플랜: <strong>' + planLabel(sub.plan) + '</strong>' +
-      (cats ? '<br><span style="font-size:14px;font-weight:600;color:var(--text)">📌 ' + cats + '</span>' : '') +
-      ' &nbsp;|&nbsp; 체험 종료일: <strong>' + endStr + '</strong>';
+      (catName ? '<br><span style="font-size:14px;font-weight:600;color:var(--text)">📌 ' + catName + '</span>' : '') +
+      (subtopicName ? '<br><span style="font-size:12px;color:var(--muted)">' + subtopicName + '</span>' : '') +
+      '<br><span style="font-size:12px;color:var(--muted)">시작일: <strong>' + startStr + '</strong> ~ 체험 종료일: <strong>' + endStr + '</strong></span>';
   } else {
     document.getElementById('cancelStep3Trial').style.display  = 'none';
     document.getElementById('cancelStep3Refund').style.display = 'block';
     document.getElementById('refundSubName').textContent = (sub.name || '고객') + ' 님';
     const endStr = fmtDate(sub.end_date);
+    // [v170] 카테고리(DB) + 부제목 + 시작일~만료일
     document.getElementById('refundSubDetail').innerHTML =
       '플랜: <strong>' + planLabel(sub.plan) + '</strong>' +
-      (cats ? '<br><span style="font-size:14px;font-weight:600;color:var(--text)">📌 ' + cats + '</span>' : '') +
-      ' &nbsp;|&nbsp; 만료일: <strong>' + endStr + '</strong>';
+      (catName ? '<br><span style="font-size:14px;font-weight:600;color:var(--text)">📌 ' + catName + '</span>' : '') +
+      (subtopicName ? '<br><span style="font-size:12px;color:var(--muted)">' + subtopicName + '</span>' : '') +
+      '<br><span style="font-size:12px;color:var(--muted)">시작일: <strong>' + startStr + '</strong> ~ 만료일: <strong>' + endStr + '</strong></span>';
 
     // 환불액 계산 UI 초기화
     document.getElementById('refundCalcBox').style.display     = 'none';

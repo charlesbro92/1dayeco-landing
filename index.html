@@ -1434,7 +1434,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v167</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v169</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -6051,7 +6051,10 @@ function renderSubList(rows, totalSteps) {
 
     const endKey  = isTrial ? (sub.trial_end || sub.trialEnd) : sub.end_date;
     const endStr  = fmtDate(endKey);
-    const cats    = catLabels(sub.categories);
+    // [v168] 카테고리 이름 — 백엔드 /api/lookup이 category_name 제공 (api-v152+)
+    //  어드민이 표시하는 DB의 실제 카테고리 이름 (예: "시트콤 영어") 사용
+    //  하드코딩 catLabels는 fallback으로만 사용 (옛 응답 호환)
+    const catName = (sub.category_name || '').trim() || catLabels(sub.categories);
     // [v167] 부제목 — 백엔드 /api/lookup이 subtopic_name 제공 (api-v151+)
     const subtopicName = (sub.subtopic_name || '').trim();
 
@@ -6073,10 +6076,10 @@ function renderSubList(rows, totalSteps) {
     else if (isRefundReq) endLabel = '환불 처리 중 — 발송 중단됨';
     else endLabel = `만료일: ${endStr}`;
 
-    // [v167] 카테고리 / 부제목 — 분리 표시 (만료일 위)
-    //  순서: 플랜명 → 카테고리 → 부제목 → 만료일
-    const catLine = cats
-      ? `<div style="font-size:13px;font-weight:600;color:var(--text);margin-top:6px">📌 ${cats}</div>`
+    // [v168] 카테고리 / 부제목 — 분리 표시 (만료일 위)
+    //  순서: 플랜명 → 카테고리(DB name) → 부제목(DB name) → 만료일
+    const catLine = catName
+      ? `<div style="font-size:13px;font-weight:600;color:var(--text);margin-top:6px">📌 ${catName}</div>`
       : '';
     // subtopic_name 없으면 — 표기 (옛 가입자 호환)
     const subtopicLine = `<div style="font-size:12px;color:var(--muted);margin-top:3px">${subtopicName || '—'}</div>`;

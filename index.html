@@ -1434,7 +1434,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v166</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v167</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -6042,13 +6042,18 @@ function renderSubList(rows, totalSteps) {
   const listEl = document.getElementById('cancelSubList');
   listEl.innerHTML = rows.map((sub, i) => {
     const isTrial = sub.status === 'trial';
-    const isRefundReq = ['refund_requested','refund_protected_ended'].includes(sub.status);
-    const isRefunded  = sub.status === 'refunded';
+    // [v167] refund_protected_ended는 보장환불 즉시완료 — UI상 환불완료로 표시
+    //  - DB status 값은 그대로 유지 (7일 쿨다운 로직 영향 없음)
+    //  - 'refund_requested'만 진행 중으로 표시
+    const isRefundReq = sub.status === 'refund_requested';
+    const isRefunded  = sub.status === 'refunded' || sub.status === 'refund_protected_ended';
     const isViewOnly  = isRefundReq || isRefunded;  // 조회 전용 (재처리 불가)
 
     const endKey  = isTrial ? (sub.trial_end || sub.trialEnd) : sub.end_date;
     const endStr  = fmtDate(endKey);
     const cats    = catLabels(sub.categories);
+    // [v167] 부제목 — 백엔드 /api/lookup이 subtopic_name 제공 (api-v151+)
+    const subtopicName = (sub.subtopic_name || '').trim();
 
     // 상태별 배지 (v147)
     let statusBadge;
@@ -6068,7 +6073,13 @@ function renderSubList(rows, totalSteps) {
     else if (isRefundReq) endLabel = '환불 처리 중 — 발송 중단됨';
     else endLabel = `만료일: ${endStr}`;
 
-    const catLine  = cats ? `<div style="font-size:13px;font-weight:600;color:var(--text);margin-top:5px">📌 ${cats}</div>` : '';
+    // [v167] 카테고리 / 부제목 — 분리 표시 (만료일 위)
+    //  순서: 플랜명 → 카테고리 → 부제목 → 만료일
+    const catLine = cats
+      ? `<div style="font-size:13px;font-weight:600;color:var(--text);margin-top:6px">📌 ${cats}</div>`
+      : '';
+    // subtopic_name 없으면 — 표기 (옛 가입자 호환)
+    const subtopicLine = `<div style="font-size:12px;color:var(--muted);margin-top:3px">${subtopicName || '—'}</div>`;
 
     // 환불 진행 상태 표시 (v147)
     let refundProgressLine = '';
@@ -6105,8 +6116,9 @@ function renderSubList(rows, totalSteps) {
           <span style="font-size:14px;font-weight:700;color:var(--text)">${planLabel(sub.plan)} 플랜</span>
           ${statusBadge}
         </div>
-        <div style="font-size:12px;color:var(--muted)">${endLabel}</div>
         ${catLine}
+        ${subtopicLine}
+        <div style="font-size:12px;color:var(--muted);margin-top:6px">${endLabel}</div>
         ${refundProgressLine}
       </button>`;
   }).join('');

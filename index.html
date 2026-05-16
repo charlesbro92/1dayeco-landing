@@ -1465,7 +1465,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v176</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v177</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -4456,10 +4456,11 @@ function updatePlanSummary(plan) {
 
   if (plan === 'monthly') {
     summary.style.display = 'block';
-    if (finalEl)   finalEl.textContent   = `₩${fmt(price)}/월`;
+    // [v177] 1개월은 일시불 (자동 갱신 X) — /월 제거 + 할인 표시 없음
+    if (finalEl)   finalEl.textContent   = `₩${fmt(price)}`;
     if (origEl)    origEl.textContent    = '';
-    if (discBadge) discBadge.textContent = '자동 갱신';
-    if (savedLine) savedLine.textContent = '매달 자동 결제';
+    if (discBadge) discBadge.textContent = '할인 0%';
+    if (savedLine) savedLine.textContent = '일회성 결제';
     return;
   }
 
@@ -5692,20 +5693,22 @@ function updateFirstSendInfo() {
   if (doneHourEl) doneHourEl.textContent = FIXED_SEND_HOUR + '시';
 
   // [옵션 B v102] 결제 완료 화면 동적 데이터
-  // 결제 금액
+  // 결제 금액 — [v177] currentPlan 기반 우선 (prepareMeta 잘못 들어와도 안전)
   const paidAmountEl = document.getElementById('donePaidAmount');
   if (paidAmountEl) {
-    const amt = (prepareMeta && prepareMeta.paid_amount)
-                || ({monthly:9900, pkg3m:19900, pkg6m:24900, pkg1y:41900}[currentPlan] || 0);
+    const PLAN_AMT = {monthly:9900, pkg3m:19900, pkg6m:24900, pkg1y:41900};
+    const planAmt = PLAN_AMT[currentPlan] || 0;
+    // prepareMeta가 currentPlan과 일치하는 경우만 사용 — 아니면 plan 기반으로
+    const metaAmt = (prepareMeta && prepareMeta.paid_amount) || 0;
+    const amt = (metaAmt && metaAmt === planAmt) ? metaAmt : planAmt;
     paidAmountEl.textContent = `결제 완료 ₩${amt.toLocaleString()}`;
   }
   // 환불 정책
   const refundEl = document.getElementById('doneRefundPolicy');
   if (refundEl) {
     const days = REFUND_PHASE1_DAYS[currentPlan] || 0;
-    refundEl.textContent = days > 0
-      ? `${days}일 이내 해지 시 100% 환불 보장`
-      : '일할 환불 적용';
+    // [v177] monthly(0일)도 "0일 이내 해지 시 100% 환불 보장"으로 명시
+    refundEl.textContent = `${days}일 이내 해지 시 100% 환불 보장 · 약관에 따라 일할 환불`;
   }
 }
 

@@ -1434,7 +1434,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v172</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v173</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1804,11 +1804,30 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   </div>
 
   <!-- 탭 — 옵션 B에서 1개월권 제외, 패키지만 운영 -->
-  <!-- (1개월권 탭 제거됨 v102) -->
+  <!-- (v173: 1개월권 다시 활성화 — 일시불 일회성 결제) -->
 
-  <!-- 탭 1: 일시불 (3개월 / 6개월 / 1년) - 유일한 패널 -->
+  <!-- 탭 1: 일시불 (1개월 / 3개월 / 6개월 / 1년) - 유일한 패널 -->
   <div class="plan-panel active" id="panel-onetime">
     <div class="plans">
+
+      <!-- 1개월 [v173] -->
+      <div class="plan">
+        <div class="plan-name">1개월 <span style="font-size:14px;color:var(--muted);font-weight:600">(30일)</span></div>
+        <div class="plan-trial-badge" style="background:rgba(120,120,120,.15);color:var(--muted)">환불 보장 없음</div>
+        <div class="plan-price-original" style="visibility:hidden">정가 ₩9,900</div>
+        <div class="plan-price"><span class="w">₩</span><span id="price-monthly">9,900</span></div>
+        <div class="plan-mo" id="price-monthly-mo">
+          <strong style="color:var(--gold);font-size:15px">하루 ₩330</strong>
+        </div>
+        <ul class="plan-feats">
+          <li>매일 1편 카테고리 콘텐츠</li>
+          <li>선택한 카테고리 집중 발송</li>
+          <li>30일 발송 · 일시불 ₩9,900</li>
+          <li>환불 보장 없음 (단기 체험 플랜)</li>
+          <li>자동 갱신 없음 · 일회성 결제</li>
+        </ul>
+        <button class="plan-btn" onclick="openModal('monthly')">지금 시작하기</button>
+      </div>
 
       <!-- 3개월 -->
       <div class="plan">
@@ -2135,6 +2154,7 @@ HIDDEN_COMINGSOON_MODAL_END -->
       <div class="field" id="planField">
         <label>구독 플랜 선택 <span style="font-size:11px;color:var(--muted);font-weight:400">(카테고리 1개당)</span></label>
         <select id="mPlan" onchange="onPlanChange()">
+          <option value="monthly">1개월 (30일)</option>
           <option value="pkg3m">3개월 (90일)</option>
           <option value="pkg6m" selected>6개월 (180일) ⭐ 인기</option>
           <option value="pkg1y">1년 (364일)</option>
@@ -4603,10 +4623,10 @@ function openModal(plan) {
   document.getElementById('modalDesc').innerHTML    = descs[plan] || '';
   // mPlan 셀렉트 항상 표시 (사용자가 모든 플랜 자유 변경 가능)
   document.getElementById('planField').style.display = 'block';
-  // [옵션 B v102] monthly/free/yearly 모두 pkg6m으로 강제 매핑 (1개월 플랜 제거됨)
+  // [v173] monthly 다시 활성화 — 강제 매핑 제거. free/yearly만 fallback 유지
   let planForSelect = plan;
-  if (plan === 'monthly' || plan === 'free') planForSelect = 'pkg6m';
-  if (plan === 'yearly')                     planForSelect = 'pkg1y';
+  if (plan === 'free')   planForSelect = 'pkg6m';
+  if (plan === 'yearly') planForSelect = 'pkg1y';
   document.getElementById('mPlan').value = planForSelect;
   currentPlan = planForSelect;
   if (typeof onPlanChange === 'function') onPlanChange();

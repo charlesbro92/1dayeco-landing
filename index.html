@@ -1457,6 +1457,26 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   }
 }
 
+/* [v179] 카테고리 상세 페이지 — 모든 폭에서 안전한 그리드 */
+/* 큰 태블릿 (1024-1280px): 3열 유지하되 max-width 화면 안에 들어오게 */
+@media (min-width:1024px) and (max-width:1280px) {
+  #cdpSubtopicGrid {
+    grid-template-columns:repeat(3, 1fr) !important;
+    max-width:calc(100% - 40px) !important;
+  }
+  .cat-topics-grid,
+  .cat-persona-grid {
+    max-width:calc(100% - 40px) !important;
+  }
+}
+/* 모바일 (~600px): 부제목 그리드 1열 */
+@media (max-width:600px) {
+  #cdpSubtopicGrid {
+    grid-template-columns:1fr !important;
+    max-width:calc(100% - 40px) !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1465,7 +1485,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v177</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v179</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1774,6 +1794,16 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   background:var(--border); vertical-align:middle; margin:0 12px;
 }
 
+/* [v179] 데스크탑 1101px+ : 3열 (기본값) */
+/* 태블릿 (601-1100px) : 2열로 통일 — iPad 세로/가로 모두 2열 */
+@media (min-width: 601px) and (max-width: 1100px) {
+  .cat-grid { grid-template-columns:repeat(2, 1fr); gap:14px; }
+}
+/* 모바일 (~600px) : 1열 */
+@media (max-width: 600px) {
+  .cat-grid { grid-template-columns:1fr; }
+}
+/* 옛 정의 (호환성 유지) */
 @media (max-width: 900px) {
   .cat-grid { grid-template-columns:repeat(2, 1fr); gap:14px; }
 }
@@ -5707,8 +5737,8 @@ function updateFirstSendInfo() {
   const refundEl = document.getElementById('doneRefundPolicy');
   if (refundEl) {
     const days = REFUND_PHASE1_DAYS[currentPlan] || 0;
-    // [v177] monthly(0일)도 "0일 이내 해지 시 100% 환불 보장"으로 명시
-    refundEl.textContent = `${days}일 이내 해지 시 100% 환불 보장 · 약관에 따라 일할 환불`;
+    // [v178] HTML 템플릿이 이미 " · 약관에 따라 일할 환불" 포함 — JS는 앞부분만 채움
+    refundEl.textContent = `${days}일 이내 해지 시 100% 환불 보장`;
   }
 }
 

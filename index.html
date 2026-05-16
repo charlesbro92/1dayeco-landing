@@ -173,6 +173,26 @@ nav {
   background:var(--gold); color:var(--dark); border-color:var(--gold);
 }
 
+/* [v180] 태블릿 (769-1100px) — nav-tabs 가로 스크롤 + 작은 폰트로 잘림 방지 */
+@media (min-width:769px) and (max-width:1100px) {
+  .nav-tabs {
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;     /* Firefox */
+    flex-wrap:nowrap;
+    justify-content:flex-start;
+    padding:0 8px;
+  }
+  .nav-tabs::-webkit-scrollbar { display:none; }  /* Chrome/Safari */
+  .nav-tab {
+    padding:8px 12px;
+    font-size:12px;
+    letter-spacing:.8px;
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+}
+
 .nav-cta {
   background:var(--gold); color:var(--dark); border:none;
   padding:10px 22px; font-size:13px; font-weight:700; font-family:var(--sans);
@@ -1208,7 +1228,8 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 /* ── 카테고리 long-form 섹션 (v27 이식) ── */
 .cat-hero {
   display:flex; flex-direction:column;
-  justify-content:flex-start; align-items:center; padding:90px 24px 40px;
+  /* [v180] padding-top 90px → 60px (텍스트가 너무 아래로 내려가는 문제 fix) */
+  justify-content:flex-start; align-items:center; padding:60px 24px 40px;
   position:relative;
 }
 .category-icon {
@@ -1450,30 +1471,34 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     grid-template-columns:repeat(2, 1fr) !important;
     max-width:720px;
   }
-  /* 부제목 그리드(인라인 style)도 2열 고정 */
-  #cdpSubtopicGrid {
-    grid-template-columns:repeat(2, 1fr) !important;
-    max-width:720px !important;
-  }
 }
 
-/* [v179] 카테고리 상세 페이지 — 모든 폭에서 안전한 그리드 */
-/* 큰 태블릿 (1024-1280px): 3열 유지하되 max-width 화면 안에 들어오게 */
-@media (min-width:1024px) and (max-width:1280px) {
-  #cdpSubtopicGrid {
-    grid-template-columns:repeat(3, 1fr) !important;
-    max-width:calc(100% - 40px) !important;
-  }
-  .cat-topics-grid,
-  .cat-persona-grid {
-    max-width:calc(100% - 40px) !important;
+/* [v180] cdp-subtopic-grid — 카테고리 상세 부제목 카드 그리드 통일 */
+/*   인라인 style 제거 후 CSS class로 일원화 */
+.cdp-subtopic-grid {
+  display:grid;
+  gap:14px;
+  margin:24px auto 0;
+  padding:0 20px;
+  /* 데스크탑 기본: 3열, max-width로 화면 안 보장 */
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  max-width:880px;
+  box-sizing:border-box;
+  width:100%;
+}
+/* 태블릿 (601-1100px): 2열 */
+@media (min-width:601px) and (max-width:1100px) {
+  .cdp-subtopic-grid {
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    max-width:720px;
   }
 }
-/* 모바일 (~600px): 부제목 그리드 1열 */
+/* 모바일 (~600px): 1열 */
 @media (max-width:600px) {
-  #cdpSubtopicGrid {
-    grid-template-columns:1fr !important;
-    max-width:calc(100% - 40px) !important;
+  .cdp-subtopic-grid {
+    grid-template-columns:1fr;
+    max-width:100%;
+    padding:0 16px;
   }
 }
 
@@ -1485,7 +1510,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v179</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v180</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2026,7 +2051,7 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
     <div class="cat-section-eyebrow">Choose</div>
     <h3 class="cat-section-title">어떤 컨텐츠로 시작할까요?</h3>
     <p class="cat-section-sub">한 카테고리 안에서도 다양한 컨텐츠이 있어요. 관심 있는 그룹을 선택해 신청하세요.</p>
-    <div id="cdpSubtopicGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;max-width:880px;margin:24px auto 0;padding:0 20px"></div>
+    <div id="cdpSubtopicGrid" class="cdp-subtopic-grid"></div>
   </section>
 
   <!-- 페인포인트 -->

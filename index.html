@@ -1585,6 +1585,32 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 #landingLoginScreen .ll-foot {
   margin-top:24px; font-size:11px; color:var(--muted); text-align:center;
 }
+/* [v183] 방문자 카운트 — 로그인 박스 하단 골드 강조 */
+#landingLoginScreen .ll-visitors {
+  margin-top:18px;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  padding:10px 16px;
+  background:var(--gold-dim);
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-size:12px; color:var(--muted);
+  letter-spacing:.3px;
+  transition:opacity .4s ease;
+}
+#landingLoginScreen .ll-visitors .ll-vis-dot {
+  width:6px; height:6px; border-radius:50%;
+  background:var(--success);
+  box-shadow:0 0 8px rgba(74,222,128,.6);
+  animation:llVisPulse 1.8s ease-in-out infinite;
+}
+@keyframes llVisPulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%     { opacity:.5; transform:scale(.85); }
+}
+#landingLoginScreen .ll-visitors .ll-vis-num {
+  color:var(--gold); font-weight:800; letter-spacing:.5px;
+}
+#landingLoginScreen .ll-visitors.is-loading .ll-vis-num { opacity:.4; }
 /* 로그인 화면이 떠 있는 동안에는 본문 스크롤 잠금 */
 body.ll-locked { overflow:hidden; }
 
@@ -1621,13 +1647,20 @@ body.ll-locked { overflow:hidden; }
     <div class="ll-err" id="llErr">아이디 또는 비밀번호가 올바르지 않습니다</div>
     <div class="ll-foot">초대받으신 분만 접속 가능합니다</div>
   </div>
+  <!-- [v183] 방문자 카운트 — 로그인 박스 아래 골드 배지 -->
+  <div class="ll-visitors is-loading" id="llVisitors" title="누적 방문자 수">
+    <span class="ll-vis-dot"></span>
+    <span>누적 방문자</span>
+    <span class="ll-vis-num" id="llVisitorsNum">—</span>
+    <span>명</span>
+  </div>
 </div>
 
 <!-- NAV -->
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v182</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v183</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2833,8 +2866,42 @@ const LL_PW = 'onedayeco123456789';
     document.body.classList.add('ll-locked');
     // 첫 입력 필드에 포커스
     setTimeout(() => { document.getElementById('llId')?.focus(); }, 50);
+    // [v183] 방문자 카운트 +1 후 표시 — 로그인 화면 노출 시에만 호출
+    fetchAndShowVisitorCount();
   }
 })();
+
+// [v183] 방문자 카운트 — 백엔드 호출 후 골드 배지에 표시
+async function fetchAndShowVisitorCount(){
+  const wrap   = document.getElementById('llVisitors');
+  const numEl  = document.getElementById('llVisitorsNum');
+  if (!wrap || !numEl) return;
+  // API_BASE는 메인 script 후반부에 선언되므로 const로 직접 지정 (의존성 분리)
+  const BACKEND = 'https://web-production-761cd.up.railway.app';
+  try {
+    const res = await fetch(`${BACKEND}/api/visitor/count`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+    });
+    if (!res.ok) throw new Error('http_' + res.status);
+    const data = await res.json();
+    const count = (data && typeof data.count === 'number') ? data.count : null;
+    if (count !== null) {
+      numEl.textContent = count.toLocaleString('ko-KR');
+      wrap.classList.remove('is-loading');
+    } else {
+      // 백엔드는 응답했지만 count 없음 — 폴백
+      numEl.textContent = '—';
+      wrap.classList.remove('is-loading');
+    }
+  } catch (e) {
+    // 네트워크/CORS 등 실패 — 로그인은 영향 없음, 카운터만 '—' 처리
+    console.warn('[visitor_count] fetch failed:', e);
+    numEl.textContent = '—';
+    wrap.classList.remove('is-loading');
+  }
+}
 
 function doLandingLogin(){
   const idEl  = document.getElementById('llId');

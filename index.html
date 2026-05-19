@@ -1730,7 +1730,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v188</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v189</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2098,7 +2098,7 @@ body.ll-locked { overflow:hidden; }
   <div class="steps">
     <div class="step"><div class="step-n">01</div><span class="step-ico">📱</span><div class="step-t">신청 후 결제</div><div class="step-d">이름, 전화번호 입력 후 카드로 1회 결제하면 가입이 완료됩니다.</div></div>
     <div class="step"><div class="step-n">02</div><span class="step-ico">☀️</span><div class="step-t">매일 아침 정기 수신</div><div class="step-d">신청 후엔 가만히 두세요. 매일 오전 8시, 구독한 분야의 새로운 지식이 카카오톡으로 자동 도착합니다.</div></div>
-    <div class="step"><div class="step-n">03</div><span class="step-ico">🛡️</span><div class="step-t">환불 보장 안심</div><div class="step-d">플랜별 환불 보장 기간 내 해지 시 결제 금액 100% 환불됩니다. 미발송분은 약관에 따라 일할 환불 가능합니다.</div></div>
+    <div class="step"><div class="step-n">03</div><span class="step-ico">🛡️</span><div class="step-t">환불 보장 안심</div><div class="step-d">플랜별 환불 보장 기간(3·5·7일) 내 해지 시 결제 금액 100% 환불됩니다. 이후에도 미발송분은 일할 환불 가능합니다 (업계 표준 위약금 10% 공제).</div></div>
   </div>
 </section>
 
@@ -2148,7 +2148,7 @@ body.ll-locked { overflow:hidden; }
           <li>매일 1편 · 90일 발송</li>
           <li>새로운 분야 시작하기 좋음</li>
           <li>9,800원 절약 · 1일 약 221원</li>
-          <li>이후 일할 환불 가능</li>
+          <li>이후 일할 환불 (위약금 10%)</li>
         </ul>
         <button class="plan-btn" onclick="openModal('pkg3m')">지금 시작하기</button>
       </div>
@@ -2168,7 +2168,7 @@ body.ll-locked { overflow:hidden; }
           <li>매일 1편 · 180일 발송</li>
           <li>가장 인기 · 가성비 최강</li>
           <li>34,500원 절약 · 1일 약 138원</li>
-          <li>이후 일할 환불 가능</li>
+          <li>이후 일할 환불 (위약금 10%)</li>
         </ul>
         <button class="plan-btn" onclick="openModal('pkg6m')">지금 시작하기</button>
       </div>
@@ -2187,7 +2187,7 @@ body.ll-locked { overflow:hidden; }
           <li>매일 1편 · 364일 발송</li>
           <li>최장기 · 가장 저렴</li>
           <li>76,900원 절약 · 1일 약 115원</li>
-          <li>이후 일할 환불 가능</li>
+          <li>이후 일할 환불 (위약금 10%)</li>
         </ul>
         <button class="plan-btn" onclick="openModal('pkg1y')">지금 시작하기</button>
         <!-- [v176] 안내 텍스트 카드 외부로 absolute 배치 — 버튼 정렬 통일 -->
@@ -2216,7 +2216,7 @@ body.ll-locked { overflow:hidden; }
 <section class="final">
   <div class="eyebrow" style="display:inline-flex;margin-bottom:28px">지금 신청하면 내일 아침 첫 메시지 발송</div>
   <h2 class="hero-title" style="font-size:clamp(30px,5vw,58px)">가만히 있어도<br><span class="gold">매일 새로운 지식</span><br class="br-desktop"><span class="thin"> 환불 보장으로 시작하세요</span></h2>
-  <p style="color:var(--muted);margin:18px 0 36px;font-size:15px">최대 7일 100% 환불 보장 · 월 ₩9,900부터 · 약관에 따라 일할 환불</p>
+  <p style="color:var(--muted);margin:18px 0 36px;font-size:15px">최대 7일 100% 환불 보장 · 월 ₩9,900부터 · 이후 일할 환불 (위약금 10%)</p>
   <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
     <button class="submit-btn" style="font-size:15px;padding:16px 44px;border-radius:10px;background:none;border:1px solid var(--gold);color:var(--gold)" onclick="document.querySelector('.pricing-wrap').scrollIntoView({behavior:'smooth'})">
       💳 요금제 보기
@@ -2633,14 +2633,15 @@ HIDDEN_COMINGSOON_MODAL_END -->
           <div><span style="display:inline-block;width:18px;color:#5eea91;font-weight:700">✓</span> <strong>오늘 결제</strong>: <span id="step2Amount" style="color:var(--gold);font-weight:700">₩24,900</span></div>
           <div><span style="display:inline-block;width:18px;color:#5eea91;font-weight:700">✓</span> <strong>내일 아침 8시부터</strong>: 매일 카카오톡 발송</div>
           <div><span style="display:inline-block;width:18px;color:#5eea91;font-weight:700">✓</span> <strong id="step2RefundPeriod">보장 기간 이내</strong> 해지: 100% 환불 보장</div>
-          <div><span style="display:inline-block;width:18px;color:#5eea91;font-weight:700">✓</span> <strong>이후 해지</strong>: 약관에 따라 일할 환불</div>
+          <div><span style="display:inline-block;width:18px;color:#5eea91;font-weight:700">✓</span> <strong>이후 해지</strong>: 일할 환불 (위약금 10%)</div>
         </div>
       </div>
 
       <!-- 환불 정책 요약 (작은 글씨) -->
       <div style="font-size:11px;color:var(--muted);line-height:1.5;margin:8px 0 14px;padding:8px 12px;background:rgba(255,255,255,.02);border-radius:6px">
         <a href="#" onclick="event.preventDefault();openRefundPolicyModal();" style="color:var(--gold);text-decoration:underline">전체 환불 정책 보기</a> ·
-        결제 후 보장 기간 초과 시 약관에 따라 일할 환불됩니다
+        보장 기간 후 일할 환불 시 위약금 10% 공제 (업계 표준)
+      </div>
       </div>
 
       <!-- 포트원 위젯 영역 -->
@@ -2686,7 +2687,7 @@ HIDDEN_COMINGSOON_MODAL_END -->
         <div style="font-size:11.5px;line-height:1.7;border-top:1px solid var(--border);padding-top:10px;margin-top:8px">
           ✓ <strong style="color:var(--text)" id="donePaidAmount">결제 완료</strong><br>
           ✓ 내일 아침 8시부터 매일 카카오톡 발송<br>
-          ✓ <span id="doneRefundPolicy">보장 기간 내 해지 시 100% 환불</span> · 약관에 따라 일할 환불<br>
+          ✓ <span id="doneRefundPolicy">보장 기간 내 해지 시 100% 환불</span> · 이후 일할 환불 (위약금 10%)<br>
           ✓ 환불 신청: 홈페이지 하단 <strong style="color:var(--text)">"취소 / 환불 요청"</strong> 버튼
         </div>
       </div>
@@ -5444,7 +5445,7 @@ function updateStep2Display(prepareRes) {
           <div style="font-size:13px;color:var(--muted);margin-bottom:6px">오늘 결제 금액</div>
           <div style="font-size:18px;font-weight:700;color:var(--gold);margin-bottom:4px">${cfg.label}</div>
           <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px">₩${cfg.amount.toLocaleString()}</div>
-          <div style="font-size:11px;color:var(--muted)">${refundDays}일 이내 100% 환불 보장 · 이후 일할 환불</div>
+          <div style="font-size:11px;color:var(--muted)">${refundDays}일 이내 100% 환불 · 이후 일할 환불 (위약금 10%)</div>
         </div>
       `;
     }
@@ -6057,7 +6058,7 @@ function updateFirstSendInfo() {
   const refundEl = document.getElementById('doneRefundPolicy');
   if (refundEl) {
     const days = REFUND_PHASE1_DAYS[currentPlan] || 0;
-    // [v178] HTML 템플릿이 이미 " · 약관에 따라 일할 환불" 포함 — JS는 앞부분만 채움
+    // [v189] HTML 템플릿이 " · 이후 일할 환불 (위약금 10%)" 포함 — JS는 앞부분만 채움
     refundEl.textContent = `${days}일 이내 해지 시 100% 환불 보장`;
   }
 }
@@ -6156,16 +6157,19 @@ const INFO_CONTENT = {
 
     <h3>제5조 (환불 정책)</h3>
     <div class="highlight"><strong style="color:var(--gold)">「전자상거래법」 제17조·제18조에 근거</strong></div>
-    <p><strong>① 100% 전액 환불 가능</strong></p>
+    <p><strong>① 100% 전액 환불 보장</strong> (보장기간 내)</p>
     <ul>
-      <li>결제 후 7일 이내 + 콘텐츠 미발송</li>
+      <li>3개월 플랜: 결제 후 <strong>3일 이내</strong></li>
+      <li>6개월 플랜: 결제 후 <strong>5일 이내</strong></li>
+      <li>1년 플랜: 결제 후 <strong>7일 이내</strong></li>
       <li>광고 내용과 다른 서비스 제공 (공급일로부터 3개월 이내)</li>
       <li>서비스 30일 이상 중단</li>
     </ul>
-    <p><strong>② 일할 환불</strong> (가분적 디지털 콘텐츠)</p>
-    <p style="background:rgba(201,168,76,.06);padding:10px 13px;border-radius:8px;font-family:monospace;font-size:12px">환불액 = 결제금액 × (잔여 발송일수 ÷ 총 발송일수)</p>
+    <p><strong>② 보장기간 후 일할 환불</strong> (가분적 디지털 콘텐츠)</p>
+    <p style="background:rgba(201,168,76,.06);padding:10px 13px;border-radius:8px;font-family:monospace;font-size:12px">환불액 = (잔여 발송일수 × 일할 단가) × 90%<br><span style="color:var(--muted);font-size:11px">※ 위약금 10% 공제 후 잔액 환불 (업계 표준)</span></p>
     <ul>
-      <li>예시: 6개월 플랜 ₩24,900에서 30일 발송 후 환불 → ₩20,750 환불</li>
+      <li>예시: 6개월 플랜 ₩24,900에서 30일 발송 후 환불 → <strong>₩18,675 환불</strong> (잔여 150일 × 일 단가 ₩138 × 90%)</li>
+      <li>예시: 1년 플랜 ₩41,900에서 100일 발송 후 환불 → <strong>₩27,350 환불</strong></li>
       <li>PG 수수료는 사업자가 부담합니다. 소비자에게 차감되지 않습니다.</li>
       <li>환불 처리: 영업일 기준 3일 이내 / 카드 환급은 카드사 영업일 5~7일</li>
     </ul>
@@ -6208,7 +6212,7 @@ const INFO_CONTENT = {
       <tr><td>주말·공휴일</td><td>휴무</td></tr></table>
     <h3>자주 묻는 질문</h3>
     <div class="highlight"><strong>Q. 메시지가 오지 않아요</strong><br>카카오톡에서 @1DAYECO 채널 친구 추가 여부를 확인해 주세요.</div>
-    <div class="highlight" style="margin-top:8px"><strong>Q. 결제 후 환불할 수 있나요?</strong><br>네. 플랜별 환불 보장 기간(3개월: 3일 / 6개월: 5일 / 12개월: 7일) 이내 해지 시 100% 환불됩니다. 미발송분은 약관에 따라 일할 환불 가능합니다.</div>
+    <div class="highlight" style="margin-top:8px"><strong>Q. 결제 후 환불할 수 있나요?</strong><br>네. 플랜별 환불 보장 기간(3개월: 3일 / 6개월: 5일 / 12개월: 7일) 이내 해지 시 결제액 100%를 전액 환불합니다. 보장 기간 후에는 미발송분에 대해 일할 환불되며, 위약금 10%가 공제됩니다 (업계 표준).</div>
     <div class="highlight" style="margin-top:8px"><strong>Q. 발송 시간을 변경하고 싶어요</strong><br>카카오톡 정책상 8시 이후 발송 가능합니다. 이후 발송 옵션에 대하여는 개발중이오니, 빠른 시일 내 서비스 제공하도록 노력하겠습니다.</div>` }
 };
 let currentInfoTab = 'intro';

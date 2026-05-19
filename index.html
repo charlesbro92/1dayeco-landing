@@ -1730,7 +1730,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v189</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v190</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2641,7 +2641,6 @@ HIDDEN_COMINGSOON_MODAL_END -->
       <div style="font-size:11px;color:var(--muted);line-height:1.5;margin:8px 0 14px;padding:8px 12px;background:rgba(255,255,255,.02);border-radius:6px">
         <a href="#" onclick="event.preventDefault();openRefundPolicyModal();" style="color:var(--gold);text-decoration:underline">전체 환불 정책 보기</a> ·
         보장 기간 후 일할 환불 시 위약금 10% 공제 (업계 표준)
-      </div>
       </div>
 
       <!-- 포트원 위젯 영역 -->
@@ -5610,6 +5609,24 @@ async function submitStep2() {
 
   // ★ TEST_MODE_DISABLE ★ 가맹 통과 후 위 if(TEST_MODE_PAYMENT_BYPASS) 블록 통째로 삭제
   try {
+    // [v190] webhook 보완용 customData — 클라이언트가 verify를 못 부를 때(브라우저 닫힘 등)
+    // PortOne webhook이 이 정보로 DB INSERT를 직접 수행할 수 있음
+    const webhookMeta = {
+      subscriber_id: subscriberId,
+      temp_id:       subscriberId,
+      plan:          currentPlan,
+      name:          buyerName,
+      phone:         buyerTel,
+      email:         (prepareMeta && prepareMeta.email) || '',
+      categories:    selectedCategories || [],
+      subtopic_id:   window._selectedSubtopicId || null,
+      subtopic_name: window._selectedSubtopicName || '',
+      send_hour:     FIXED_SEND_HOUR,
+      notify_d1:     !!(prepareMeta && prepareMeta.notify_d1),
+      paid_amount:   totalAmount,
+      total_send_days: (prepareMeta && prepareMeta.total_send_days) || null,
+    };
+
     // [옵션 B v102] PortOne V2 일반결제 (requestPayment)
     const response = await PortOne.requestPayment({
       storeId:     PORTONE_STORE_ID,
@@ -5624,6 +5641,7 @@ async function submitStep2() {
         fullName:    buyerName,
         phoneNumber: buyerTel,
       },
+      customData:  JSON.stringify(webhookMeta),  // [v190] webhook 누락 보완용
       redirectUrl: location.origin + location.pathname + '?payment_complete=1',
     });
 
@@ -6590,9 +6608,9 @@ async function selectCancelSub(sub, totalSteps, skipStep2) {
           { signal: AbortSignal.timeout(8000) });
         calcData = r.ok ? await r.json() : null;
       } else {
-        // mock
+        // mock — [v189] 새 정책 기준: 6개월 ₩24,900 / 30일 발송 → (150일 × 138원 × 0.9) = ₩18,675
         await new Promise(r => setTimeout(r, 800));
-        calcData = { success: true, paid_amount: 24900, sent_days: 30, remaining_days: 153, total_send_days: 183, refund_amount: 20779 };
+        calcData = { success: true, paid_amount: 24900, sent_days: 30, remaining_days: 150, total_send_days: 180, refund_amount: 18675 };
       }
       if (calcData && calcData.success) {
         const isFullRefund = calcData.refund_amount >= calcData.paid_amount;

@@ -1675,7 +1675,8 @@ body.ll-locked { overflow:hidden; }
      - sessionStorage('llAuth')='1' 인 동안 유지 (탭 닫으면 초기화)
      - 제거 지시 있을 때까지 유지
 ============================================================ -->
-<div id="landingLoginScreen">
+<!-- [v191] 카드사 심사 일시 비활성화 — 심사 완료 후 style="display:none" 제거하면 원복 -->
+<div id="landingLoginScreen" style="display:none">
   <div class="ll-logo-wrap">
     <div class="ll-logo-mark">📊</div>
     <div class="ll-logo-text">1DAYECO</div>
@@ -1730,7 +1731,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v190</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v191</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2921,6 +2922,10 @@ const LL_ID = 'onedayeco';
 const LL_PW = 'onedayeco123456789';
 
 (function landingLoginGate(){
+  // [v191] ⚠️ 카드사 심사 일시 비활성화 — 심사 완료 후 아래 라인 제거하면 원복됨
+  // 원복 방법: 다음 줄 한 줄만 삭제 (또는 주석 처리)
+  return; /* SOFT_OPEN_GATE_DISABLED_FOR_REVIEW */
+
   const screen = document.getElementById('landingLoginScreen');
   if (!screen) return;
   const authed = sessionStorage.getItem('llAuth') === '1';

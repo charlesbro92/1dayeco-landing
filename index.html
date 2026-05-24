@@ -1664,6 +1664,57 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 /* 로그인 화면이 떠 있는 동안에는 본문 스크롤 잠금 */
 body.ll-locked { overflow:hidden; }
 
+/* [v195] 샘플 화면 안내문 */
+.sample-notice {
+  font-size: 11.5px;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 12px;
+  margin-bottom: 0;
+  letter-spacing: .2px;
+  opacity: .75;
+  font-style: italic;
+}
+
+/* [v195] 후기 보내기 CTA (카카오톡 채널) */
+.review-cta {
+  max-width: 540px;
+  margin: 48px auto 0;
+  text-align: center;
+  padding: 28px 24px;
+  background: rgba(255,255,255,.02);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.review-cta-text {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  margin-bottom: 18px;
+  font-weight: 500;
+}
+.review-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 28px;
+  background: #FEE500;
+  color: #181600;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 8px;
+  text-decoration: none;
+  letter-spacing: -.2px;
+  transition: opacity .2s;
+}
+.review-cta-btn:hover { opacity: .85; }
+.review-cta-sub {
+  margin-top: 14px;
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
 </style>
 </head>
 <body>
@@ -1731,7 +1782,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v194</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v196</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1915,6 +1966,8 @@ body.ll-locked { overflow:hidden; }
           </div>
         </div>
       </div>
+      <!-- [v195] 샘플 화면 안내문 -->
+      <p class="sample-notice">이 화면은 실제 제공되는 내용을 바탕으로 샘플로 제작되었습니다.</p>
     </div>
 
     <!-- 오른쪽: 콘텐츠 구성 설명 -->
@@ -2208,8 +2261,16 @@ body.ll-locked { overflow:hidden; }
   <h2 class="sec-title">구독자들의 진짜 후기</h2>
   <div class="testis">
     <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"뉴스는 길고 유튜브는 시간이 아까웠는데, 1분이라 매일 읽게 됩니다. 출근길에 카톡 열면 그 날 공부 끝."</p><div class="testi-who"><div class="testi-av">👨‍💼</div><div><div class="testi-name">김**</div><div class="testi-job">IT 스타트업 대표</div></div></div></div>
-    <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"하루는 부동산 용어, 다른 날은 심슨으로 영어 한 마디. 지루할 틈이 없고 매일 다른 분야가 채워집니다."</p><div class="testi-who"><div class="testi-av">👩‍🏫</div><div><div class="testi-name">박**</div><div class="testi-job">중학교 교사</div></div></div></div>
+    <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"카테고리 3개나 구독했는데 알아서 카톡으로 다 도착해요. 따로 챙길 필요 없이 매일 자동으로 와서 진짜 편합니다."</p><div class="testi-who"><div class="testi-av">👩‍🏫</div><div><div class="testi-name">박**</div><div class="testi-job">중학교 교사</div></div></div></div>
     <div class="testi"><div class="testi-stars">★★★★☆</div><p class="testi-text">"팀원들한테 단체로 구독시켰어요. 월요일 미팅 때 경제·상식 얘기가 자연스럽게 나오기 시작했습니다."</p><div class="testi-who"><div class="testi-av">👨‍💻</div><div><div class="testi-name">이**</div><div class="testi-job">마케팅 팀장</div></div></div></div>
+  </div>
+  <!-- [v195] 후기 보내기 CTA (카카오톡 채널) -->
+  <div class="review-cta">
+    <div class="review-cta-text">1DAYECO를 사용해 보셨나요?<br>여러분의 진솔한 후기를 들려주세요.</div>
+    <a href="http://pf.kakao.com/_ctaTX" target="_blank" rel="noopener" class="review-cta-btn">
+      💬 카카오톡 채널 @1DAYECO 에 후기 보내기
+    </a>
+    <div class="review-cta-sub">검토 후 이 페이지에 소개해 드릴 수 있어요.</div>
   </div>
 </section>
 
@@ -2285,6 +2346,8 @@ body.ll-locked { overflow:hidden; }
     <h3 class="cat-section-title">매일 아침 받아보는 콘텐츠</h3>
     <p class="cat-section-sub">출근길 1분, 핵심만 깔끔하게 전달합니다.</p>
     <div class="cat-preview-grid" id="cdpPreviewGrid"></div>
+    <!-- [v195] 샘플 화면 안내문 -->
+    <p class="sample-notice" style="margin-top:24px;text-align:center">이 화면은 실제 제공되는 내용을 바탕으로 샘플로 제작되었습니다.</p>
   </section>
 
   <!-- 주제 미리보기 -->

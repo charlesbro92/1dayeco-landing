@@ -1782,7 +1782,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v196</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v197</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -4428,14 +4428,47 @@ async function loadSubtopicsForCategory(catId, force) {
 }
 
 // 화면에 노출된 모든 [data-cat-subtopics] placeholder를 부제목 이름으로 채움
-// [v156] NO-OP — 본인 요청: 대분류 페이지에선 카테고리 카드만 보여주고, 부제목은 상세 페이지에서만
+// [v197] 재활성화 — 모든 카테고리 카드의 desc 아래에 전체 부주제를 칩(한 줄에 하나씩)으로 표시
 async function _hydrateCardSubtopics() {
-  // 카드 안 부제목 칩 표시 비활성화 (대분류 페이지 단순화)
-  // 카드 안에는 카테고리 이름 + 설명만 표시
-  document.querySelectorAll('[data-cat-subtopics]').forEach(el => {
-    el.style.display = 'none';
-    el.innerHTML = '';
+  const slots = document.querySelectorAll('[data-cat-subtopics]');
+  if (!slots.length) return;
+
+  // 카드별 비동기 로드를 한 번에 처리 (캐시되어 있으면 즉시 반환됨)
+  const tasks = Array.from(slots).map(async (el) => {
+    if (el.dataset.subHydrated === '1') return;  // 중복 렌더 방지
+    const catId = el.getAttribute('data-cat-subtopics');
+    if (!catId) return;
+    try {
+      const subs = await loadSubtopicsForCategory(catId);
+      if (!Array.isArray(subs) || subs.length === 0) {
+        el.style.display = 'none';
+        el.innerHTML = '';
+        return;
+      }
+      // display_order 정렬은 백엔드/캐시에서 처리되어 있음
+      const html = subs.map(s => {
+        const name = (s && s.name) ? String(s.name) : '';
+        if (!name) return '';
+        // XSS 방어: 단순 텍스트 이스케이프
+        const safe = name.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        return `<span class="card-subtopic-chip">${safe}</span>`;
+      }).filter(Boolean).join('');
+      if (!html) {
+        el.style.display = 'none';
+        el.innerHTML = '';
+        return;
+      }
+      el.innerHTML = html;
+      el.style.display = 'flex';   // .cat-card-tag 컨테이너는 column flex로 정의됨
+      el.dataset.subHydrated = '1';
+    } catch (e) {
+      // 실패 시 조용히 숨김
+      el.style.display = 'none';
+      el.innerHTML = '';
+    }
   });
+  // 모든 카드 동시 렌더 (순서 보장 불필요)
+  await Promise.all(tasks);
 }
 
 async function loadCategoriesFromAPI() {

@@ -1782,7 +1782,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v201</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v202</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2110,78 +2110,76 @@ body.ll-locked { overflow:hidden; }
   .cat-grid { grid-template-columns:1fr; }
 }
 
-/* ── [v201] 슈퍼카테고리 스와이프 ──────────────────────────────
-   데스크탑/태블릿: .cat-swipe-page는 display:contents로 layout에서 빠짐 → 기존 그리드 흐름 유지
-   모바일(≤600px): #introActiveGrid를 가로 flex + scroll-snap으로 전환, 슈퍼카테고리별 1페이지
+/* ── [v202] 슈퍼카테고리 내부 카드 캐러셀 ─────────────────────
+   - 데스크탑/태블릿: super-group, swipe-rail은 display:contents → 기존 그리드 흐름 유지
+   - 모바일(≤600px): 각 슈퍼카테고리 그룹은 세로 배치, 그룹 안의 카드들만 가로 스와이프
+   - 슈퍼카테고리 헤더(💰 금융·투자 등)는 모든 화면에서 보임
 */
-.cat-swipe-page { display:contents; }
-.cat-swipe-indicator { display:none; }
+.cat-super-group { display:contents; }
+.cat-swipe-rail { display:contents; }
+.cat-rail-dots { display:none; }
 
 @media (max-width: 600px) {
+  /* 모바일에서는 introActiveGrid가 flex로 (세로 흐름)로 슈퍼그룹을 쌓음 */
   #introActiveGrid {
     display:flex !important;
-    flex-direction:row !important;
+    flex-direction:column !important;
     grid-template-columns:none !important;
+    gap:0;
+  }
+  .cat-super-group {
+    display:flex !important;
+    flex-direction:column !important;
+    width:100%;
+    margin-bottom:8px;
+  }
+  /* 헤더 인라인 grid-column 무효화 (모바일은 flex 컨테이너) */
+  .cat-super-group .cat-swipe-header {
+    grid-column:auto !important;
+    margin:14px 0 8px !important;
+  }
+  /* 카드 캐러셀(rail): 가로 스크롤 + scroll-snap */
+  .cat-swipe-rail {
+    display:flex !important;
+    flex-direction:row !important;
     overflow-x:auto;
     overflow-y:hidden;
     scroll-snap-type:x mandatory;
     -webkit-overflow-scrolling:touch;
     scrollbar-width:none;
-    gap:0;
-    /* 컨테이너 외부로 살짝 넘기는 효과 차단 */
-    margin-left:-4px; margin-right:-4px;
-    padding:0;
+    gap:10px;
+    padding:2px 16px 6px;
+    margin:0 -16px;  /* 좌우 padding을 컨테이너 밖으로 빼서 카드가 가장자리까지 닿게 */
+    scroll-padding-left:16px;
   }
-  #introActiveGrid::-webkit-scrollbar { display:none; }
-
-  .cat-swipe-page {
-    display:flex !important;
-    flex-direction:column !important;
-    flex:0 0 100%;
-    width:100%;
-    box-sizing:border-box;
+  .cat-swipe-rail::-webkit-scrollbar { display:none; }
+  /* 카드 한 장 너비: 다음 카드의 일부가 살짝 보이도록 88% */
+  .cat-swipe-rail .cat-card {
+    flex:0 0 88%;
     scroll-snap-align:start;
     scroll-snap-stop:always;
-    gap:12px;
-    padding:0 8px;
   }
-  /* 헤더 인라인 style 의 grid-column 무효화 */
-  .cat-swipe-page .cat-swipe-header {
-    grid-column:auto !important;
-    margin:4px 0 6px !important;
-  }
-  /* 카드 너비는 컨테이너 100% */
-  .cat-swipe-page .cat-card { width:100%; }
-
-  /* 도트 인디케이터 */
-  .cat-swipe-indicator {
+  /* 그룹별 도트 인디케이터 */
+  .cat-rail-dots {
     display:flex;
     justify-content:center;
-    align-items:center;
-    gap:8px;
-    margin-top:14px;
-    flex-wrap:wrap;
+    gap:6px;
+    margin-top:10px;
+    margin-bottom:4px;
   }
-  .cat-swipe-indicator .csi-dot {
-    width:8px; height:8px; border-radius:50%;
+  .cat-rail-dots .crd-dot {
+    width:6px; height:6px; border-radius:50%;
     background:rgba(201,168,76,.25);
+    border:none; padding:0;
     transition:all .25s ease;
     cursor:pointer;
-    border:none; padding:0;
   }
-  .cat-swipe-indicator .csi-dot.active {
+  .cat-rail-dots .crd-dot.active {
     background:var(--gold);
-    width:22px; border-radius:5px;
+    width:16px; border-radius:3px;
   }
-  .cat-swipe-indicator .csi-label {
-    width:100%;
-    text-align:center;
-    font-size:12px;
-    color:var(--gold);
-    letter-spacing:.3px;
-    margin-top:4px;
-    font-weight:600;
-  }
+  /* 카드가 1개뿐인 그룹은 도트 자체 숨김 (스와이프 의미 없음) */
+  .cat-rail-dots[data-count="1"] { display:none; }
 }
 </style>
 <section class="cat-preview-section">
@@ -2195,8 +2193,6 @@ body.ll-locked { overflow:hidden; }
       카테고리를 불러오는 중...
     </div>
   </div>
-  <!-- [v201] 모바일 스와이프 인디케이터(도트 + 라벨) — 모바일에서만 표시 -->
-  <div class="cat-swipe-indicator" id="catSwipeIndicator" aria-hidden="true"></div>
 
   <!-- ⭐ Coming Soon 미리보기 (어드민 coming_soon 카테고리 중 앞 3개, 0개면 섹션 자체 숨김) -->
   <div id="introComingSoonSection" style="display:none">
@@ -4547,57 +4543,58 @@ async function _hydrateCardSubtopics() {
   await Promise.all(tasks);
 }
 
-// ── [v201] 모바일 슈퍼카테고리 스와이프 도트 인디케이터 ──────────
-// #introActiveGrid의 .cat-swipe-page 수만큼 도트를 만들고,
-// 스크롤 위치에 따라 활성 도트와 라벨을 갱신함. 도트 클릭 시 해당 페이지로 스크롤.
-function _initCatSwipeIndicator() {
+// ── [v202] 슈퍼카테고리 그룹별 카드 캐러셀 도트 인디케이터 ──────
+// 각 .cat-super-group 안의 .cat-swipe-rail에 도트를 생성하고
+// rail 스크롤 위치에 따라 활성 도트를 동기화. 도트 클릭 시 해당 카드로 스크롤.
+function _initCatRailDots() {
   const grid = document.getElementById('introActiveGrid');
-  const ind  = document.getElementById('catSwipeIndicator');
-  if (!grid || !ind) return;
-  const pages = grid.querySelectorAll('.cat-swipe-page');
-  if (!pages.length) { ind.innerHTML = ''; return; }
+  if (!grid) return;
+  const groups = grid.querySelectorAll('.cat-super-group');
+  groups.forEach(group => {
+    const rail = group.querySelector('.cat-swipe-rail');
+    const dotsBox = group.querySelector('.cat-rail-dots');
+    if (!rail || !dotsBox) return;
+    const cards = rail.querySelectorAll('.cat-card');
+    if (cards.length <= 1) { dotsBox.innerHTML = ''; return; }
 
-  // 도트 + 현재 페이지 라벨 생성
-  let dotsHtml = '';
-  pages.forEach((p, i) => {
-    const label = p.getAttribute('data-label') || '';
-    dotsHtml += `<button class="csi-dot${i===0?' active':''}" data-idx="${i}" aria-label="${label}"></button>`;
-  });
-  dotsHtml += `<div class="csi-label" id="csiLabel">${pages[0].getAttribute('data-label') || ''}</div>`;
-  ind.innerHTML = dotsHtml;
-
-  // 도트 클릭 → 해당 페이지로 스크롤
-  ind.querySelectorAll('.csi-dot').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const idx = parseInt(btn.getAttribute('data-idx'), 10) || 0;
-      const target = pages[idx];
-      if (target) {
-        grid.scrollTo({ left: target.offsetLeft - grid.offsetLeft, behavior: 'smooth' });
-      }
+    // 도트 생성 (카드 수만큼)
+    let html = '';
+    cards.forEach((_, i) => {
+      html += `<button class="crd-dot${i===0?' active':''}" data-idx="${i}" aria-label="${i+1}번 카드"></button>`;
     });
-  });
+    dotsBox.innerHTML = html;
 
-  // 스크롤 위치에 따라 활성 도트/라벨 갱신 (모바일 한정 — display:none 데스크탑에선 무영향)
-  let raf = null;
-  const sync = () => {
-    raf = null;
-    const sl = grid.scrollLeft;
-    const gw = grid.clientWidth;
-    let activeIdx = 0;
-    let minDist = Infinity;
-    pages.forEach((p, i) => {
-      const d = Math.abs(p.offsetLeft - grid.offsetLeft - sl);
-      if (d < minDist) { minDist = d; activeIdx = i; }
+    // 도트 클릭 → 해당 카드로 부드럽게 스크롤
+    dotsBox.querySelectorAll('.crd-dot').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.getAttribute('data-idx'), 10) || 0;
+        const target = cards[idx];
+        if (target) {
+          rail.scrollTo({ left: target.offsetLeft - rail.offsetLeft, behavior: 'smooth' });
+        }
+      });
     });
-    const dots = ind.querySelectorAll('.csi-dot');
-    dots.forEach((d, i) => d.classList.toggle('active', i === activeIdx));
-    const labelEl = document.getElementById('csiLabel');
-    if (labelEl) labelEl.textContent = pages[activeIdx].getAttribute('data-label') || '';
-  };
-  grid.addEventListener('scroll', () => {
-    if (raf) return;
-    raf = requestAnimationFrame(sync);
-  }, { passive: true });
+
+    // 스크롤 위치 변화에 맞춰 활성 도트 갱신 (rAF로 throttle)
+    let raf = null;
+    const sync = () => {
+      raf = null;
+      const sl = rail.scrollLeft;
+      let activeIdx = 0;
+      let minDist = Infinity;
+      cards.forEach((c, i) => {
+        const d = Math.abs(c.offsetLeft - rail.offsetLeft - sl);
+        if (d < minDist) { minDist = d; activeIdx = i; }
+      });
+      dotsBox.querySelectorAll('.crd-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === activeIdx);
+      });
+    };
+    rail.addEventListener('scroll', () => {
+      if (raf) return;
+      raf = requestAnimationFrame(sync);
+    }, { passive: true });
+  });
 }
 
 async function loadCategoriesFromAPI() {
@@ -4752,19 +4749,21 @@ async function _initCategoryVisibility() {
             <span style="font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px">${s.label}</span>
             <span style="font-size:11px;color:var(--muted);margin-left:auto">${cats.length}개</span>
           </div>`;
-          return `<div class="cat-swipe-page" data-super="${s.id}" data-label="${s.label}">${header}${cats.map(buildCardHtml).join('')}</div>`;
+          const rail = `<div class="cat-swipe-rail" data-super="${s.id}">${cats.map(buildCardHtml).join('')}</div>`;
+          const dots = `<div class="cat-rail-dots" data-super="${s.id}" data-count="${cats.length}" aria-hidden="true"></div>`;
+          return `<div class="cat-super-group" data-super="${s.id}">${header}${rail}${dots}</div>`;
         }).join('');
         const ungroupedHtml = ungrouped.length > 0
-          ? `<div class="cat-swipe-page" data-super="other" data-label="기타"><div class="cat-swipe-header" style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:18px 0 6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.15)">
+          ? `<div class="cat-super-group" data-super="other"><div class="cat-swipe-header" style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:18px 0 6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.15)">
               <span style="font-size:18px">📌</span>
               <span style="font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px">기타</span>
               <span style="font-size:11px;color:var(--muted);margin-left:auto">${ungrouped.length}개</span>
-            </div>` + ungrouped.map(buildCardHtml).join('') + `</div>`
+            </div><div class="cat-swipe-rail" data-super="other">` + ungrouped.map(buildCardHtml).join('') + `</div><div class="cat-rail-dots" data-super="other" data-count="${ungrouped.length}" aria-hidden="true"></div></div>`
           : '';
         introActiveGrid.innerHTML = html + ungroupedHtml;
         _hydrateCardSubtopics();
-        // [v201] 모바일 스와이프 인디케이터(도트) 초기화
-        _initCatSwipeIndicator();
+        // [v202] 각 슈퍼카테고리별 카드 캐러셀 도트 인디케이터 초기화
+        _initCatRailDots();
       }
     }
 

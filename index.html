@@ -1782,7 +1782,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v200</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v201</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2109,6 +2109,80 @@ body.ll-locked { overflow:hidden; }
 @media (max-width: 480px) {
   .cat-grid { grid-template-columns:1fr; }
 }
+
+/* ── [v201] 슈퍼카테고리 스와이프 ──────────────────────────────
+   데스크탑/태블릿: .cat-swipe-page는 display:contents로 layout에서 빠짐 → 기존 그리드 흐름 유지
+   모바일(≤600px): #introActiveGrid를 가로 flex + scroll-snap으로 전환, 슈퍼카테고리별 1페이지
+*/
+.cat-swipe-page { display:contents; }
+.cat-swipe-indicator { display:none; }
+
+@media (max-width: 600px) {
+  #introActiveGrid {
+    display:flex !important;
+    flex-direction:row !important;
+    grid-template-columns:none !important;
+    overflow-x:auto;
+    overflow-y:hidden;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    gap:0;
+    /* 컨테이너 외부로 살짝 넘기는 효과 차단 */
+    margin-left:-4px; margin-right:-4px;
+    padding:0;
+  }
+  #introActiveGrid::-webkit-scrollbar { display:none; }
+
+  .cat-swipe-page {
+    display:flex !important;
+    flex-direction:column !important;
+    flex:0 0 100%;
+    width:100%;
+    box-sizing:border-box;
+    scroll-snap-align:start;
+    scroll-snap-stop:always;
+    gap:12px;
+    padding:0 8px;
+  }
+  /* 헤더 인라인 style 의 grid-column 무효화 */
+  .cat-swipe-page .cat-swipe-header {
+    grid-column:auto !important;
+    margin:4px 0 6px !important;
+  }
+  /* 카드 너비는 컨테이너 100% */
+  .cat-swipe-page .cat-card { width:100%; }
+
+  /* 도트 인디케이터 */
+  .cat-swipe-indicator {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+    margin-top:14px;
+    flex-wrap:wrap;
+  }
+  .cat-swipe-indicator .csi-dot {
+    width:8px; height:8px; border-radius:50%;
+    background:rgba(201,168,76,.25);
+    transition:all .25s ease;
+    cursor:pointer;
+    border:none; padding:0;
+  }
+  .cat-swipe-indicator .csi-dot.active {
+    background:var(--gold);
+    width:22px; border-radius:5px;
+  }
+  .cat-swipe-indicator .csi-label {
+    width:100%;
+    text-align:center;
+    font-size:12px;
+    color:var(--gold);
+    letter-spacing:.3px;
+    margin-top:4px;
+    font-weight:600;
+  }
+}
 </style>
 <section class="cat-preview-section">
   <div class="sec-eye">Categories</div>
@@ -2121,6 +2195,8 @@ body.ll-locked { overflow:hidden; }
       카테고리를 불러오는 중...
     </div>
   </div>
+  <!-- [v201] 모바일 스와이프 인디케이터(도트 + 라벨) — 모바일에서만 표시 -->
+  <div class="cat-swipe-indicator" id="catSwipeIndicator" aria-hidden="true"></div>
 
   <!-- ⭐ Coming Soon 미리보기 (어드민 coming_soon 카테고리 중 앞 3개, 0개면 섹션 자체 숨김) -->
   <div id="introComingSoonSection" style="display:none">
@@ -4471,6 +4547,59 @@ async function _hydrateCardSubtopics() {
   await Promise.all(tasks);
 }
 
+// ── [v201] 모바일 슈퍼카테고리 스와이프 도트 인디케이터 ──────────
+// #introActiveGrid의 .cat-swipe-page 수만큼 도트를 만들고,
+// 스크롤 위치에 따라 활성 도트와 라벨을 갱신함. 도트 클릭 시 해당 페이지로 스크롤.
+function _initCatSwipeIndicator() {
+  const grid = document.getElementById('introActiveGrid');
+  const ind  = document.getElementById('catSwipeIndicator');
+  if (!grid || !ind) return;
+  const pages = grid.querySelectorAll('.cat-swipe-page');
+  if (!pages.length) { ind.innerHTML = ''; return; }
+
+  // 도트 + 현재 페이지 라벨 생성
+  let dotsHtml = '';
+  pages.forEach((p, i) => {
+    const label = p.getAttribute('data-label') || '';
+    dotsHtml += `<button class="csi-dot${i===0?' active':''}" data-idx="${i}" aria-label="${label}"></button>`;
+  });
+  dotsHtml += `<div class="csi-label" id="csiLabel">${pages[0].getAttribute('data-label') || ''}</div>`;
+  ind.innerHTML = dotsHtml;
+
+  // 도트 클릭 → 해당 페이지로 스크롤
+  ind.querySelectorAll('.csi-dot').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.getAttribute('data-idx'), 10) || 0;
+      const target = pages[idx];
+      if (target) {
+        grid.scrollTo({ left: target.offsetLeft - grid.offsetLeft, behavior: 'smooth' });
+      }
+    });
+  });
+
+  // 스크롤 위치에 따라 활성 도트/라벨 갱신 (모바일 한정 — display:none 데스크탑에선 무영향)
+  let raf = null;
+  const sync = () => {
+    raf = null;
+    const sl = grid.scrollLeft;
+    const gw = grid.clientWidth;
+    let activeIdx = 0;
+    let minDist = Infinity;
+    pages.forEach((p, i) => {
+      const d = Math.abs(p.offsetLeft - grid.offsetLeft - sl);
+      if (d < minDist) { minDist = d; activeIdx = i; }
+    });
+    const dots = ind.querySelectorAll('.csi-dot');
+    dots.forEach((d, i) => d.classList.toggle('active', i === activeIdx));
+    const labelEl = document.getElementById('csiLabel');
+    if (labelEl) labelEl.textContent = pages[activeIdx].getAttribute('data-label') || '';
+  };
+  grid.addEventListener('scroll', () => {
+    if (raf) return;
+    raf = requestAnimationFrame(sync);
+  }, { passive: true });
+}
+
 async function loadCategoriesFromAPI() {
   if (_categoriesCache) return _categoriesCache;
   if (_categoriesCachePromise) return _categoriesCachePromise;
@@ -4618,22 +4747,24 @@ async function _initCategoryVisibility() {
         const html = SUPER_CATS.map(s => {
           const cats = grouped[s.id];
           if (!cats || cats.length === 0) return '';
-          const header = `<div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:18px 0 6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.15)">
+          const header = `<div class="cat-swipe-header" style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:18px 0 6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.15)">
             <span style="font-size:18px">${s.emoji}</span>
             <span style="font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px">${s.label}</span>
             <span style="font-size:11px;color:var(--muted);margin-left:auto">${cats.length}개</span>
           </div>`;
-          return header + cats.map(buildCardHtml).join('');
+          return `<div class="cat-swipe-page" data-super="${s.id}" data-label="${s.label}">${header}${cats.map(buildCardHtml).join('')}</div>`;
         }).join('');
         const ungroupedHtml = ungrouped.length > 0
-          ? `<div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:18px 0 6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.15)">
+          ? `<div class="cat-swipe-page" data-super="other" data-label="기타"><div class="cat-swipe-header" style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:18px 0 6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.15)">
               <span style="font-size:18px">📌</span>
               <span style="font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px">기타</span>
               <span style="font-size:11px;color:var(--muted);margin-left:auto">${ungrouped.length}개</span>
-            </div>` + ungrouped.map(buildCardHtml).join('')
+            </div>` + ungrouped.map(buildCardHtml).join('') + `</div>`
           : '';
         introActiveGrid.innerHTML = html + ungroupedHtml;
         _hydrateCardSubtopics();
+        // [v201] 모바일 스와이프 인디케이터(도트) 초기화
+        _initCatSwipeIndicator();
       }
     }
 

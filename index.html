@@ -1782,7 +1782,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v202</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v203</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -3139,9 +3139,9 @@ const API_BASE        = 'https://web-production-761cd.up.railway.app';
 // 포트원 V2 설정 (포트원 콘솔 > 결제연동 > 연동 정보)
 const PORTONE_STORE_ID    = 'store-3a0615b4-5d94-46c6-9e1b-45da9a7436d7';     // Store ID (V2용)
 const PORTONE_IMP_CODE    = 'imp07247578';     // 가맹점 식별코드 (V1 IMP.init용, imp_xxx 형식 — 포트원 콘솔 > 연동정보 확인)
-const PORTONE_CHANNEL_KEY = 'channel-key-d42d33ea-8ddd-4437-8a5a-f0db5c44c823';     // 채널키 (예: 'channel-key-aaaa-bbbb-cccc-dddd-eeee')
-                                     // KG이니시스 테스트 채널 또는 라이브 네이버페이 채널
-const PAYMENT_TEST_MODE   = true;   // true: 테스트 안내 배너 표시, false: 숨김
+const PORTONE_CHANNEL_KEY = 'channel-key-4dd06859-ab29-47a2-9739-c316341f9d17';     // [v203] 라이브 카카오페이 채널
+                                     // 카카오페이 실연동(V2). KG이니시스는 미사용(추후 카드 PG 추가 시 별도 채널)
+const PAYMENT_TEST_MODE   = false;  // [v203] 실결제 전환 — 테스트 배너/버튼 텍스트 숨김
 
 // ── 상태 ─────────────────────────────────────────────────────
 let currentPlan = 'pkg6m';     // 디폴트 6개월
@@ -5759,12 +5759,11 @@ async function submitStep2() {
     showToast('결제 준비 중입니다. 잠시만 기다려주세요.', 'ng');
     return;
   }
-  // [TEST MODE] PortOne SDK 체크 우회 — 실제 결제 안 함
-  // ★ 가맹 통과 후 아래 if(typeof PortOne...) 블록 복원
-  // if (typeof PortOne === 'undefined') {
-  //   showToast('결제 SDK 로딩 실패. 새로고침 후 다시 시도해주세요.', 'ng');
-  //   return;
-  // }
+  // [v203] 실결제 — PortOne SDK 로딩 체크
+  if (typeof PortOne === 'undefined') {
+    showToast('결제 SDK 로딩 실패. 새로고침 후 다시 시도해주세요.', 'ng');
+    return;
+  }
 
   const buyerName = document.getElementById('mName').value.trim();
   const buyerTel  = document.getElementById('mPhone').value.replace(/-/g, '');
@@ -5806,39 +5805,7 @@ async function submitStep2() {
 
   setLoading('step2Btn', 'step2Spin', 'step2BtnTxt', true);
 
-  // ────────────────────────────────────────────────────────────
-  // [TEST MODE — 결제 가맹 통과 전 우회]
-  // PortOne 결제창 호출만 우회 + mock paymentId로 verify 호출.
-  // → DB에 active 가입자 INSERT됨 + 솔라피 알림톡 발송됨 (테스트 가능)
-  // 가맹 통과 후 아래 ★ TEST_MODE_DISABLE ★ 영역 주석 풀기
-  // ────────────────────────────────────────────────────────────
-  const TEST_MODE_PAYMENT_BYPASS = true;
-  if (TEST_MODE_PAYMENT_BYPASS) {
-    console.log('[TEST MODE] PortOne 결제창 우회. mock paymentId:', paymentId, '금액:', totalAmount, '플랜:', currentPlan);
-    try {
-      // mock paymentId로 verify 직접 호출 (백엔드도 테스트 모드여야 함)
-      const verify = await apiPost('/api/payment/verify', {
-        payment_id:    paymentId,        // mock paymentId
-        subscriber_id: subscriberId,
-        _meta:         prepareMeta,
-        _test_mode:    true,             // 백엔드 테스트 모드 플래그
-      });
-      if (verify && verify.success) {
-        showToast(`🧪 테스트 모드: ₩${totalAmount.toLocaleString()} 결제 처리 + DB INSERT 완료`, 'ok');
-        try { sessionStorage.removeItem('billing_ctx'); } catch(e) {}
-        showStep(3);
-      } else {
-        showToast('🧪 테스트 모드 verify 실패: ' + (verify?.message || verify?.error), 'ng');
-      }
-    } catch(e) {
-      console.error('test verify error:', e);
-      showToast('🧪 테스트 모드 verify 오류. 콘솔 확인.', 'ng');
-    }
-    setLoading('step2Btn', 'step2Spin', 'step2BtnTxt', false);
-    return;
-  }
-
-  // ★ TEST_MODE_DISABLE ★ 가맹 통과 후 위 if(TEST_MODE_PAYMENT_BYPASS) 블록 통째로 삭제
+  // [v203] 실결제 — PortOne 카카오페이 결제창 호출
   try {
     // [v190] webhook 보완용 customData — 클라이언트가 verify를 못 부를 때(브라우저 닫힘 등)
     // PortOne webhook이 이 정보로 DB INSERT를 직접 수행할 수 있음
@@ -5866,7 +5833,10 @@ async function submitStep2() {
       orderName:   orderName,
       totalAmount: totalAmount,
       currency:    'CURRENCY_KRW',
-      payMethod:   'CARD',
+      payMethod:   'EASY_PAY',
+      easyPay: {
+        easyPayProvider: 'EASY_PAY_PROVIDER_KAKAOPAY',
+      },
       customer: {
         customerId:  customerUidRef,
         fullName:    buyerName,

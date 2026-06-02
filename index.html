@@ -1782,7 +1782,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v203</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v204</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2775,7 +2775,7 @@ HIDDEN_COMINGSOON_MODAL_END -->
 
       <!-- 환불 정책 요약 (작은 글씨) -->
       <div style="font-size:11px;color:var(--muted);line-height:1.5;margin:8px 0 14px;padding:8px 12px;background:rgba(255,255,255,.02);border-radius:6px">
-        <a href="#" onclick="event.preventDefault();openRefundPolicyModal();" style="color:var(--gold);text-decoration:underline">전체 환불 정책 보기</a> ·
+        <a href="#" onclick="event.preventDefault();openInfo('terms');" style="color:var(--gold);text-decoration:underline">전체 환불 정책 보기</a> ·
         보장 기간 후 일할 환불 시 위약금 10% 공제 (업계 표준)
       </div>
 
@@ -5428,6 +5428,29 @@ async function _populateDonePanel() {
       yearly:  '1년 (364일)',
     };
     document.getElementById('donePlanName').textContent = planLabels[plan] || plan;
+
+    // [v204] 결제 금액 + 환불 보장일 — 방금 결제값(prepareMeta/plan) 기준으로 채움
+    //   (기존엔 이 부분을 안 채워서 이전 세션의 값이 그대로 노출되는 버그)
+    const planAmounts = {
+      monthly: 9900, pkg3m: 19900, pkg6m: 24900, pkg1y: 41900, yearly: 41900,
+    };
+    let paidAmt = 0;
+    if (typeof prepareMeta !== 'undefined' && prepareMeta && prepareMeta.paid_amount) {
+      paidAmt = Number(prepareMeta.paid_amount) || 0;
+    }
+    if (!paidAmt) paidAmt = planAmounts[plan] || 0;
+    const amtEl = document.getElementById('donePaidAmount');
+    if (amtEl) amtEl.textContent = paidAmt ? `결제 완료 ₩${paidAmt.toLocaleString()}` : '결제 완료';
+
+    // 환불 보장일: 결제창과 동일한 REFUND_PHASE1_DAYS 재사용 (monthly=0, pkg3m=3, pkg6m=5, pkg1y=7)
+    const gDays = (typeof REFUND_PHASE1_DAYS !== 'undefined' && REFUND_PHASE1_DAYS[plan] != null)
+                  ? REFUND_PHASE1_DAYS[plan] : 0;
+    const refundEl = document.getElementById('doneRefundPolicy');
+    if (refundEl) {
+      refundEl.textContent = gDays > 0
+        ? `${gDays}일 이내 해지 시 100% 환불 보장`
+        : '환불 보장 기간 없음';
+    }
   } catch (_) {}
 }
 

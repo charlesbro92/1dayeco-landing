@@ -1781,7 +1781,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v213</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v214</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -7479,6 +7479,7 @@ function openModal(plan) {
   // 새 모달 열림 → 이전 가입 정보 초기화 (다른 plan으로 새 신청 가능)
   subscriberId = null;
   customerKey  = null;
+  window._appliedCoupon = null;   // [v214] 쿠폰 적용 상태 초기화
   showStep(1);  // 항상 Step 1부터 시작
 
   const titles = {
@@ -7893,6 +7894,10 @@ async function submitConfirm() {
     if (window._selectedSubtopicId) {
       preparePayload.subtopic_id = window._selectedSubtopicId;
     }
+    // [v214] 적용된 쿠폰이 있으면 함께 전송 (서버에서 금액 재계산)
+    if (window._appliedCoupon) {
+      preparePayload.coupon_code = window._appliedCoupon;
+    }
     const res = await apiPost('/api/payment/prepare', preparePayload);
     if (res && res.success === false) {
       throw new Error(res.message || '신청 처리 중 오류가 발생했습니다');
@@ -7900,6 +7905,7 @@ async function submitConfirm() {
     subscriberId   = res.subscriber_id || res.temp_id;
     customerUidRef = res.customer_uid;
     prepareMeta    = res._meta || null;
+    window._prepareRes = res;   // [v214] 쿠폰 적용 시 재참조용
     paymentReady   = true;
 
     showStep(2);
@@ -7958,16 +7964,57 @@ function updateStep2Display(prepareRes) {
           <span style="color:var(--muted);font-size:10.5px">테스트 카드: 5570-2000-0000-0000 / 만료 12/29 / 비밀번호 12 / 생년월일 900101</span>
         </div>
       ` : '';
+
+      // [v214] 쿠폰 적용 상태 — prepareRes.coupon 기반
+      const coupon = prepareRes && prepareRes.coupon ? prepareRes.coupon : null;
+      const isFree = !!(prepareRes && prepareRes.is_free);
+      const origAmount = coupon && coupon.original_amount ? coupon.original_amount : cfg.amount;
+
+      // 금액 표시 블록 (쿠폰 적용 시 원가 취소선 + 할인 후 금액)
+      let amountBlock;
+      if (coupon) {
+        amountBlock = `
+          <div style="font-size:13px;color:var(--gold);margin-bottom:6px;font-weight:700">🎟️ 쿠폰 적용됨 (−₩${(coupon.discount||0).toLocaleString()})</div>
+          <div style="font-size:14px;color:var(--muted);text-decoration:line-through;margin-bottom:2px">₩${origAmount.toLocaleString()}</div>
+          <div style="font-size:26px;font-weight:900;color:${isFree?'var(--gold-light)':'var(--text)'};margin-bottom:8px">${isFree?'무료 (₩0)':'₩'+cfg.amount.toLocaleString()}</div>`;
+      } else {
+        amountBlock = `<div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px">₩${cfg.amount.toLocaleString()}</div>`;
+      }
+
+      // 쿠폰 등록 UI (적용 전: 입력창 / 적용 후: 적용됨 + 해제)
+      let couponUI;
+      if (coupon) {
+        couponUI = `
+          <div style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:8px;background:rgba(201,168,76,.08);border:1px solid var(--gold);border-radius:8px;padding:10px 12px">
+            <span style="font-size:12px;color:var(--gold-light)">쿠폰 ${coupon.code} 적용 중</span>
+            <button type="button" onclick="removeCoupon()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline;font-family:var(--sans)">해제</button>
+          </div>`;
+      } else {
+        couponUI = `
+          <div style="margin-top:12px">
+            <button type="button" id="couponToggleBtn" onclick="toggleCouponInput()" style="width:100%;background:rgba(255,255,255,.03);border:1px dashed var(--border);border-radius:8px;padding:11px;font-size:13px;color:var(--gold-light);cursor:pointer;font-family:var(--sans);font-weight:600">🎟️ 쿠폰 등록하기</button>
+            <div id="couponInputRow" style="display:none;margin-top:8px;gap:8px">
+              <div style="display:flex;gap:8px">
+                <input type="text" id="couponCodeInput" placeholder="쿠폰번호 입력" maxlength="30"
+                  style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:11px 12px;font-size:14px;color:var(--text);font-family:var(--sans);outline:none;text-transform:uppercase">
+                <button type="button" id="couponApplyBtn" onclick="applyCoupon()" style="background:var(--gold);color:#1A1A1C;border:none;border-radius:8px;padding:11px 18px;font-size:14px;font-weight:800;cursor:pointer;font-family:var(--sans);flex-shrink:0">적용</button>
+              </div>
+              <div id="couponMsg" style="font-size:12px;margin-top:8px;min-height:16px"></div>
+            </div>
+          </div>`;
+      }
+
       tossPayment.innerHTML = testBanner + `
         <div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:10px;padding:18px;text-align:center">
           <div style="font-size:13px;color:var(--muted);margin-bottom:6px">오늘 결제 금액</div>
           <div style="font-size:18px;font-weight:700;color:var(--gold);margin-bottom:4px">${cfg.label}</div>
-          <div style="font-size:24px;font-weight:900;color:var(--text);margin-bottom:8px">₩${cfg.amount.toLocaleString()}</div>
+          ${amountBlock}
           <div style="font-size:11px;color:var(--muted)">${refundDays}일 이내 100% 환불 · 이후 일할 환불 (위약금 10%)</div>
+          ${couponUI}
         </div>
       `;
     }
-    if (step2BtnTxt) step2BtnTxt.textContent = PAYMENT_TEST_MODE ? '🧪 테스트 결제' : '결제하기';
+    if (step2BtnTxt) step2BtnTxt.textContent = (prepareRes && prepareRes.is_free) ? '무료로 시작하기' : (PAYMENT_TEST_MODE ? '🧪 테스트 결제' : '결제하기');
   } else {
     // 키 미설정: 안내 박스 표시
     if (tossDisabled) {
@@ -7982,6 +8029,61 @@ function updateStep2Display(prepareRes) {
     if (tossPayment)  tossPayment.style.display  = 'none';
     if (step2BtnTxt)  step2BtnTxt.textContent    = '임시 가입 완료';
   }
+}
+
+// ── [v214] 쿠폰 등록 ──────────────────────────────────────
+function toggleCouponInput() {
+  const row = document.getElementById('couponInputRow');
+  const btn = document.getElementById('couponToggleBtn');
+  if (!row) return;
+  const open = row.style.display === 'none' || !row.style.display;
+  row.style.display = open ? 'block' : 'none';
+  if (btn) btn.style.display = open ? 'none' : 'block';
+  if (open) { const i = document.getElementById('couponCodeInput'); if (i) i.focus(); }
+}
+
+async function applyCoupon() {
+  const input = document.getElementById('couponCodeInput');
+  const msg   = document.getElementById('couponMsg');
+  const btn   = document.getElementById('couponApplyBtn');
+  if (!input || !msg) return;
+  const code = (input.value || '').trim().toUpperCase();
+  msg.style.color = 'var(--muted)'; msg.textContent = '';
+  if (!code) { msg.style.color = 'var(--danger)'; msg.textContent = '쿠폰번호를 입력해주세요.'; return; }
+
+  // 결제 대상 plan/phone (submitConfirm과 동일 로직)
+  const phone = (document.getElementById('mPhone').value || '').replace(/[^0-9]/g,'');
+  let plan;
+  if (currentPlan === 'free') plan = 'monthly';
+  else if (currentPlan === 'monthly' || currentPlan === 'yearly') {
+    plan = document.getElementById('mPlan') ? document.getElementById('mPlan').value : currentPlan;
+    if (plan === 'yearly') plan = 'pkg1y';
+  } else plan = currentPlan;
+
+  if (btn) { btn.disabled = true; btn.textContent = '확인 중...'; }
+  try {
+    // 1차: 쿠폰 자체 검증 (발급/미사용/번호 확인)
+    const vr = await apiPost('/api/coupon/validate', { code, phone, plan });
+    if (!vr || vr.success === false) {
+      msg.style.color = 'var(--danger)';
+      msg.textContent = (vr && vr.message) || '쿠폰을 사용할 수 없습니다.';
+      return;
+    }
+    // 2차: 쿠폰 포함해 prepare 재호출 → 서버가 금액 재계산
+    window._appliedCoupon = code;
+    await submitConfirm();   // step2 재렌더 (쿠폰 적용 금액 반영)
+  } catch (e) {
+    msg.style.color = 'var(--danger)';
+    msg.textContent = '쿠폰 적용 중 오류가 발생했습니다.';
+    window._appliedCoupon = null;
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '적용'; }
+  }
+}
+
+async function removeCoupon() {
+  window._appliedCoupon = null;
+  await submitConfirm();   // 쿠폰 없이 prepare 재호출 → 원가 복원
 }
 
 async function backToStep1() {
@@ -8047,6 +8149,30 @@ async function submitStep2() {
     showToast('결제 준비 중입니다. 잠시만 기다려주세요.', 'ng');
     return;
   }
+
+  // [v214] 쿠폰 전액 할인(0원) — PortOne 결제 없이 verify 직행 (무료 가입)
+  if (prepareMeta && prepareMeta.is_free) {
+    setLoading('step2Btn', 'step2Spin', 'step2BtnTxt', true);
+    try {
+      const verify = await apiPost('/api/payment/verify', {
+        subscriber_id: subscriberId,
+        _meta:         prepareMeta,   // payment_id 없음 — 서버가 free_coupon ID 자동 부여
+      });
+      if (verify && verify.success) {
+        try { sessionStorage.removeItem('billing_ctx'); } catch(e) {}
+        showStep(3);
+      } else {
+        showToast((verify && verify.message) || '가입 처리에 실패했습니다.', 'ng');
+      }
+    } catch(e) {
+      showToast('가입 처리 중 오류가 발생했습니다. 다시 시도해주세요.', 'ng');
+      console.error('free verify error:', e);
+    } finally {
+      setLoading('step2Btn', 'step2Spin', 'step2BtnTxt', false);
+    }
+    return;
+  }
+
   // [v203] 실결제 — PortOne SDK 로딩 체크
   if (typeof PortOne === 'undefined') {
     showToast('결제 SDK 로딩 실패. 새로고침 후 다시 시도해주세요.', 'ng');

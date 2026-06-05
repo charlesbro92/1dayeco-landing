@@ -1781,7 +1781,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v214</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v215</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -8066,19 +8066,36 @@ async function applyCoupon() {
     const vr = await apiPost('/api/coupon/validate', { code, phone, plan });
     if (!vr || vr.success === false) {
       msg.style.color = 'var(--danger)';
-      msg.textContent = (vr && vr.message) || '쿠폰을 사용할 수 없습니다.';
+      msg.textContent = couponErrText(vr && vr.error, vr && vr.message);
       return;
     }
     // 2차: 쿠폰 포함해 prepare 재호출 → 서버가 금액 재계산
     window._appliedCoupon = code;
     await submitConfirm();   // step2 재렌더 (쿠폰 적용 금액 반영)
   } catch (e) {
+    // apiPost는 4xx 시 throw — 백엔드 error/message를 그대로 살려서 안내
+    const body = e && e.responseBody ? e.responseBody : {};
     msg.style.color = 'var(--danger)';
-    msg.textContent = '쿠폰 적용 중 오류가 발생했습니다.';
+    msg.textContent = couponErrText(body.error, body.message || (e && e.message));
     window._appliedCoupon = null;
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = '적용'; }
   }
+}
+
+// 쿠폰 에러코드 → 사용자 친화 메시지
+function couponErrText(code, fallbackMsg) {
+  const map = {
+    already_used:       '이미 쿠폰이 적용된 번호입니다.',
+    already_subscribed: '이미 쿠폰이 적용된 번호입니다.',
+    not_issued:         '이 번호로 발급된 쿠폰이 없습니다. 이벤트 페이지에서 먼저 발급받아 주세요.',
+    invalid_code:       '유효하지 않은 쿠폰번호입니다.',
+    invalid_phone:      '전화번호를 입력해주세요.',
+    event_disabled:     '현재 사용 가능한 쿠폰 이벤트가 아닙니다.',
+    cooldown_active:    '최근 취소·만료한 부제목입니다. 잠시 후 다시 신청해 주세요.',
+  };
+  if (code && map[code]) return map[code];
+  return fallbackMsg || '쿠폰을 사용할 수 없습니다.';
 }
 
 async function removeCoupon() {

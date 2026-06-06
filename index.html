@@ -1781,7 +1781,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v215</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v216</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -7993,6 +7993,7 @@ function updateStep2Display(prepareRes) {
         couponUI = `
           <div style="margin-top:12px">
             <button type="button" id="couponToggleBtn" onclick="toggleCouponInput()" style="width:100%;background:rgba(255,255,255,.03);border:1px dashed var(--border);border-radius:8px;padding:11px;font-size:13px;color:var(--gold-light);cursor:pointer;font-family:var(--sans);font-weight:600">🎟️ 쿠폰 등록하기</button>
+            <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:5px">사용기한 6월 30일까지</div>
             <div id="couponInputRow" style="display:none;margin-top:8px;gap:8px">
               <div style="display:flex;gap:8px">
                 <input type="text" id="couponCodeInput" placeholder="쿠폰번호 입력" maxlength="30"
@@ -8092,6 +8093,7 @@ function couponErrText(code, fallbackMsg) {
     invalid_code:       '유효하지 않은 쿠폰번호입니다.',
     invalid_phone:      '전화번호를 입력해주세요.',
     event_disabled:     '현재 사용 가능한 쿠폰 이벤트가 아닙니다.',
+    event_expired:      '쿠폰 사용 기한(6월 30일)이 지났습니다.',
     cooldown_active:    '최근 취소·만료한 부제목입니다. 잠시 후 다시 신청해 주세요.',
   };
   if (code && map[code]) return map[code];

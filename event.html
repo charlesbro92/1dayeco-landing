@@ -58,10 +58,7 @@
   .counter-num{font-family:var(--serif);font-size:22px;font-weight:900;
     color:var(--gold-light)}
   .counter-label{font-size:13px;color:var(--muted)}
-  .counter-bar{width:100%;max-width:320px;height:6px;border-radius:6px;
-    background:rgba(255,255,255,.06);overflow:hidden}
-  .counter-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));
-    width:0%;transition:width .6s ease}
+
 
   /* 쿠폰 비주얼 */
   .coupon-card{background:linear-gradient(135deg,#1E1B12,#16161A);
@@ -161,9 +158,8 @@
     <div class="counter-badge">
       <span class="counter-dot"></span>
       <span class="counter-num" id="remainNum">—</span>
-      <span class="counter-label">/ 100명 남음</span>
+      <span class="counter-label">명 남음</span>
     </div>
-    <div class="counter-bar"><div class="counter-bar-fill" id="barFill"></div></div>
   </div>
 
   <!-- 쿠폰 비주얼 -->

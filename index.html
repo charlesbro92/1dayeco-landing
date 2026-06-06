@@ -1781,7 +1781,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v216</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v217</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -7985,9 +7985,12 @@ function updateStep2Display(prepareRes) {
       let couponUI;
       if (coupon) {
         couponUI = `
-          <div style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:8px;background:rgba(201,168,76,.08);border:1px solid var(--gold);border-radius:8px;padding:10px 12px">
-            <span style="font-size:12px;color:var(--gold-light)">쿠폰 ${coupon.code} 적용 중</span>
-            <button type="button" onclick="removeCoupon()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline;font-family:var(--sans)">해제</button>
+          <div style="margin-top:12px;background:rgba(201,168,76,.08);border:1px solid var(--gold);border-radius:8px;padding:10px 12px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+              <span style="font-size:12px;color:var(--gold-light)">쿠폰 ${coupon.code} 적용 중</span>
+              <button type="button" onclick="removeCoupon()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline;font-family:var(--sans)">해제</button>
+            </div>
+            <div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.5">⚠️ 결제 완료 후 환불하더라도 쿠폰은 재사용이 불가합니다.</div>
           </div>`;
       } else {
         couponUI = `
@@ -8089,7 +8092,7 @@ function couponErrText(code, fallbackMsg) {
   const map = {
     already_used:       '이미 쿠폰이 적용된 번호입니다.',
     already_subscribed: '이미 쿠폰이 적용된 번호입니다.',
-    not_issued:         '이 번호로 발급된 쿠폰이 없습니다. 이벤트 페이지에서 먼저 발급받아 주세요.',
+    not_issued:         '이 번호로 발급된 쿠폰이 없습니다. <a href="/event.html" target="_blank" style="color:var(--gold-light);text-decoration:underline">이벤트 페이지</a>에서 먼저 발급받아 주세요.',
     invalid_code:       '유효하지 않은 쿠폰번호입니다.',
     invalid_phone:      '전화번호를 입력해주세요.',
     event_disabled:     '현재 사용 가능한 쿠폰 이벤트가 아닙니다.',
@@ -8099,6 +8102,61 @@ function couponErrText(code, fallbackMsg) {
   if (code && map[code]) return map[code];
   return fallbackMsg || '쿠폰을 사용할 수 없습니다.';
 }
+
+// ── [v217] 업셀 팝업 ──────────────────────────────────────
+const _UPSELL_DATA = {
+  pkg3m: {
+    title: '1개월 결제비로 3개월 이용하세요',
+    desc: '지금 \u20a95,000만 추가하면 3개월(90일) 동안 매일 아침 콘텐츠를 받을 수 있어요.\n1일 기준 \u20a955원 — 커피 한 잔 값도 안 됩니다.',
+    extra: 5000, original: 14900,
+    btnLabel: '\u20a95,000 추가하고 3개월 이용하기',
+    saving: '정가 대비 최대 \u20a914,800 절약',
+  },
+  pkg6m: {
+    title: '반년치를 커피 두 잔 값에',
+    desc: '\u20a915,000만 더 내면 6개월(180일) 동안 매일 배우고, 총 \u20a934,500을 절약하게 됩니다.\n지금 신청자에게만 제공되는 특가예요.',
+    extra: 15000, original: 24900,
+    btnLabel: '\u20a915,000 추가하고 6개월 이용하기',
+    saving: '정가 대비 최대 \u20a934,500 절약',
+  },
+  pkg1y: {
+    title: '1년 최대 할인, 지금이 마지막 기회',
+    desc: '쿠폰 적용 후 단 \u20a932,000으로 364일 — 1일 \u20a988원입니다.\n이 가격에 1년 구독은 이벤트 기간에만 가능해요.',
+    extra: 32000, original: 41900,
+    btnLabel: '\u20a932,000 추가하고 1년 이용하기',
+    saving: '정가 대비 최대 \u20a976,900 절약',
+  },
+};
+
+function _showUpsell(plan) {
+  const d = _UPSELL_DATA[plan];
+  if (!d) return;
+  document.getElementById('upsellTitle').textContent   = d.title;
+  document.getElementById('upsellDesc').innerHTML      = d.desc.replace(/\n/g, '<br>');
+  document.getElementById('upsellPrice').textContent   = '\u20a9' + d.extra.toLocaleString();
+  document.getElementById('upsellSaving').textContent  = d.saving;
+  document.getElementById('upsellUpgradeBtn').textContent = d.btnLabel;
+  window._upsellPlan = plan;
+  const m = document.getElementById('upsellModal');
+  m.style.display = 'flex';
+}
+
+function upsellSkip() {
+  document.getElementById('upsellModal').style.display = 'none';
+  submitStep2(); // 두 번째 클릭 → _upsellShown=false 이므로 바로 진행
+}
+
+async function upsellUpgrade() {
+  document.getElementById('upsellModal').style.display = 'none';
+  window._upsellShown = false;
+  const plan = window._upsellPlan;
+  if (!plan) return;
+  const selPlan = document.getElementById('mPlan');
+  if (selPlan) selPlan.value = plan;
+  currentPlan = plan;
+  await submitConfirm(); // 업셀 플랜으로 prepare 재호출
+}
+// ──────────────────────────────────────────────────────────
 
 async function removeCoupon() {
   window._appliedCoupon = null;
@@ -8169,8 +8227,15 @@ async function submitStep2() {
     return;
   }
 
-  // [v214] 쿠폰 전액 할인(0원) — PortOne 결제 없이 verify 직행 (무료 가입)
+  // [v217] 쿠폰 전액 할인(0원) + 3/6/12개월 플랜 → 업셀 팝업 (첫 클릭)
   if (prepareMeta && prepareMeta.is_free) {
+    const plan = prepareMeta.plan || currentPlan;
+    if (!window._upsellShown && ['pkg3m','pkg6m','pkg1y'].includes(plan)) {
+      window._upsellShown = true;
+      _showUpsell(plan);
+      return;
+    }
+    window._upsellShown = false; // 두 번째 클릭 → 초기화 후 진행
     setLoading('step2Btn', 'step2Spin', 'step2BtnTxt', true);
     try {
       const verify = await apiPost('/api/payment/verify', {
@@ -9579,5 +9644,22 @@ function onKakaoChannelClick() {
 }
 
 </script>
+
+<!-- ── [v217] 업셀 팝업 (쿠폰 0원 + 3개월/6개월/1년 플랜) ── -->
+<div id="upsellModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:9999;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#1E1B12;border:1.5px solid var(--gold);border-radius:20px;max-width:380px;width:100%;padding:28px 24px;text-align:center;position:relative">
+    <div style="font-size:22px;margin-bottom:8px">🎁</div>
+    <div id="upsellTitle" style="font-family:var(--serif);font-size:18px;font-weight:900;color:var(--gold-light);margin-bottom:10px;line-height:1.4"></div>
+    <div id="upsellDesc" style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:20px"></div>
+    <div id="upsellPriceRow" style="background:rgba(201,168,76,.08);border:1px solid var(--gold);border-radius:10px;padding:12px;margin-bottom:20px">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:4px">쿠폰 적용 후 추가 결제</div>
+      <div id="upsellPrice" style="font-size:24px;font-weight:900;color:var(--gold-light)"></div>
+      <div id="upsellSaving" style="font-size:11px;color:var(--ok);margin-top:4px"></div>
+    </div>
+    <div style="font-size:11px;color:rgba(255,255,255,.35);margin-bottom:18px">⚠️ 결제 완료 후 환불 시 쿠폰 재사용 불가</div>
+    <button id="upsellUpgradeBtn" onclick="upsellUpgrade()" style="width:100%;background:var(--gold);color:#1A1A1C;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:900;cursor:pointer;font-family:var(--sans);margin-bottom:10px"></button>
+    <button onclick="upsellSkip()" style="width:100%;background:none;border:1px solid var(--border);border-radius:10px;padding:12px;font-size:13px;color:var(--muted);cursor:pointer;font-family:var(--sans)">아니요, 1개월 무료로 시작할게요</button>
+  </div>
+</div>
 </body>
 </html>

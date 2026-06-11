@@ -47,11 +47,17 @@
     margin-bottom:32px;word-break:keep-all}
 
   /* 남은 수량 카운터 */
-  .counter{display:flex;flex-direction:column;align-items:center;gap:10px;
+  .counter{display:flex;flex-direction:row;align-items:center;justify-content:center;gap:12px;
     margin-bottom:34px}
   .counter-badge{display:inline-flex;align-items:center;gap:10px;
     background:var(--gold-dim);border:1px solid var(--border);
     border-radius:30px;padding:12px 24px}
+  .counter-back{display:inline-flex;align-items:center;
+    padding:12px 20px;border:1.5px solid var(--gold);color:var(--gold);
+    border-radius:30px;font-size:15px;font-weight:600;letter-spacing:.3px;
+    text-decoration:none;background:transparent;
+    transition:background .2s}
+  .counter-back:hover{background:rgba(201,168,76,.1)}
   .counter-dot{width:9px;height:9px;border-radius:50%;background:var(--ok);
     animation:pulse 1.6s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
@@ -155,6 +161,7 @@
 
   <!-- 남은 수량 -->
   <div class="counter">
+    <a href="https://onedayeco.com" class="counter-back">← 서비스 소개</a>
     <div class="counter-badge">
       <span class="counter-dot"></span>
       <span class="counter-num" id="remainNum">—</span>

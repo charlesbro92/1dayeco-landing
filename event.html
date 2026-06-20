@@ -156,8 +156,8 @@
 <div class="wrap">
   <div class="brand">1DAYECO · 하루 1분 지식</div>
   <div class="eyebrow">1 min for better Day</div>
-  <h1>오픈 기념<br><span class="hl">9,900원 할인 쿠폰</span></h1>
-  <p class="sub">선착순 100명 한정. 매일 아침 8시, 출근길 1분 학습을<br>지금 시작하세요. 어떤 플랜이든 9,900원 할인!</p>
+  <h1>오픈 기념<br><span class="hl"><span id="evDiscHero">9,900</span>원 할인 쿠폰</span></h1>
+  <p class="sub">선착순 <span id="evLimit1">100</span>명 한정. 매일 아침 8시, 출근길 1분 학습을<br>지금 시작하세요. 어떤 플랜이든 <span id="evDisc2">9,900</span>원 할인!</p>
 
   <!-- 남은 수량 -->
   <div class="counter">
@@ -171,9 +171,9 @@
 
   <!-- 쿠폰 비주얼 -->
   <div class="coupon-card">
-    <div class="coupon-amount"><span class="won">₩</span>9,900 <span class="won">할인</span></div>
+    <div class="coupon-amount"><span class="won">₩</span><span id="evDiscBig">9,900</span> <span class="won">할인</span></div>
     <div class="coupon-desc">전 플랜 사용 가능 · 1개월 플랜은 전액 무료</div>
-    <div class="coupon-note">전화번호당 1회 발급 · 1회 사용 · 사용기한 6월 30일까지</div>
+    <div class="coupon-note">전화번호당 1회 발급 · 1회 사용<span id="evExpireWrap"> · 사용기한 6월 30일까지</span></div>
   </div>
 
   <!-- 발급 폼 -->
@@ -198,8 +198,8 @@
   <div class="info">
     <div class="info-title">📌 이벤트 안내</div>
     <ul>
-      <li>오픈 기념 9,900원 정액 할인 쿠폰입니다.</li>
-      <li>선착순 100명 한정, 전화번호당 1회만 발급됩니다. (010 휴대폰 번호만 가능)</li>
+      <li>오픈 기념 <span id="evDisc3">9,900</span>원 정액 할인 쿠폰입니다.</li>
+      <li>선착순 <span id="evLimit2">100</span>명 한정, 전화번호당 1회만 발급됩니다. (010 휴대폰 번호만 가능)</li>
       <li>발급받으면 쿠폰번호를 안내해 드립니다. 신청 화면의 "쿠폰 등록"에서 사용하세요.</li>
       <li>모든 구독 플랜(1·3·6·12개월)에 적용되며, 1개월 플랜은 전액 무료입니다.</li>
       <li>유료 결제 시 환불은 실제 결제하신 금액 기준으로 적용됩니다.</li>
@@ -214,7 +214,7 @@
   <div class="modal">
     <div class="modal-check">🎉</div>
     <div class="modal-title">정상 등록되었습니다!</div>
-    <div class="modal-sub">아래 쿠폰번호를 신청 화면의<br>"쿠폰 등록"에 입력하면 9,900원 할인됩니다.</div>
+    <div class="modal-sub">아래 쿠폰번호를 신청 화면의<br>"쿠폰 등록"에 입력하면 <span id="evDisc4">9,900</span>원 할인됩니다.</div>
     <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:4px;line-height:1.6">⚠️ 결제 완료 후 환불하더라도 쿠폰은 재사용이 불가합니다.</div>
     <div class="coupon-code-box">
       <div class="coupon-code-label">쿠폰번호</div>
@@ -239,20 +239,50 @@ phoneInput.addEventListener('input', function(e){
   else e.target.value=v.slice(0,3)+'-'+v.slice(3,7)+'-'+v.slice(7);
 });
 
+// ── [v4] API값으로 화면 문구 동적 표시 ──
+function _setTxt(id, txt){ const el=document.getElementById(id); if(el) el.textContent=txt; }
+function _fmtExpire(iso){
+  // ISO → "M월 D일까지". 빈 값이면 null (= 기한 없음).
+  if(!iso) return null;
+  try{
+    const m = String(iso).match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if(m) return `${parseInt(m[2],10)}월 ${parseInt(m[3],10)}일까지`;
+    const dt = new Date(iso);
+    if(isNaN(dt)) return null;
+    return `${dt.getMonth()+1}월 ${dt.getDate()}일까지`;
+  }catch(e){ return null; }
+}
+function applyCouponDisplay(d){
+  const disc = Number(d.discount ?? 9900);
+  const discTxt = disc.toLocaleString();
+  ['evDiscHero','evDisc2','evDiscBig','evDisc3','evDisc4'].forEach(id => _setTxt(id, discTxt));
+  const limit = d.limit ?? 100;
+  _setTxt('evLimit1', limit);
+  _setTxt('evLimit2', limit);
+  if(d.code) _setTxt('couponCodeText', d.code);
+  // 사용기한
+  const exp = _fmtExpire(d.expire_at);
+  const wrap = document.getElementById('evExpireWrap');
+  if(wrap){
+    if(exp) wrap.textContent = ' · 사용기한 ' + exp;
+    else wrap.style.display = 'none';  // 기한 없음 → 문구 숨김
+  }
+}
+
 // ── 남은 수량 로드 ──
 async function loadStatus(){
   try{
     const r = await fetch(API_BASE+'/api/coupon/status');
     const d = await r.json();
     if(!d.success) return;
+    applyCouponDisplay(d);  // [v4] 할인액·코드·기한·한도 동적 반영
     const remain = d.remaining ?? 0;
-    const limit = d.limit ?? 100;
     document.getElementById('remainNum').textContent = remain;
     if(!d.enabled || d.sold_out || remain<=0){
       document.getElementById('issueForm').style.display='none';
       document.getElementById('soldoutBox').style.display='block';
     }
-  }catch(e){ /* 네트워크 실패 시 폼 유지 */ }
+  }catch(e){ /* 네트워크 실패 시 폼 유지(하드코딩 기본값 표시) */ }
 }
 
 // ── 쿠폰 발급 ──

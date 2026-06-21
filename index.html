@@ -1781,7 +1781,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v221</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v222</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2020,6 +2020,135 @@ body.ll-locked { overflow:hidden; }
   </div>
 </section>
 
+<!-- PRICING -->
+<div class="pricing-wrap">
+  <div style="max-width:860px;margin:0 auto">
+    <div class="sec-eye">Pricing</div>
+    <h2 class="sec-title">커피 한 잔보다 저렴한<br class="br-desktop">지식 구독</h2>
+    <!-- [v222] 금액 강조 배너 -->
+    <div style="text-align:center;margin:16px auto 0">
+      <div style="display:inline-flex;align-items:baseline;gap:7px;padding:11px 24px;border:1.5px solid var(--gold);background:rgba(201,168,76,.1);border-radius:999px">
+        <span style="font-size:14px;color:var(--muted);font-weight:600">월</span>
+        <span style="font-size:36px;font-weight:900;color:var(--gold);line-height:1;letter-spacing:-.5px">₩9,900</span>
+        <span style="font-size:14px;color:var(--muted);font-weight:600">부터 · 하루 ₩115~</span>
+      </div>
+      <div style="margin-top:10px;font-size:13px;color:var(--gold-light);font-weight:700">🎟️ 9,900원 쿠폰 적용 시 1개월 플랜 무료</div>
+    </div>
+  </div>
+
+  <!-- 탭 — 옵션 B에서 1개월권 제외, 패키지만 운영 -->
+  <!-- (v173: 1개월권 다시 활성화 — 일시불 일회성 결제) -->
+
+  <!-- 탭 1: 일시불 (1개월 / 3개월 / 6개월 / 1년) - 유일한 패널 -->
+  <div class="plan-panel active" id="panel-onetime">
+    <div class="plans">
+
+      <!-- 1개월 [v173] -->
+      <div class="plan">
+        <div class="plan-name">1개월 <span style="font-size:14px;color:var(--muted);font-weight:600">(30일)</span></div>
+        <div class="plan-trial-badge" style="background:rgba(120,120,120,.15);color:var(--muted)">환불 보장 기간 없음</div>
+        <div class="plan-price-original" style="visibility:hidden">정가 ₩9,900</div>
+        <div class="plan-price"><span class="w">₩</span><span id="price-monthly">9,900</span></div>
+        <div class="plan-mo" id="price-monthly-mo">
+          <strong style="color:var(--gold);font-size:15px">하루 ₩330</strong>
+        </div>
+        <div class="plan-coupon" style="margin:12px 0 6px;padding:10px;border:1.5px solid var(--gold);background:rgba(201,168,76,.14);border-radius:10px;text-align:center;line-height:1.35">
+          <div style="font-size:11px;color:var(--gold-light);font-weight:700;letter-spacing:.2px;margin-bottom:2px">🎟️ 9,900원 쿠폰 적용가</div>
+          <s style="color:var(--muted);font-size:13px">₩9,900</s>
+          <strong style="color:var(--gold);font-size:24px;font-weight:900;margin-left:5px">무료</strong>
+        </div>
+        <ul class="plan-feats">
+          <li>매일 1편 · 30일 발송</li>
+          <li>카테고리 자유 선택</li>
+          <li>자동 갱신 없음</li>
+          <li class="warn">환불 보장 기간 없음 (단기 체험)</li>
+        </ul>
+        <button class="plan-btn" onclick="openModal('monthly')">지금 시작하기</button>
+      </div>
+
+      <!-- 3개월 -->
+      <div class="plan">
+        <div class="plan-name">3개월 <span style="font-size:14px;color:var(--muted);font-weight:600">(90일)</span></div>
+        <div class="plan-trial-badge">🛡️ 3일 환불 보장</div>
+        <div class="plan-price-original" id="price-pkg3m-original">정가 ₩29,700</div>
+        <div class="plan-price"><span class="w">₩</span><span id="price-pkg3m">19,900</span></div>
+        <div class="plan-mo" id="price-pkg3m-mo">
+          <strong style="color:var(--gold);font-size:15px">하루 ₩222</strong> ·
+          <span style="color:#ff7676;font-weight:700">33% 할인</span>
+        </div>
+        <div class="plan-coupon" style="margin:12px 0 6px;padding:10px;border:1.5px solid var(--gold);background:rgba(201,168,76,.14);border-radius:10px;text-align:center;line-height:1.35">
+          <div style="font-size:11px;color:var(--gold-light);font-weight:700;letter-spacing:.2px;margin-bottom:2px">🎟️ 9,900원 쿠폰 적용가</div>
+          <s style="color:var(--muted);font-size:13px">₩19,900</s>
+          <strong style="color:var(--gold);font-size:24px;font-weight:900;margin-left:5px"><span style="font-size:16px">₩</span>10,000</strong>
+        </div>
+        <ul class="plan-feats">
+          <li>매일 1편 · 90일 발송</li>
+          <li>새로운 분야 시작하기 좋음</li>
+          <li>9,800원 절약 · 1일 약 221원</li>
+          <li>이후 일할 환불 (위약금 10%)</li>
+        </ul>
+        <button class="plan-btn" onclick="openModal('pkg3m')">지금 시작하기</button>
+      </div>
+
+      <!-- 6개월 (HOT) -->
+      <div class="plan hot">
+        <div class="plan-badge">🔥 가장 인기</div>
+        <div class="plan-name">6개월 <span style="font-size:14px;color:var(--muted);font-weight:600">(180일)</span></div>
+        <div class="plan-trial-badge">🛡️ 5일 환불 보장</div>
+        <div class="plan-price-original" id="price-pkg6m-original">정가 ₩59,400</div>
+        <div class="plan-price"><span class="w">₩</span><span id="price-pkg6m">24,900</span></div>
+        <div class="plan-mo" id="price-pkg6m-mo">
+          <strong style="color:var(--gold);font-size:15px">하루 ₩138</strong> ·
+          <span style="color:#ff7676;font-weight:700">58% 할인</span>
+        </div>
+        <div class="plan-coupon" style="margin:12px 0 6px;padding:10px;border:1.5px solid var(--gold);background:rgba(201,168,76,.18);border-radius:10px;text-align:center;line-height:1.35">
+          <div style="font-size:11px;color:var(--gold-light);font-weight:700;letter-spacing:.2px;margin-bottom:2px">🎟️ 9,900원 쿠폰 적용가</div>
+          <s style="color:var(--muted);font-size:13px">₩24,900</s>
+          <strong style="color:var(--gold);font-size:24px;font-weight:900;margin-left:5px"><span style="font-size:16px">₩</span>15,000</strong>
+        </div>
+        <ul class="plan-feats">
+          <li>매일 1편 · 180일 발송</li>
+          <li>가장 인기 · 가성비 최강</li>
+          <li>34,500원 절약 · 1일 약 138원</li>
+          <li>이후 일할 환불 (위약금 10%)</li>
+        </ul>
+        <button class="plan-btn" onclick="openModal('pkg6m')">지금 시작하기</button>
+      </div>
+
+      <!-- 1년 -->
+      <div class="plan plan-1y-notice">
+        <div class="plan-name">1년 <span style="font-size:14px;color:var(--muted);font-weight:600">(364일)</span></div>
+        <div class="plan-trial-badge">🛡️ 7일 환불 보장 (최장)</div>
+        <div class="plan-price-original" id="price-pkg1y-original">정가 ₩118,800</div>
+        <div class="plan-price"><span class="w">₩</span><span id="price-pkg1y">41,900</span></div>
+        <div class="plan-mo" id="price-pkg1y-mo">
+          <strong style="color:var(--gold);font-size:15px">하루 ₩115</strong> ·
+          <span style="color:#ff7676;font-weight:700">65% 할인 (최대)</span>
+        </div>
+        <div class="plan-coupon" style="margin:12px 0 6px;padding:10px;border:1.5px solid var(--gold);background:rgba(201,168,76,.14);border-radius:10px;text-align:center;line-height:1.35">
+          <div style="font-size:11px;color:var(--gold-light);font-weight:700;letter-spacing:.2px;margin-bottom:2px">🎟️ 9,900원 쿠폰 적용가</div>
+          <s style="color:var(--muted);font-size:13px">₩41,900</s>
+          <strong style="color:var(--gold);font-size:24px;font-weight:900;margin-left:5px"><span style="font-size:16px">₩</span>32,000</strong>
+        </div>
+        <ul class="plan-feats">
+          <li>매일 1편 · 364일 발송</li>
+          <li>최장기 · 가장 저렴</li>
+          <li>76,900원 절약 · 1일 약 115원</li>
+          <li>이후 일할 환불 (위약금 10%)</li>
+        </ul>
+        <button class="plan-btn" onclick="openModal('pkg1y')">지금 시작하기</button>
+        <!-- [v176] 안내 텍스트 카드 외부로 absolute 배치 — 버튼 정렬 통일 -->
+        <p class="plan-1y-note">※ 결제 프로그램 정책상 1년 이내 제공 가능하여 364일 발송됩니다.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- (v102: 1개월권 패널 제거됨 — 옵션 B에서 운영 안 함) -->
+
+</div>
+
+
 <!-- ─────────── 4개 카테고리 미리보기 ─────────── -->
 <style>
 .cat-preview-section {
@@ -2241,127 +2370,8 @@ body.ll-locked { overflow:hidden; }
   </div>
 </section>
 
-<!-- PRICING -->
-<div class="pricing-wrap">
-  <div style="max-width:860px;margin:0 auto">
-    <div class="sec-eye">Pricing</div>
-    <h2 class="sec-title">커피 한 잔보다 저렴한<br class="br-desktop">지식 구독</h2>
-  </div>
-
-  <!-- 탭 — 옵션 B에서 1개월권 제외, 패키지만 운영 -->
-  <!-- (v173: 1개월권 다시 활성화 — 일시불 일회성 결제) -->
-
-  <!-- 탭 1: 일시불 (1개월 / 3개월 / 6개월 / 1년) - 유일한 패널 -->
-  <div class="plan-panel active" id="panel-onetime">
-    <div class="plans">
-
-      <!-- 1개월 [v173] -->
-      <div class="plan">
-        <div class="plan-name">1개월 <span style="font-size:14px;color:var(--muted);font-weight:600">(30일)</span></div>
-        <div class="plan-trial-badge" style="background:rgba(120,120,120,.15);color:var(--muted)">환불 보장 기간 없음</div>
-        <div class="plan-price-original" style="visibility:hidden">정가 ₩9,900</div>
-        <div class="plan-price"><span class="w">₩</span><span id="price-monthly">9,900</span></div>
-        <div class="plan-mo" id="price-monthly-mo">
-          <strong style="color:var(--gold);font-size:15px">하루 ₩330</strong>
-        </div>
-        <div class="plan-coupon" style="margin:12px 0 6px;padding:10px;border:1.5px solid var(--gold);background:rgba(201,168,76,.14);border-radius:10px;text-align:center;line-height:1.35">
-          <div style="font-size:11px;color:var(--gold-light);font-weight:700;letter-spacing:.2px;margin-bottom:2px">🎟️ 9,900원 쿠폰 적용가</div>
-          <s style="color:var(--muted);font-size:13px">₩9,900</s>
-          <strong style="color:var(--gold);font-size:24px;font-weight:900;margin-left:5px">무료</strong>
-        </div>
-        <ul class="plan-feats">
-          <li>매일 1편 · 30일 발송</li>
-          <li>카테고리 자유 선택</li>
-          <li>자동 갱신 없음</li>
-          <li class="warn">환불 보장 기간 없음 (단기 체험)</li>
-        </ul>
-        <button class="plan-btn" onclick="openModal('monthly')">지금 시작하기</button>
-      </div>
-
-      <!-- 3개월 -->
-      <div class="plan">
-        <div class="plan-name">3개월 <span style="font-size:14px;color:var(--muted);font-weight:600">(90일)</span></div>
-        <div class="plan-trial-badge">🛡️ 3일 환불 보장</div>
-        <div class="plan-price-original" id="price-pkg3m-original">정가 ₩29,700</div>
-        <div class="plan-price"><span class="w">₩</span><span id="price-pkg3m">19,900</span></div>
-        <div class="plan-mo" id="price-pkg3m-mo">
-          <strong style="color:var(--gold);font-size:15px">하루 ₩222</strong> ·
-          <span style="color:#ff7676;font-weight:700">33% 할인</span>
-        </div>
-        <div class="plan-coupon" style="margin:12px 0 6px;padding:10px;border:1.5px solid var(--gold);background:rgba(201,168,76,.14);border-radius:10px;text-align:center;line-height:1.35">
-          <div style="font-size:11px;color:var(--gold-light);font-weight:700;letter-spacing:.2px;margin-bottom:2px">🎟️ 9,900원 쿠폰 적용가</div>
-          <s style="color:var(--muted);font-size:13px">₩19,900</s>
-          <strong style="color:var(--gold);font-size:24px;font-weight:900;margin-left:5px"><span style="font-size:16px">₩</span>10,000</strong>
-        </div>
-        <ul class="plan-feats">
-          <li>매일 1편 · 90일 발송</li>
-          <li>새로운 분야 시작하기 좋음</li>
-          <li>9,800원 절약 · 1일 약 221원</li>
-          <li>이후 일할 환불 (위약금 10%)</li>
-        </ul>
-        <button class="plan-btn" onclick="openModal('pkg3m')">지금 시작하기</button>
-      </div>
-
-      <!-- 6개월 (HOT) -->
-      <div class="plan hot">
-        <div class="plan-badge">🔥 가장 인기</div>
-        <div class="plan-name">6개월 <span style="font-size:14px;color:var(--muted);font-weight:600">(180일)</span></div>
-        <div class="plan-trial-badge">🛡️ 5일 환불 보장</div>
-        <div class="plan-price-original" id="price-pkg6m-original">정가 ₩59,400</div>
-        <div class="plan-price"><span class="w">₩</span><span id="price-pkg6m">24,900</span></div>
-        <div class="plan-mo" id="price-pkg6m-mo">
-          <strong style="color:var(--gold);font-size:15px">하루 ₩138</strong> ·
-          <span style="color:#ff7676;font-weight:700">58% 할인</span>
-        </div>
-        <div class="plan-coupon" style="margin:12px 0 6px;padding:10px;border:1.5px solid var(--gold);background:rgba(201,168,76,.18);border-radius:10px;text-align:center;line-height:1.35">
-          <div style="font-size:11px;color:var(--gold-light);font-weight:700;letter-spacing:.2px;margin-bottom:2px">🎟️ 9,900원 쿠폰 적용가</div>
-          <s style="color:var(--muted);font-size:13px">₩24,900</s>
-          <strong style="color:var(--gold);font-size:24px;font-weight:900;margin-left:5px"><span style="font-size:16px">₩</span>15,000</strong>
-        </div>
-        <ul class="plan-feats">
-          <li>매일 1편 · 180일 발송</li>
-          <li>가장 인기 · 가성비 최강</li>
-          <li>34,500원 절약 · 1일 약 138원</li>
-          <li>이후 일할 환불 (위약금 10%)</li>
-        </ul>
-        <button class="plan-btn" onclick="openModal('pkg6m')">지금 시작하기</button>
-      </div>
-
-      <!-- 1년 -->
-      <div class="plan plan-1y-notice">
-        <div class="plan-name">1년 <span style="font-size:14px;color:var(--muted);font-weight:600">(364일)</span></div>
-        <div class="plan-trial-badge">🛡️ 7일 환불 보장 (최장)</div>
-        <div class="plan-price-original" id="price-pkg1y-original">정가 ₩118,800</div>
-        <div class="plan-price"><span class="w">₩</span><span id="price-pkg1y">41,900</span></div>
-        <div class="plan-mo" id="price-pkg1y-mo">
-          <strong style="color:var(--gold);font-size:15px">하루 ₩115</strong> ·
-          <span style="color:#ff7676;font-weight:700">65% 할인 (최대)</span>
-        </div>
-        <div class="plan-coupon" style="margin:12px 0 6px;padding:10px;border:1.5px solid var(--gold);background:rgba(201,168,76,.14);border-radius:10px;text-align:center;line-height:1.35">
-          <div style="font-size:11px;color:var(--gold-light);font-weight:700;letter-spacing:.2px;margin-bottom:2px">🎟️ 9,900원 쿠폰 적용가</div>
-          <s style="color:var(--muted);font-size:13px">₩41,900</s>
-          <strong style="color:var(--gold);font-size:24px;font-weight:900;margin-left:5px"><span style="font-size:16px">₩</span>32,000</strong>
-        </div>
-        <ul class="plan-feats">
-          <li>매일 1편 · 364일 발송</li>
-          <li>최장기 · 가장 저렴</li>
-          <li>76,900원 절약 · 1일 약 115원</li>
-          <li>이후 일할 환불 (위약금 10%)</li>
-        </ul>
-        <button class="plan-btn" onclick="openModal('pkg1y')">지금 시작하기</button>
-        <!-- [v176] 안내 텍스트 카드 외부로 absolute 배치 — 버튼 정렬 통일 -->
-        <p class="plan-1y-note">※ 결제 프로그램 정책상 1년 이내 제공 가능하여 364일 발송됩니다.</p>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- (v102: 1개월권 패널 제거됨 — 옵션 B에서 운영 안 함) -->
-
-</div>
-
 <!-- TESTIMONIALS -->
-<section class="section">
+<section class="section" id="reviewsSection">
   <div class="sec-eye">Reviews</div>
   <h2 class="sec-title">구독자들의 진짜 후기</h2>
   <div class="testis">
@@ -9842,6 +9852,21 @@ function onKakaoChannelClick() {
   });
 })();
 </script>
+
+<!-- [v222] 모바일 보정: 리뷰 숨김 + 콘텐츠 소개 순번 제거·가운데 정렬 -->
+<style>
+  @media (max-width:768px){
+    /* 리뷰(후기) 섹션 모바일 숨김 */
+    #reviewsSection{ display:none !important; }
+    /* 콘텐츠 소개: 순번(번호) 동그라미 제거 + 가운데 정렬 */
+    .content-breakdown .breakdown-num{ display:none !important; }
+    .content-breakdown .breakdown-item{ flex-direction:column; align-items:center; text-align:center; gap:6px; }
+    .content-breakdown .breakdown-content h4,
+    .content-breakdown .breakdown-content p{ text-align:center; }
+    /* 설명 영역 자체도 가운데 정렬 */
+    .mockup-desc{ text-align:center; }
+  }
+</style>
 
 <!-- [v221] 쿠폰 이벤트 플로팅 버튼 — 원형 배경 제거, 쿠폰 이미지(🎟️)+글씨만, 호버 시 텍스트 -->
 <style>

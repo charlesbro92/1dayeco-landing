@@ -1781,7 +1781,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v228</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v229</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2365,20 +2365,60 @@ body.ll-locked { overflow:hidden; }
   </div>
 </section>
 
+<!-- [v229] 후기 자동 스와이프 캐러셀 스타일 -->
+<style>
+  .review-marquee{
+    margin-top:44px; overflow:hidden; width:100%;
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);
+            mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);
+  }
+  .review-track{ display:flex; width:max-content; align-items:stretch; animation:reviewScroll 75s linear infinite; }
+  .review-marquee:hover .review-track{ animation-play-state:paused; }
+  .review-track .testi{
+    flex:0 0 300px; width:300px; box-sizing:border-box; margin:0 14px 0 0;
+    display:flex; flex-direction:column;
+  }
+  .review-track .testi .testi-text{ flex:1; }
+  @keyframes reviewScroll{ from{transform:translateX(0)} to{transform:translateX(-50%)} }
+  @media (max-width:768px){
+    .review-track .testi{ flex-basis:268px; width:268px; margin-right:12px; }
+    .review-track{ animation-duration:55s; }
+  }
+  @media (prefers-reduced-motion:reduce){
+    .review-track{ animation:none; }
+    .review-marquee{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  }
+</style>
+
 <!-- TESTIMONIALS -->
 <section class="section" id="reviewsSection">
   <div class="sec-eye">Reviews</div>
   <h2 class="sec-title">구독자들의 진짜 후기</h2>
-  <div class="testis">
-    <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"뉴스는 길고 유튜브는 시간이 아까웠는데, 1분이라 매일 읽게 됩니다. 출근길에 카톡 열면 그 날 공부 끝."</p><div class="testi-who"><div class="testi-av">👨‍💼</div><div><div class="testi-name">김**</div><div class="testi-job">IT 스타트업 대표</div></div></div></div>
-    <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"카테고리 3개나 구독했는데 알아서 카톡으로 다 도착해요. 따로 챙길 필요 없이 매일 자동으로 와서 진짜 편합니다."</p><div class="testi-who"><div class="testi-av">👩‍🏫</div><div><div class="testi-name">박**</div><div class="testi-job">중학교 교사</div></div></div></div>
-    <div class="testi"><div class="testi-stars">★★★★☆</div><p class="testi-text">"팀원들한테 단체로 구독시켰어요. 월요일 미팅 때 경제·상식 얘기가 자연스럽게 나오기 시작했습니다."</p><div class="testi-who"><div class="testi-av">👨‍💻</div><div><div class="testi-name">이**</div><div class="testi-job">마케팅 팀장</div></div></div></div>
+  <!-- [v229] 자동 스와이프 후기 캐러셀 (마퀴) -->
+  <div class="review-marquee" aria-label="구독자 후기 모음">
+    <div class="review-track" id="reviewTrack">
+      <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"GDP·금리 뉴스만 나오면 채널 돌렸는데, '처음 만나는 경제 용어'부터 보니 이제 출근길 경제 뉴스가 들리기 시작했어요."</p><div class="testi-who"><div class="testi-av">🧑‍💼</div><div><div class="testi-name">김**</div><div class="testi-job">사회초년생</div></div></div></div>
+      <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"'한국 증시 첫걸음'으로 코스피·코스닥이 뭔지, 호가·배당 같은 기본 개념부터 잡았어요. 종목 추천이 아니라 개념 설명이라 부담 없이 읽습니다."</p><div class="testi-who"><div class="testi-av">🧑‍💻</div><div><div class="testi-name">이**</div><div class="testi-job">직장인</div></div></div></div>
+      <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"'빅테크 M7 한 줄 분석'은 어떤 회사가 뭘로 돈을 버는지 풀어줘요. 뉴스에 엔비디아·애플이 나와도 이제 무슨 얘긴지 이해됩니다."</p><div class="testi-who"><div class="testi-av">👨‍💻</div><div><div class="testi-name">박**</div><div class="testi-job">IT 회사원</div></div></div></div>
+      <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"'부동산 정책 한 조각'으로 청약·LTV 같은 용어와 정책이 어떻게 돌아가는지 이해됐어요. 사라 마라가 아니라 개념 설명이라 좋아요."</p><div class="testi-who"><div class="testi-av">🧑‍🤝‍🧑</div><div><div class="testi-name">정**</div><div class="testi-job">예비 청약 신혼부부</div></div></div></div>
+      <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"'프렌즈 카페에서 영어'로 매일 한 표현씩. 단어장 앱은 다 지웠는데 이건 아침 카톡이라 자연스럽게 봐요."</p><div class="testi-who"><div class="testi-av">🧑‍🎓</div><div><div class="testi-name">최**</div><div class="testi-job">대학생</div></div></div></div>
+      <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"AI 얘기가 회의마다 나오는데 벅찼어요. 'AI 기본기 한 조각'을 아침에 읽고 가면 그날 회의가 한결 편합니다."</p><div class="testi-who"><div class="testi-av">👩‍💼</div><div><div class="testi-name">윤**</div><div class="testi-job">마케터</div></div></div></div>
+      <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"'시간을 벌어주는 자동화' 팁 하나 따라 했다가 반복 업무가 확 줄었어요. 출근하자마자 바로 써먹습니다."</p><div class="testi-who"><div class="testi-av">🧑‍💼</div><div><div class="testi-name">한**</div><div class="testi-job">5년차 사무직</div></div></div></div>
+      <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"'내 코인 지키는 법'은 사라 마라가 아니라 사기·해킹 피하는 법과 기본 개념을 알려줘서 안심돼요. 아침에 하나씩 챙겨봅니다."</p><div class="testi-who"><div class="testi-av">🧑‍💻</div><div><div class="testi-name">장**</div><div class="testi-job">직장인</div></div></div></div>
+      <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"베트남 거래처 미팅 전에 '회사에서 쓰는 베트남어' 한 줄이 큰 힘이 돼요. 출근길에 외우고 갑니다."</p><div class="testi-who"><div class="testi-av">🧑‍✈️</div><div><div class="testi-name">서**</div><div class="testi-job">해외영업 담당</div></div></div></div>
+      <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"직원들과 '현직자처럼 보는 경제'를 같이 구독했어요. 아침마다 같은 주제가 도착하니 점심 때 자연스럽게 대화가 됩니다."</p><div class="testi-who"><div class="testi-av">👨‍💼</div><div><div class="testi-name">임**</div><div class="testi-job">중소기업 대표</div></div></div></div>
+      <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"'심슨네 가족과 영어'는 짧고 재밌어서 아이랑 같이 봐요. 아침에 한 표현씩 따라 하니 영어가 놀이가 됐어요."</p><div class="testi-who"><div class="testi-av">👩‍👧</div><div><div class="testi-name">강**</div><div class="testi-job">워킹맘</div></div></div></div>
+      <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"'국내외 IT 핫이슈'를 한 줄로 받아서, 개발자 동료들과 대화할 때 더는 멍하지 않아요."</p><div class="testi-who"><div class="testi-av">🧑‍💼</div><div><div class="testi-name">조**</div><div class="testi-job">비전공 기획자</div></div></div></div>
+      <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"'팀과 통하는 협업 툴' 팁으로 노션·슬랙을 제대로 쓰기 시작했어요. 출근 직후 바로 적용합니다."</p><div class="testi-who"><div class="testi-av">🧑‍💻</div><div><div class="testi-name">노**</div><div class="testi-job">스타트업 직원</div></div></div></div>
+      <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"'뉴스가 술술 읽히는 경제'를 보고 나서 아침 경제 기사가 정말 술술 읽혀요. 개념을 잡아주니 겁이 안 나요."</p><div class="testi-who"><div class="testi-av">👨‍💼</div><div><div class="testi-name">오**</div><div class="testi-job">30대 직장인</div></div></div></div>
+      <div class="testi"><div class="testi-stars">★★★★★</div><p class="testi-text">"'미국 주식 핵심 용어'로 ETF·배당 같은 말부터 이해했어요. 투자 권유가 아니라 용어 설명이라 입문하기 딱 좋네요."</p><div class="testi-who"><div class="testi-av">👩‍💼</div><div><div class="testi-name">신**</div><div class="testi-job">직장인</div></div></div></div>
+    </div>
   </div>
-  <!-- [v195] 후기 보내기 CTA (카카오톡 채널) -->
+  <!-- [v229] 후기 보내기 CTA (구글폼 연결) -->
   <div class="review-cta">
     <div class="review-cta-text">1DAYECO를 사용해 보셨나요?<br>여러분의 진솔한 후기를 들려주세요.</div>
-    <a href="http://pf.kakao.com/_ctaTX" target="_blank" rel="noopener" class="review-cta-btn">
-      💬 카카오톡 채널 @1DAYECO 에 후기 보내기
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSfJAraEMIP36NBVc2wr2_8ijxpqeJ_nikS3x0QSdsYDDVpgVA/viewform" target="_blank" rel="noopener" class="review-cta-btn">
+      ✍️ 1분 후기 남기기
     </a>
     <div class="review-cta-sub">검토 후 이 페이지에 소개해 드릴 수 있어요.</div>
   </div>
@@ -9866,8 +9906,7 @@ function onKakaoChannelClick() {
 <!-- [v222] 모바일 보정: 리뷰 숨김 + 콘텐츠 소개 순번 제거·가운데 정렬 -->
 <style>
   @media (max-width:768px){
-    /* 리뷰(후기) 섹션 모바일 숨김 */
-    #reviewsSection{ display:none !important; }
+    /* [v229] 후기 섹션 모바일에도 노출 (캐러셀) — 기존 숨김 해제 */
     /* 콘텐츠 소개: 순번(번호) 동그라미 제거 + 가운데 정렬 */
     .content-breakdown .breakdown-num{ display:none !important; }
     .content-breakdown .breakdown-item{ flex-direction:column; align-items:center; text-align:center; gap:6px; }
@@ -10018,6 +10057,22 @@ function onKakaoChannelClick() {
   }
   if(document.readyState !== 'loading') initPlansDots();
   else document.addEventListener('DOMContentLoaded', initPlansDots);
+})();
+</script>
+
+<!-- [v229] 후기 캐러셀: 끊김 없는 무한 루프 위해 카드 1세트 복제 -->
+<script>
+(function(){
+  function initReviewMarquee(){
+    var t = document.getElementById('reviewTrack');
+    if(!t || t.dataset.cloned) return;
+    var kids = Array.prototype.slice.call(t.children);
+    if(kids.length < 2) return;
+    kids.forEach(function(k){ var c = k.cloneNode(true); c.setAttribute('aria-hidden','true'); t.appendChild(c); });
+    t.dataset.cloned = '1';
+  }
+  if(document.readyState !== 'loading') initReviewMarquee();
+  else document.addEventListener('DOMContentLoaded', initReviewMarquee);
 })();
 </script>
 </body>

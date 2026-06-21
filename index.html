@@ -1781,7 +1781,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v225</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v226</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2144,6 +2144,8 @@ body.ll-locked { overflow:hidden; }
     </div>
     <!-- [v223] 모바일 스와이프 도트 인디케이터 -->
     <div class="plans-dots" id="plansDots" aria-hidden="true"></div>
+    <!-- [v226] 1년 플랜 안내문 (모바일 전용 — 카드 밖, 캐러셀 하단) -->
+    <p class="plan-note-mobile">※ 결제 프로그램 정책상 1년 이내 제공 가능하여 364일 발송됩니다.</p>
   </div>
 
   <!-- (v102: 1개월권 패널 제거됨 — 옵션 B에서 운영 안 함) -->
@@ -9919,8 +9921,10 @@ function onKakaoChannelClick() {
 <!-- [v225] 모바일 보정: 목업·콘텐츠 전체 가운데 정렬 + 1년 플랜 안내문 잘림 수정 -->
 <style>
   @media (max-width:768px){
-    /* 샘플 목업 + 콘텐츠 소개 전체 가운데 정렬 (강제) */
-    .mockup-section{ justify-items:center !important; }
+    /* [v226] 핵심 원인: .iphone-body 고정 340px 가 좁은 폰에서 .mockup-section 을
+       뷰포트보다 넓게 강제 → 전체가 오른쪽으로 오버플로(쏠림). 아이폰을 반응형으로. */
+    .iphone-body{ width:min(300px, 80vw) !important; }
+    .mockup-section{ justify-items:center !important; max-width:100% !important; overflow:hidden; }
     .iphone-wrap{ align-items:center !important; margin-left:auto !important; margin-right:auto !important; }
     .mockup-desc{ text-align:center !important; }
     .mockup-desc .sec-eye,
@@ -9936,14 +9940,12 @@ function onKakaoChannelClick() {
     .content-breakdown .breakdown-content h4,
     .content-breakdown .breakdown-content p{ text-align:center !important; }
 
-    /* 1년 플랜 안내문이 스와이프 레일(overflow) 밖으로 나가 잘리는 문제 →
-       absolute 해제하고 카드 흐름 안으로 + 레일 하단 여백 확보 */
-    #panel-onetime .plans .plan-1y-note{
-      position:static !important; top:auto !important; left:auto !important; right:auto !important;
-      margin:10px 0 0 !important; padding:0 4px !important;
-    }
-    #panel-onetime .plans{ align-items:start !important; padding-bottom:24px !important; }
+    /* [v226] 1년 플랜 안내문: 카드 안에 넣지 않고(카드 크기 동일 유지) 캐러셀 아래 별도 표시 */
+    #panel-onetime .plans .plan-1y-note{ display:none !important; }
+    #panel-onetime .plans{ align-items:stretch !important; padding-bottom:14px !important; }
+    .plan-note-mobile{ display:block !important; text-align:center; font-size:10.5px; color:var(--muted); line-height:1.5; margin:2px 16px 0; }
   }
+  .plan-note-mobile{ display:none; }
 </style>
 
 <!-- [v221] 쿠폰 이벤트 플로팅 버튼 — 원형 배경 제거, 쿠폰 이미지(🎟️)+글씨만, 호버 시 텍스트 -->

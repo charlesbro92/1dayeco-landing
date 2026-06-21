@@ -1781,7 +1781,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v226</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v227</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -9726,7 +9726,7 @@ function onKakaoChannelClick() {
     <button onclick="closeCouponPopup()" aria-label="닫기" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--muted);font-size:22px;line-height:1;cursor:pointer">×</button>
 
     <div style="text-align:center;font-size:12px;color:var(--gold-light);font-weight:700;letter-spacing:2px;font-style:italic;margin-bottom:6px">OPEN EVENT</div>
-    <h3 style="text-align:center;font-family:var(--serif,'Noto Serif KR',serif);font-size:25px;font-weight:900;line-height:1.3;margin:0 0 6px;color:var(--text,#F2F1EC)">오픈 기념 <span style="color:var(--gold-light)">9,900원 할인</span></h3>
+    <h3 style="text-align:center;font-family:var(--serif,'Noto Serif KR',serif);font-size:25px;font-weight:900;line-height:1.3;margin:0 0 6px;color:var(--text,#F2F1EC)">오픈 기념 <span style="color:var(--gold-light)">할인 쿠폰</span></h3>
     <p style="text-align:center;font-size:13px;color:var(--muted);margin:0 0 14px;word-break:keep-all">전 플랜 사용 가능 · <b style="color:var(--gold-light)">1개월 플랜은 전액 무료!</b><br>선착순 100명 · 전화번호당 1회 · 6/30까지</p>
 
     <!-- 쿠폰 비주얼 + 잔여수량 -->
@@ -9979,7 +9979,8 @@ function onKakaoChannelClick() {
     #couponFab .fab-label{ display:none; } /* 모바일은 호버 없음 → 라벨 숨김 */
   }
 </style>
-<a href="https://onedayeco.com/event.html" id="couponFab" aria-label="9,900원 할인 쿠폰 받기" title="9,900원 할인 쿠폰 받기">
+<a href="https://onedayeco.com/event.html" id="couponFab" aria-label="9,900원 할인 쿠폰 받기" title="9,900원 할인 쿠폰 받기"
+   onclick="if(typeof showCouponPopup==='function'){showCouponPopup();return false;}">
   <span class="fab-label">🎟️ 9,900원 할인 쿠폰 받기</span>
   <span class="fab-coupon">
     <span class="fab-ico" aria-hidden="true">🎟️</span>

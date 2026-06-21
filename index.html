@@ -1781,7 +1781,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v222</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v223</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -2142,6 +2142,8 @@ body.ll-locked { overflow:hidden; }
       </div>
 
     </div>
+    <!-- [v223] 모바일 스와이프 도트 인디케이터 -->
+    <div class="plans-dots" id="plansDots" aria-hidden="true"></div>
   </div>
 
   <!-- (v102: 1개월권 패널 제거됨 — 옵션 B에서 운영 안 함) -->
@@ -9865,6 +9867,37 @@ function onKakaoChannelClick() {
     .content-breakdown .breakdown-content p{ text-align:center; }
     /* 설명 영역 자체도 가운데 정렬 */
     .mockup-desc{ text-align:center; }
+
+    /* [v223] 금액 플랜 가로 스와이프 (부주제 스와이프와 동일 방식) */
+    #panel-onetime .plans{
+      display:flex !important;
+      flex-direction:row !important;
+      grid-template-columns:none !important;
+      max-width:none !important;
+      overflow-x:auto; overflow-y:hidden;
+      scroll-snap-type:x mandatory;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:none;
+      gap:12px;
+      padding:4px 16px 16px;
+      margin-left:-16px; margin-right:-16px;
+      scroll-padding-left:16px;
+    }
+    #panel-onetime .plans::-webkit-scrollbar{ display:none; }
+    #panel-onetime .plans .plan{
+      flex:0 0 80%;
+      scroll-snap-align:start;
+      scroll-snap-stop:always;
+      margin:0;  /* hot 카드 등 위아래 변형 제거해 정렬 통일 */
+    }
+    #panel-onetime .plans .plan.hot{ transform:none; }
+  }
+  /* 스와이프 도트 (모바일에서만 표시) */
+  .plans-dots{ display:none; }
+  @media (max-width:768px){
+    .plans-dots{ display:flex; justify-content:center; gap:6px; margin:2px 0 8px; }
+    .plans-dots .pd{ width:6px; height:6px; border-radius:50%; background:rgba(201,168,76,.28); border:none; padding:0; cursor:pointer; transition:all .25s ease; }
+    .plans-dots .pd.active{ background:var(--gold); width:16px; border-radius:3px; }
   }
 </style>
 
@@ -9906,5 +9939,47 @@ function onKakaoChannelClick() {
     <span class="fab-txt">쿠폰</span>
   </span>
 </a>
+
+<!-- [v223] 금액 플랜 스와이프 도트 인디케이터 -->
+<script>
+(function(){
+  function initPlansDots(){
+    var rail = document.querySelector('#panel-onetime .plans');
+    var dots = document.getElementById('plansDots');
+    if(!rail || !dots) return;
+    var cards = rail.querySelectorAll('.plan');
+    if(cards.length < 2){ dots.style.display='none'; return; }
+    dots.innerHTML = '';
+    for(var i=0;i<cards.length;i++){
+      (function(idx){
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'pd' + (idx===0 ? ' active' : '');
+        b.setAttribute('aria-label', (idx+1) + '번째 플랜으로 이동');
+        b.addEventListener('click', function(){
+          cards[idx].scrollIntoView({behavior:'smooth', inline:'start', block:'nearest'});
+        });
+        dots.appendChild(b);
+      })(i);
+    }
+    var ds = dots.querySelectorAll('.pd');
+    var base = cards[0].offsetLeft;
+    function sync(){
+      var sl = rail.scrollLeft, best = 0, bd = Infinity;
+      for(var i=0;i<cards.length;i++){
+        var d = Math.abs((cards[i].offsetLeft - base) - sl);
+        if(d < bd){ bd = d; best = i; }
+      }
+      for(var j=0;j<ds.length;j++) ds[j].classList.toggle('active', j===best);
+    }
+    var t=null;
+    rail.addEventListener('scroll', function(){
+      if(t) return; t = setTimeout(function(){ t=null; sync(); }, 80);
+    }, {passive:true});
+  }
+  if(document.readyState !== 'loading') initPlansDots();
+  else document.addEventListener('DOMContentLoaded', initPlansDots);
+})();
+</script>
 </body>
 </html>

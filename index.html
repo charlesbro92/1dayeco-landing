@@ -1781,7 +1781,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v223</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v224</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -9703,6 +9703,21 @@ function onKakaoChannelClick() {
   </div>
 </div>
 
+<!-- [v224] 쿠폰 팝업 라이트 모드 연동 (하드코딩 다크 색상 → 테마 토큰 오버라이드) -->
+<style>
+  body.light-mode #couponPopupBg{ background:rgba(20,18,12,.42) !important; }
+  body.light-mode #couponPopupBg > div{
+    background:var(--dark2) !important;
+    box-shadow:0 20px 60px rgba(120,110,70,.22) !important;
+  }
+  body.light-mode #cpName,
+  body.light-mode #cpPhone{
+    background:var(--dark) !important;
+    color:var(--text) !important;
+  }
+  body.light-mode #couponPopupDone > div{ background:var(--dark3) !important; }
+</style>
+
 <!-- ── [v219] 쿠폰 이벤트 첫 진입 팝업 ───────────────────────────── -->
 <div id="couponPopupBg" style="position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;z-index:9999;padding:18px;backdrop-filter:blur(4px)" onclick="if(event.target===this)closeCouponPopup()">
   <div style="background:linear-gradient(160deg,#1E1B12,#16161A);border:1.5px solid var(--gold);border-radius:20px;max-width:400px;width:100%;padding:26px 22px 22px;position:relative;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.5)">
@@ -9737,7 +9752,7 @@ function onKakaoChannelClick() {
       </div>
       <button id="cpCopyBtn" onclick="couponPopupCopy()" style="width:100%;background:rgba(201,168,76,.14);border:1px solid var(--gold);color:var(--gold-light);border-radius:10px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--sans)">📋 쿠폰번호 복사</button>
       <button onclick="couponPopupGoApply()" style="width:100%;margin-top:9px;background:var(--gold);color:#1A1A1C;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:800;cursor:pointer;font-family:var(--sans)">신청하러 가기 →</button>
-      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:10px;text-align:center;line-height:1.5">신청 화면의 "쿠폰 등록"에 입력하면 적용됩니다.<br>⚠️ 결제 후 환불해도 쿠폰 재사용은 불가합니다.</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:10px;text-align:center;line-height:1.5">신청 화면의 "쿠폰 등록"에 입력하면 적용됩니다.<br>⚠️ 결제 후 환불해도 쿠폰 재사용은 불가합니다.</div>
     </div>
 
     <!-- 이벤트 페이지 바로가기 -->

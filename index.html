@@ -1781,7 +1781,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v224</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v225</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -9913,6 +9913,36 @@ function onKakaoChannelClick() {
     .plans-dots{ display:flex; justify-content:center; gap:6px; margin:2px 0 8px; }
     .plans-dots .pd{ width:6px; height:6px; border-radius:50%; background:rgba(201,168,76,.28); border:none; padding:0; cursor:pointer; transition:all .25s ease; }
     .plans-dots .pd.active{ background:var(--gold); width:16px; border-radius:3px; }
+  }
+</style>
+
+<!-- [v225] 모바일 보정: 목업·콘텐츠 전체 가운데 정렬 + 1년 플랜 안내문 잘림 수정 -->
+<style>
+  @media (max-width:768px){
+    /* 샘플 목업 + 콘텐츠 소개 전체 가운데 정렬 (강제) */
+    .mockup-section{ justify-items:center !important; }
+    .iphone-wrap{ align-items:center !important; margin-left:auto !important; margin-right:auto !important; }
+    .mockup-desc{ text-align:center !important; }
+    .mockup-desc .sec-eye,
+    .mockup-desc h2,
+    .mockup-desc > p{ text-align:center !important; }
+    .content-breakdown{ align-items:center !important; }
+    .content-breakdown .breakdown-item{
+      flex-direction:column !important; align-items:center !important;
+      text-align:center !important; gap:6px !important; max-width:560px; margin:0 auto;
+    }
+    .content-breakdown .breakdown-num{ display:none !important; }
+    .content-breakdown .breakdown-content{ text-align:center !important; }
+    .content-breakdown .breakdown-content h4,
+    .content-breakdown .breakdown-content p{ text-align:center !important; }
+
+    /* 1년 플랜 안내문이 스와이프 레일(overflow) 밖으로 나가 잘리는 문제 →
+       absolute 해제하고 카드 흐름 안으로 + 레일 하단 여백 확보 */
+    #panel-onetime .plans .plan-1y-note{
+      position:static !important; top:auto !important; left:auto !important; right:auto !important;
+      margin:10px 0 0 !important; padding:0 4px !important;
+    }
+    #panel-onetime .plans{ align-items:start !important; padding-bottom:24px !important; }
   }
 </style>
 

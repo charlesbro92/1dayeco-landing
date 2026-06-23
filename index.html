@@ -1781,7 +1781,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v231</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v232</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -10266,6 +10266,7 @@ function onKakaoChannelClick() {
       +   '<div style="font-size:18px;font-weight:800;color:#2a2a2a;margin-bottom:6px;">발송 완료!</div>'
       +   '<div id="trialDoneMsg" style="font-size:13px;color:#777;line-height:1.6;margin-bottom:20px;">카카오톡을 확인해보세요.</div>'
       +   '<button id="trialToPay" type="button" style="width:100%;padding:14px;border:0;border-radius:10px;background:#b8893b;color:#fff;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:8px;">마음에 드셨다면 쿠폰가로 이어보기 →</button>'
+      +   '<button id="trialAgain" type="button" style="width:100%;padding:12px;border:1.5px solid #b8893b;border-radius:10px;background:#fff;color:#b8893b;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;">🎁 다른 컨텐츠도 체험하기</button>'
       +   '<button id="trialDoneClose" type="button" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:10px;background:#fff;color:#888;font-size:13px;cursor:pointer;">닫기</button>'
       + '</div>'
       + '</div>';
@@ -10276,6 +10277,7 @@ function onKakaoChannelClick() {
     ov.querySelector('#trialCat').addEventListener('change', onCatChange);
     ov.querySelector('#trialSubmit').addEventListener('click', submitTrial);
     ov.querySelector('#trialToPay').addEventListener('click', goToPay);
+    ov.querySelector('#trialAgain').addEventListener('click', resetTrialForm);
     // 전화 자동 하이픈
     ov.querySelector('#trialPhone').addEventListener('input', function(){
       var v = this.value.replace(/[^0-9]/g,'').slice(0,11);
@@ -10381,6 +10383,20 @@ function onKakaoChannelClick() {
     closeTrial();
     var el = document.querySelector('.pricing-wrap');
     if (el) el.scrollIntoView({ behavior:'smooth' });
+  }
+
+  // 완료 화면 → 첫 입력 화면으로 복귀 (다른 컨텐츠 체험)
+  function resetTrialForm(){
+    document.getElementById('trialDone').style.display = 'none';
+    document.getElementById('trialForm').style.display = 'block';
+    clearErr();
+    // 이름/전화는 유지, 주제 선택만 초기화해 새 주제를 고르게 함
+    var catSel = document.getElementById('trialCat');
+    var subSel = document.getElementById('trialSub');
+    if (catSel) catSel.value = '';
+    if (subSel){ subSel.innerHTML = '<option value="">부주제 선택</option>'; subSel.disabled = true; }
+    var ov = document.getElementById('trialOverlay');
+    if (ov){ var box = ov.querySelector('[role=dialog]'); if (box) box.scrollTop = 0; }
   }
 
   if (document.readyState !== 'loading') initCountdown();

@@ -1781,7 +1781,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v230</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v231</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1923,6 +1923,13 @@ body.ll-locked { overflow:hidden; }
       </div>
       <div class="agree-err" id="heroAgreeErr">필수 약관에 모두 동의해 주세요</div>
     </div>
+    <!-- [v231] 쿠폰 이벤트 카운트다운 -->
+    <div id="couponCountdown" style="display:none;margin-top:14px;text-align:center">
+      <div style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border-radius:999px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.35)">
+        <span style="font-size:12px;color:var(--gold);font-weight:700">🔥 쿠폰 이벤트 종료까지</span>
+        <span id="couponCountdownClock" style="font-size:14px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums;letter-spacing:.5px">--:--:--</span>
+      </div>
+    </div>
     <div style="margin-top:14px;text-align:center">
       <a href="https://onedayeco.com/event.html"
          onclick="showCouponPopup();return false;"
@@ -1931,6 +1938,16 @@ body.ll-locked { overflow:hidden; }
          onmouseout="this.style.background='transparent'">
         🎟️ 9,900원 할인 쿠폰 받기
       </a>
+    </div>
+    <!-- [v231] 무료 1편 체험 진입 -->
+    <div style="margin-top:12px;text-align:center">
+      <button type="button" onclick="openTrialModal()"
+         style="display:inline-flex;align-items:center;gap:6px;padding:12px 30px;border:0;border-radius:8px;background:var(--gold);color:#fff;font-size:14px;font-weight:800;letter-spacing:.3px;cursor:pointer;box-shadow:0 6px 18px rgba(201,168,76,.35);transition:transform .15s,box-shadow .15s"
+         onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 22px rgba(201,168,76,.45)'"
+         onmouseout="this.style.transform='none';this.style.boxShadow='0 6px 18px rgba(201,168,76,.35)'">
+        🎁 무료로 1편 받아보기
+      </button>
+      <div style="margin-top:6px;font-size:11px;color:var(--muted)">결제 없이, 지금 카카오톡으로 샘플 1편을 받아보세요</div>
     </div>
   </div>
 
@@ -10176,6 +10193,198 @@ function onKakaoChannelClick() {
   function init(){ recordVisit(); initBadgeTrigger(); }
   if (document.readyState !== 'loading') init();
   else document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+
+<!-- [v231] 무료 1편 체험 + 쿠폰 카운트다운 ───────────────────────── -->
+<script>
+(function(){
+  var BACKEND = 'https://web-production-761cd.up.railway.app';
+
+  // ───────── 1) 쿠폰 카운트다운 ─────────
+  var cdTimer = null;
+  function pad(n){ return (n<10?'0':'')+n; }
+  function startCountdown(expireAt){
+    var wrap = document.getElementById('couponCountdown');
+    var clock = document.getElementById('couponCountdownClock');
+    if (!wrap || !clock || !expireAt) return;
+    var end = new Date(expireAt).getTime();
+    if (isNaN(end)) return;
+    function tick(){
+      var diff = end - Date.now();
+      if (diff <= 0){
+        clock.textContent = '00:00:00';
+        wrap.style.display = 'none';
+        if (cdTimer) clearInterval(cdTimer);
+        return;
+      }
+      var d = Math.floor(diff/86400000);
+      var h = Math.floor((diff%86400000)/3600000);
+      var m = Math.floor((diff%3600000)/60000);
+      var s = Math.floor((diff%60000)/1000);
+      clock.textContent = (d>0? d+'일 ' : '') + pad(h)+':'+pad(m)+':'+pad(s);
+    }
+    wrap.style.display = 'block';
+    tick();
+    if (cdTimer) clearInterval(cdTimer);
+    cdTimer = setInterval(tick, 1000);
+  }
+  function initCountdown(){
+    fetch(BACKEND + '/api/coupon/status', { cache:'no-store' })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (d && d.enabled && d.expire_at && !d.sold_out) startCountdown(d.expire_at);
+      })
+      .catch(function(e){ console.warn('[coupon countdown]', e); });
+  }
+
+  // ───────── 2) 무료 1편 체험 모달 ─────────
+  var trialData = null; // {categories:[{id,label,subtopics:[{id,name}]}]}
+
+  function buildTrialModal(){
+    var ov = document.getElementById('trialOverlay');
+    if (ov) return ov;
+    ov = document.createElement('div');
+    ov.id = 'trialOverlay';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);font-family:inherit;padding:16px;';
+    ov.innerHTML =
+      '<div role="dialog" aria-modal="true" style="background:#fff;border-radius:18px;padding:26px 24px 22px;width:min(420px,94vw);max-height:90vh;overflow:auto;box-shadow:0 24px 60px rgba(0,0,0,.3);position:relative;">'
+      + '<button id="trialClose" aria-label="닫기" style="position:absolute;top:12px;right:14px;border:0;background:transparent;font-size:24px;line-height:1;color:#aaa;cursor:pointer;">&times;</button>'
+      + '<div style="font-size:18px;font-weight:800;color:#2a2a2a;margin-bottom:4px;">🎁 무료로 1편 받아보기</div>'
+      + '<div style="font-size:13px;color:#888;margin-bottom:18px;">관심 주제를 고르면 지금 바로 카카오톡으로 샘플 1편을 보내드려요.</div>'
+      + '<div id="trialForm">'
+      +   '<input id="trialName" type="text" maxlength="20" placeholder="이름을 입력해주세요" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:10px;">'
+      +   '<input id="trialPhone" type="tel" maxlength="13" placeholder="010-0000-0000" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:10px;">'
+      +   '<select id="trialCat" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:10px;background:#fff;"><option value="">카테고리 선택</option></select>'
+      +   '<select id="trialSub" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:6px;background:#fff;" disabled><option value="">부주제 선택</option></select>'
+      +   '<div id="trialErr" style="display:none;font-size:12px;color:#d23;margin:4px 2px 0;"></div>'
+      +   '<label style="display:flex;gap:8px;align-items:flex-start;margin:12px 2px 14px;font-size:12px;color:#666;cursor:pointer;"><input id="trialAgree" type="checkbox" style="margin-top:2px;"><span>개인정보 수집·이용 및 카카오톡 발송에 동의합니다 (필수)</span></label>'
+      +   '<button id="trialSubmit" type="button" style="width:100%;padding:14px;border:0;border-radius:10px;background:#b8893b;color:#fff;font-size:15px;font-weight:800;cursor:pointer;">체험하기</button>'
+      + '</div>'
+      + '<div id="trialDone" style="display:none;text-align:center;">'
+      +   '<div style="font-size:42px;margin:6px 0 8px;">📩</div>'
+      +   '<div style="font-size:18px;font-weight:800;color:#2a2a2a;margin-bottom:6px;">발송 완료!</div>'
+      +   '<div id="trialDoneMsg" style="font-size:13px;color:#777;line-height:1.6;margin-bottom:20px;">카카오톡을 확인해보세요.</div>'
+      +   '<button id="trialToPay" type="button" style="width:100%;padding:14px;border:0;border-radius:10px;background:#b8893b;color:#fff;font-size:15px;font-weight:800;cursor:pointer;margin-bottom:8px;">마음에 드셨다면 쿠폰가로 이어보기 →</button>'
+      +   '<button id="trialDoneClose" type="button" style="width:100%;padding:11px;border:1px solid #ddd;border-radius:10px;background:#fff;color:#888;font-size:13px;cursor:pointer;">닫기</button>'
+      + '</div>'
+      + '</div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click', function(e){ if (e.target === ov) closeTrial(); });
+    ov.querySelector('#trialClose').addEventListener('click', closeTrial);
+    ov.querySelector('#trialDoneClose').addEventListener('click', closeTrial);
+    ov.querySelector('#trialCat').addEventListener('change', onCatChange);
+    ov.querySelector('#trialSubmit').addEventListener('click', submitTrial);
+    ov.querySelector('#trialToPay').addEventListener('click', goToPay);
+    // 전화 자동 하이픈
+    ov.querySelector('#trialPhone').addEventListener('input', function(){
+      var v = this.value.replace(/[^0-9]/g,'').slice(0,11);
+      if (v.length >= 8) this.value = v.replace(/(\d{3})(\d{3,4})(\d{0,4})/, function(_,a,b,c){ return c? a+'-'+b+'-'+c : a+'-'+b; });
+      else if (v.length >= 4) this.value = v.replace(/(\d{3})(\d{0,4})/, '$1-$2');
+      else this.value = v;
+    });
+    return ov;
+  }
+
+  function showErr(msg){
+    var e = document.getElementById('trialErr');
+    if (e){ e.textContent = msg; e.style.display = 'block'; }
+  }
+  function clearErr(){ var e = document.getElementById('trialErr'); if (e) e.style.display = 'none'; }
+
+  function onCatChange(){
+    var catSel = document.getElementById('trialCat');
+    var subSel = document.getElementById('trialSub');
+    var cid = catSel.value;
+    subSel.innerHTML = '<option value="">부주제 선택</option>';
+    var cat = (trialData && trialData.categories || []).find(function(c){ return String(c.id) === String(cid); });
+    if (cat && cat.subtopics.length){
+      cat.subtopics.forEach(function(s){
+        var o = document.createElement('option'); o.value = s.id; o.textContent = s.name; subSel.appendChild(o);
+      });
+      subSel.disabled = false;
+    } else {
+      subSel.disabled = true;
+    }
+  }
+
+  function loadTrialSubtopics(){
+    var catSel = document.getElementById('trialCat');
+    if (trialData){ return; }
+    fetch(BACKEND + '/api/trial/subtopics', { cache:'no-store' })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if (!d || !d.success){ showErr('체험 목록을 불러오지 못했어요.'); return; }
+        trialData = d;
+        catSel.innerHTML = '<option value="">카테고리 선택</option>';
+        (d.categories||[]).forEach(function(c){
+          var o = document.createElement('option'); o.value = c.id; o.textContent = c.label; catSel.appendChild(o);
+        });
+        if (!(d.categories||[]).length) showErr('지금은 체험 가능한 주제가 없어요.');
+      })
+      .catch(function(e){ console.warn('[trial subtopics]', e); showErr('네트워크 오류로 목록을 못 불러왔어요.'); });
+  }
+
+  window.openTrialModal = function(){
+    var ov = buildTrialModal();
+    ov.style.display = 'flex';
+    // 폼/완료 화면 초기화
+    document.getElementById('trialForm').style.display = 'block';
+    document.getElementById('trialDone').style.display = 'none';
+    clearErr();
+    // 히어로 입력값 프리필
+    var hn = document.getElementById('heroName'), hp = document.getElementById('heroPhone');
+    if (hn && hn.value) document.getElementById('trialName').value = hn.value;
+    if (hp && hp.value) document.getElementById('trialPhone').value = hp.value;
+    loadTrialSubtopics();
+  };
+  function closeTrial(){ var ov = document.getElementById('trialOverlay'); if (ov) ov.style.display = 'none'; }
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeTrial(); });
+
+  function submitTrial(){
+    clearErr();
+    var name = (document.getElementById('trialName').value||'').trim();
+    var phone = (document.getElementById('trialPhone').value||'').trim();
+    var sub = document.getElementById('trialSub').value;
+    var agree = document.getElementById('trialAgree').checked;
+    if (!name){ showErr('이름을 입력해주세요.'); return; }
+    if (!/^01[016789]-?\d{3,4}-?\d{4}$/.test(phone.replace(/-/g,''))){ showErr('올바른 휴대폰 번호를 입력해주세요.'); return; }
+    if (!sub){ showErr('체험할 부주제를 선택해주세요.'); return; }
+    if (!agree){ showErr('필수 동의에 체크해주세요.'); return; }
+
+    var btn = document.getElementById('trialSubmit');
+    btn.disabled = true; var orig = btn.textContent; btn.textContent = '발송 중…';
+    fetch(BACKEND + '/api/trial/send', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ name:name, phone:phone, subtopic_id: parseInt(sub,10) })
+    })
+    .then(function(r){ return r.json().then(function(j){ return {ok:r.ok, j:j}; }); })
+    .then(function(res){
+      btn.disabled = false; btn.textContent = orig;
+      if (res.j && res.j.success){
+        // 히어로 입력값에도 반영 (이어보기 흐름)
+        var hn = document.getElementById('heroName'), hp = document.getElementById('heroPhone');
+        if (hn && !hn.value) hn.value = name;
+        if (hp && !hp.value){ hp.value = phone; if (typeof fmtPhone==='function'){ try{ fmtPhone(hp); }catch(e){} } }
+        var msg = '“' + (res.j.subtopic_name||'') + '” 1편을 카카오톡으로 보내드렸어요.\\n잠시 후 메시지를 확인해보세요!';
+        document.getElementById('trialDoneMsg').textContent = msg;
+        document.getElementById('trialForm').style.display = 'none';
+        document.getElementById('trialDone').style.display = 'block';
+      } else {
+        showErr((res.j && res.j.message) || '발송에 실패했어요. 잠시 후 다시 시도해주세요.');
+      }
+    })
+    .catch(function(e){ btn.disabled=false; btn.textContent=orig; showErr('네트워크 오류로 발송하지 못했어요.'); });
+  }
+
+  function goToPay(){
+    closeTrial();
+    var el = document.querySelector('.pricing-wrap');
+    if (el) el.scrollIntoView({ behavior:'smooth' });
+  }
+
+  if (document.readyState !== 'loading') initCountdown();
+  else document.addEventListener('DOMContentLoaded', initCountdown);
 })();
 </script>
 </body>

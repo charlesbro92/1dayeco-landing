@@ -1781,7 +1781,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v232</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v233</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1923,25 +1923,25 @@ body.ll-locked { overflow:hidden; }
       </div>
       <div class="agree-err" id="heroAgreeErr">필수 약관에 모두 동의해 주세요</div>
     </div>
-    <!-- [v232] 카운트다운 + CTA 2개 일렬 배치 -->
-    <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center">
-      <div id="couponCountdown" style="display:none;align-items:center;gap:8px;padding:11px 16px;border-radius:8px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.35);white-space:nowrap">
-        <span style="font-size:12px;color:var(--gold);font-weight:700">🔥 쿠폰 종료까지</span>
-        <span id="couponCountdownClock" style="font-size:14px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums;letter-spacing:.5px">--:--:--</span>
+    <!-- [v233] 카운트다운 → 쿠폰받기 → 무료1편받기 한 줄(줄바꿈 없음) -->
+    <div style="margin-top:14px;display:flex;flex-wrap:nowrap;gap:8px;justify-content:center;align-items:center;width:100%">
+      <div id="couponCountdown" style="display:none;align-items:center;gap:6px;padding:10px 12px;border-radius:8px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.35);white-space:nowrap;flex:0 0 auto">
+        <span style="font-size:11px;color:var(--gold);font-weight:700">🔥 쿠폰 종료까지</span>
+        <span id="couponCountdownClock" style="font-size:13px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums;letter-spacing:.3px">--:--:--</span>
       </div>
-      <button type="button" onclick="openTrialModal()"
-         style="display:inline-flex;align-items:center;gap:6px;padding:12px 22px;border:0;border-radius:8px;background:var(--gold);color:#fff;font-size:14px;font-weight:800;letter-spacing:.3px;cursor:pointer;box-shadow:0 6px 18px rgba(201,168,76,.35);transition:transform .15s,box-shadow .15s;white-space:nowrap"
-         onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 22px rgba(201,168,76,.45)'"
-         onmouseout="this.style.transform='none';this.style.boxShadow='0 6px 18px rgba(201,168,76,.35)'">
-        🎁 무료로 1편 받기
-      </button>
       <a href="https://onedayeco.com/event.html"
          onclick="showCouponPopup();return false;"
-         style="display:inline-flex;align-items:center;padding:12px 22px;border:1.5px solid var(--gold);color:var(--gold);border-radius:8px;font-size:14px;font-weight:700;letter-spacing:.3px;text-decoration:none;transition:background .2s;white-space:nowrap"
+         style="display:inline-flex;align-items:center;justify-content:center;padding:11px 16px;border:1.5px solid var(--gold);color:var(--gold);border-radius:8px;font-size:13px;font-weight:700;letter-spacing:.2px;text-decoration:none;transition:background .2s;white-space:nowrap;flex:0 0 auto"
          onmouseover="this.style.background='rgba(201,168,76,.1)'"
          onmouseout="this.style.background='transparent'">
         🎟️ 9,900원 쿠폰 받기
       </a>
+      <button type="button" onclick="openTrialModal()"
+         style="display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:11px 16px;border:0;border-radius:8px;background:var(--gold);color:#fff;font-size:13px;font-weight:800;letter-spacing:.2px;cursor:pointer;box-shadow:0 6px 18px rgba(201,168,76,.35);transition:transform .15s,box-shadow .15s;white-space:nowrap;flex:0 0 auto"
+         onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 22px rgba(201,168,76,.45)'"
+         onmouseout="this.style.transform='none';this.style.boxShadow='0 6px 18px rgba(201,168,76,.35)'">
+        🎁 무료로 1편 받기
+      </button>
     </div>
   </div>
 

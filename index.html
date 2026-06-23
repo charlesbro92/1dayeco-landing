@@ -1781,7 +1781,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v229</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v230</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1882,7 +1882,7 @@ body.ll-locked { overflow:hidden; }
 <section class="hero">
   <div class="hero-bg"></div>
   <div class="grid-lines"></div>
-  <div class="eyebrow"><span class="eyebrow-dot"></span>매일 오전 8시 카카오톡 발송</div>
+  <div class="eyebrow" id="kakaoBadge"><span class="eyebrow-dot"></span>매일 오전 8시 카카오톡 발송</div>
   <h1 class="hero-title">
     하루 1분으로<br>
     <span class="gold">지식을 쌓는</span><br>
@@ -10073,6 +10073,109 @@ function onKakaoChannelClick() {
   }
   if(document.readyState !== 'loading') initReviewMarquee();
   else document.addEventListener('DOMContentLoaded', initReviewMarquee);
+})();
+</script>
+
+<!-- [v230] 방문자 통계 — 배지 5회 클릭 시 팝업(오늘/누적 방문자) ─────────── -->
+<script>
+(function(){
+  var BACKEND = 'https://web-production-761cd.up.railway.app';
+
+  // ── 1) 페이지 로드 시 방문 기록 (브라우저 세션당 1회) ──────────────
+  function recordVisit(){
+    try {
+      if (sessionStorage.getItem('visitRecorded') === '1') return;
+      sessionStorage.setItem('visitRecorded', '1');
+      fetch(BACKEND + '/api/visitor/count', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        keepalive: true,
+      }).catch(function(e){ console.warn('[visit] record failed:', e); });
+    } catch(e) { /* sessionStorage 차단 환경 무시 */ }
+  }
+
+  // ── 2) 통계 팝업 ───────────────────────────────────────────────
+  function buildOverlay(){
+    var ov = document.getElementById('visitorStatsOverlay');
+    if (ov) return ov;
+    ov = document.createElement('div');
+    ov.id = 'visitorStatsOverlay';
+    ov.style.cssText = 'position:fixed;inset:0;z-index:99999;display:none;'
+      + 'align-items:center;justify-content:center;background:rgba(0,0,0,.55);'
+      + 'backdrop-filter:blur(2px);font-family:inherit;';
+    ov.innerHTML =
+      '<div role="dialog" aria-modal="true" style="background:#fff;border-radius:18px;'
+      + 'padding:28px 30px 24px;width:min(340px,86vw);box-shadow:0 24px 60px rgba(0,0,0,.28);'
+      + 'text-align:center;position:relative;">'
+      + '<button id="visitorStatsClose" aria-label="닫기" style="position:absolute;top:12px;right:14px;'
+      + 'border:0;background:transparent;font-size:22px;line-height:1;color:#999;cursor:pointer;">&times;</button>'
+      + '<div style="font-size:13px;font-weight:700;letter-spacing:.02em;color:#b8893b;margin-bottom:4px;">📊 방문자 현황</div>'
+      + '<div id="visitorStatsDate" style="font-size:12px;color:#9a9a9a;margin-bottom:18px;"></div>'
+      + '<div style="display:flex;gap:12px;justify-content:center;">'
+      +   '<div style="flex:1;background:#faf6ef;border:1px solid #efe3cf;border-radius:12px;padding:14px 8px;">'
+      +     '<div style="font-size:12px;color:#8a7a5c;margin-bottom:6px;">오늘 방문자</div>'
+      +     '<div id="visitorStatsToday" style="font-size:26px;font-weight:800;color:#2a2a2a;">…</div>'
+      +   '</div>'
+      +   '<div style="flex:1;background:#faf6ef;border:1px solid #efe3cf;border-radius:12px;padding:14px 8px;">'
+      +     '<div style="font-size:12px;color:#8a7a5c;margin-bottom:6px;">누적 방문자</div>'
+      +     '<div id="visitorStatsTotal" style="font-size:26px;font-weight:800;color:#2a2a2a;">…</div>'
+      +   '</div>'
+      + '</div>'
+      + '</div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click', function(e){ if (e.target === ov) closeOverlay(); });
+    ov.querySelector('#visitorStatsClose').addEventListener('click', closeOverlay);
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeOverlay(); });
+    return ov;
+  }
+  function closeOverlay(){ var ov = document.getElementById('visitorStatsOverlay'); if (ov) ov.style.display = 'none'; }
+
+  function fmt(n){ return (typeof n === 'number') ? n.toLocaleString('ko-KR') : '—'; }
+
+  function openStats(){
+    var ov = buildOverlay();
+    ov.style.display = 'flex';
+    var todayEl = ov.querySelector('#visitorStatsToday');
+    var totalEl = ov.querySelector('#visitorStatsTotal');
+    var dateEl  = ov.querySelector('#visitorStatsDate');
+    todayEl.textContent = '…'; totalEl.textContent = '…';
+    fetch(BACKEND + '/api/visitor/stats', { cache: 'no-store' })
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        todayEl.textContent = fmt(d && d.today);
+        totalEl.textContent = fmt(d && d.total);
+        if (dateEl) dateEl.textContent = (d && d.date) ? d.date + ' 기준' : '';
+      })
+      .catch(function(e){
+        console.warn('[visitor_stats] fetch failed:', e);
+        todayEl.textContent = '—'; totalEl.textContent = '—';
+      });
+  }
+
+  // ── 3) 배지 5회 클릭 트리거 ────────────────────────────────────
+  function initBadgeTrigger(){
+    var badge = document.getElementById('kakaoBadge');
+    if (!badge) return;
+    var clicks = 0, timer = null;
+    badge.style.cursor = 'pointer';
+    badge.style.userSelect = 'none';
+    badge.addEventListener('click', function(){
+      clicks++;
+      if (timer) clearTimeout(timer);
+      // 2초 내 연속 클릭만 누적 — 그 외엔 리셋
+      timer = setTimeout(function(){ clicks = 0; }, 2000);
+      if (clicks >= 5) {
+        clicks = 0;
+        clearTimeout(timer);
+        openStats();
+      }
+    });
+  }
+
+  function init(){ recordVisit(); initBadgeTrigger(); }
+  if (document.readyState !== 'loading') init();
+  else document.addEventListener('DOMContentLoaded', init);
 })();
 </script>
 </body>

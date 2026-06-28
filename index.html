@@ -1781,7 +1781,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v235</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v236</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1800,7 +1800,7 @@ body.ll-locked { overflow:hidden; }
   <button id="navBackBtn" class="nav-back-btn" onclick="goBackOnePage()" title="뒤로 가기">뒤로</button>
   <!-- v137: 테마 토글 (다크/라이트) -->
   <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="다크/라이트 모드 전환" aria-label="테마 전환">
-    <span id="themeIcon">🌙</span>
+    <span id="themeIcon">☀️</span>
   </button>
   <button class="nav-cta" onclick="document.querySelector('.pricing-wrap').scrollIntoView({behavior:'smooth'})">지금 시작하기</button>
   <!-- 모바일 햄버거 버튼 (모바일에서만 표시) -->
@@ -6778,12 +6778,12 @@ function toggleTheme() {
 (function _initTheme() {
   try {
     const saved = localStorage.getItem('1dayeco_theme');
-    // v140: saved 없으면 다크 명시 (디폴트는 항상 다크)
+    // [v236] 디폴트는 라이트(밝은 컨셉). saved 없으면 light 적용·저장.
+    //   (기존에 직접 다크로 바꾼 사용자는 'dark' 저장값이 있으니 그대로 다크 유지)
     if (saved === null) {
-      localStorage.setItem('1dayeco_theme', 'dark');
-      return;
+      localStorage.setItem('1dayeco_theme', 'light');
     }
-    if (saved === 'light') {
+    if (saved === null || saved === 'light') {
       document.body.classList.add('light-mode');
       // 아이콘은 DOM 준비 후 처리
       const setIcon = () => {
@@ -10042,6 +10042,53 @@ function onKakaoChannelClick() {
   </span>
 </a>
 
+<!-- [v236] 무료 1편 FAB (쿠폰 버튼 왼쪽) + 맨 위로 버튼 -->
+<style>
+  #trialFab{
+    position:fixed; right:96px; bottom:20px; z-index:500;
+    display:flex; flex-direction:column; align-items:center; gap:1px; line-height:1;
+    text-decoration:none; cursor:pointer; transition:transform .2s;
+  }
+  #trialFab:hover{ transform:translateY(-2px); }
+  #trialFab .fab-ico{ font-size:40px; filter:drop-shadow(0 2px 5px rgba(0,0,0,.35)); }
+  #trialFab .fab-txt{
+    font-size:12px; font-weight:800; color:#c9a84c;
+    text-shadow:0 1px 3px rgba(0,0,0,.5), 0 0 2px rgba(255,255,255,.35);
+  }
+  #toTopFab{
+    position:fixed; right:24px; bottom:108px; z-index:500;
+    width:44px; height:44px; border-radius:50%;
+    border:1.5px solid #c9a84c; background:rgba(255,255,255,.92); color:#b8893b;
+    font-size:20px; font-weight:800; cursor:pointer;
+    box-shadow:0 4px 14px rgba(0,0,0,.18);
+    display:none; align-items:center; justify-content:center;
+    transition:transform .2s, opacity .2s;
+  }
+  #toTopFab:hover{ transform:translateY(-2px); }
+  @media (max-width:520px){
+    #trialFab{ right:78px; bottom:14px; }
+    #trialFab .fab-ico{ font-size:34px; }
+    #toTopFab{ right:16px; bottom:92px; width:40px; height:40px; font-size:18px; }
+  }
+</style>
+<a id="trialFab" href="#" aria-label="무료로 1편 받기" title="무료로 1편 받기"
+   onclick="if(typeof openTrialModal==='function'){openTrialModal();}return false;">
+  <span class="fab-ico" aria-hidden="true">🎁</span>
+  <span class="fab-txt">무료</span>
+</a>
+<button id="toTopFab" type="button" aria-label="맨 위로" title="맨 위로"
+   onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+  (function(){
+    function onScroll(){
+      var b=document.getElementById('toTopFab');
+      if(b) b.style.display = (window.scrollY>400)?'flex':'none';
+    }
+    window.addEventListener('scroll', onScroll, {passive:true});
+    onScroll();
+  })();
+</script>
+
 <!-- [v223] 금액 플랜 스와이프 도트 인디케이터 -->
 <script>
 (function(){
@@ -10251,6 +10298,26 @@ function onKakaoChannelClick() {
   function buildTrialModal(){
     var ov = document.getElementById('trialOverlay');
     if (ov) return ov;
+    // [v236] 브랜드 톤 셀렉트 스타일 1회 주입 (크림 배경·골드 테두리·커스텀 화살표)
+    if (!document.getElementById('trialSelectStyle')){
+      var st = document.createElement('style');
+      st.id = 'trialSelectStyle';
+      st.textContent = `
+        .trial-select{
+          width:100%;box-sizing:border-box;
+          padding:12px 40px 12px 14px;margin-bottom:10px;
+          border:1.5px solid #e3d7bd;border-radius:10px;
+          font-size:14px;font-family:inherit;color:#2e2a23;
+          background-color:#fdfaf4;cursor:pointer;
+          -webkit-appearance:none;-moz-appearance:none;appearance:none;
+          background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='none' stroke='%23b8893b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' d='M1 1.5 6 6.5 11 1.5'/></svg>");
+          background-repeat:no-repeat;background-position:right 14px center;background-size:12px 8px;
+        }
+        .trial-select:focus{outline:none;border-color:#b8893b;box-shadow:0 0 0 3px rgba(184,137,59,.15)}
+        .trial-select:disabled{opacity:.55;cursor:not-allowed;background-color:#f2ece0}
+      `;
+      document.head.appendChild(st);
+    }
     ov = document.createElement('div');
     ov.id = 'trialOverlay';
     ov.style.cssText = 'position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);font-family:inherit;padding:16px;';
@@ -10262,8 +10329,8 @@ function onKakaoChannelClick() {
       + '<div id="trialForm">'
       +   '<input id="trialName" type="text" maxlength="20" placeholder="이름을 입력해주세요" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:10px;">'
       +   '<input id="trialPhone" type="tel" maxlength="13" placeholder="010-0000-0000" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:10px;">'
-      +   '<select id="trialCat" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:10px;background:#fff;"><option value="">카테고리 선택</option></select>'
-      +   '<select id="trialSub" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:6px;background:#fff;" disabled><option value="">부주제 선택</option></select>'
+      +   '<select id="trialCat" class="trial-select"><option value="">카테고리 선택</option></select>'
+      +   '<select id="trialSub" class="trial-select" disabled><option value="">부주제 선택</option></select>'
       +   '<div id="trialErr" style="display:none;font-size:12px;color:#d23;margin:4px 2px 0;"></div>'
       +   '<label style="display:flex;gap:8px;align-items:flex-start;margin:12px 2px 14px;font-size:12px;color:#666;cursor:pointer;"><input id="trialAgree" type="checkbox" style="margin-top:2px;"><span>개인정보 수집·이용 및 카카오톡 발송에 동의합니다 (필수)</span></label>'
       +   '<button id="trialSubmit" type="button" style="width:100%;padding:14px;border:0;border-radius:10px;background:#b8893b;color:#fff;font-size:15px;font-weight:800;cursor:pointer;">체험하기</button>'

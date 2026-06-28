@@ -474,11 +474,11 @@ nav {
     padding:6px 10px;
     font-size:12px;
   }
-  /* v141: 모바일 테마 토글 — 햄버거 옆 좌측 절대위치 (뒤로 버튼과 겹침 원천 차단) */
+  /* v237: 모바일 테마 토글 — 우측 배치 (햄버거는 좌측, 토글은 우측) */
   .theme-toggle {
     position:absolute !important;
-    left:60px !important;        /* 햄버거(left:16) 옆 */
-    right:auto !important;
+    right:16px !important;
+    left:auto !important;
     top:50% !important;
     transform:translateY(-50%) !important;
     margin:0 !important;
@@ -488,10 +488,10 @@ nav {
     font-size:14px;
     flex-shrink:0;
   }
+  /* 뒤로 버튼(우측 right:16)이 보일 때는 그 왼쪽으로 비켜서 겹침 방지 */
   .theme-toggle.with-back-btn {
-    /* 모바일에선 위치 동일 — 클래스 무관 */
-    left:60px !important;
-    right:auto !important;
+    right:56px !important;
+    left:auto !important;
   }
   .theme-toggle:hover {
     transform:translateY(-50%) !important;
@@ -577,17 +577,17 @@ nav {
 /* ── 모바일 슬라이드 패널 (우측에서 슬라이드) ── */
 .mobile-menu-panel {
   position:fixed;
-  top:0; right:0;
+  top:0; left:0; right:auto;
   width:80%; max-width:320px;
   height:100vh;
   background:var(--s2, #1a1a1a);
-  border-left:1px solid rgba(201,168,76,.2);
+  border-right:1px solid rgba(201,168,76,.2);
   z-index:999;
-  transform:translateX(100%);
+  transform:translateX(-100%);
   transition:transform .3s ease;
   display:flex;
   flex-direction:column;
-  box-shadow:-8px 0 32px rgba(0,0,0,.4);
+  box-shadow:8px 0 32px rgba(0,0,0,.4);
 }
 .mobile-menu-panel.open {
   transform:translateX(0);
@@ -1781,7 +1781,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v236</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v237</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>

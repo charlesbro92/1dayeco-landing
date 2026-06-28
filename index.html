@@ -1781,7 +1781,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v234</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v235</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1923,8 +1923,15 @@ body.ll-locked { overflow:hidden; }
       </div>
       <div class="agree-err" id="heroAgreeErr">필수 약관에 모두 동의해 주세요</div>
     </div>
-    <!-- [v233] 카운트다운 → 쿠폰받기 → 무료1편받기 한 줄(줄바꿈 없음) -->
-    <div style="margin-top:14px;display:flex;flex-wrap:nowrap;gap:8px;justify-content:center;align-items:center;width:100%">
+    <!-- [v235] 카운트다운 → 쿠폰받기 → 무료1편받기 : 데스크톱 한 줄 / 모바일 세로 1개씩 -->
+    <style>
+      #ctaRow{margin-top:14px;display:flex;flex-wrap:nowrap;gap:8px;justify-content:center;align-items:center;width:100%}
+      @media (max-width:560px){
+        #ctaRow{flex-direction:column;gap:10px}
+        #ctaRow > *{width:100%;flex:0 0 auto;justify-content:center;box-sizing:border-box}
+      }
+    </style>
+    <div id="ctaRow">
       <div id="couponCountdown" style="display:none;align-items:center;gap:6px;padding:10px 12px;border-radius:8px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.35);white-space:nowrap;flex:0 0 auto">
         <span style="font-size:11px;color:var(--gold);font-weight:700">🔥 쿠폰 종료까지</span>
         <span id="couponCountdownClock" style="font-size:13px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums;letter-spacing:.3px">--:--:--</span>

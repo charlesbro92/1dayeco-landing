@@ -1781,7 +1781,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v239</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v240</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -10553,6 +10553,9 @@ function onKakaoChannelClick() {
     } else if (pricing){
       fnTrack('pricing_view', true);
     }
+    // 3) [v240] 체류시간 마일스톤 — 3초/10초 도달 (페이지 열려있는 동안만 발동)
+    setTimeout(function(){ fnTrack('dwell_3s', true); }, 3000);
+    setTimeout(function(){ fnTrack('dwell_10s', true); }, 10000);
   }
   if (document.readyState !== 'loading') init();
   else document.addEventListener('DOMContentLoaded', init);

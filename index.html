@@ -1781,7 +1781,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v238</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v239</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -9927,9 +9927,8 @@ function onKakaoChannelClick() {
   // 첫 진입 자동 노출 — 하루 1회
   document.addEventListener('DOMContentLoaded', function(){
     var seen=''; try{ seen=localStorage.getItem(CP_KEY)||''; }catch(e){}
-    if(seen !== cpToday()){
-      setTimeout(window.showCouponPopup, 900);
-    }
+    /* [v239] 진입 자동노출은 무료체험 오케스트레이터가 담당 (체험 닫은 뒤 쿠폰 노출) */
+    void seen;
   });
 })();
 </script>
@@ -10329,7 +10328,7 @@ function onKakaoChannelClick() {
     ov.id = 'trialOverlay';
     ov.style.cssText = 'position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.55);backdrop-filter:blur(2px);font-family:inherit;padding:16px;';
     ov.innerHTML =
-      '<div role="dialog" aria-modal="true" style="background:#fff;border-radius:18px;padding:26px 24px 22px;width:min(420px,94vw);max-height:90vh;overflow:auto;box-shadow:0 24px 60px rgba(0,0,0,.3);position:relative;">'
+      '<div role="dialog" aria-modal="true" style="background:#fff;border-radius:20px;padding:26px 22px 22px;width:min(400px,94vw);max-height:92vh;overflow:auto;box-shadow:0 24px 60px rgba(0,0,0,.3);position:relative;">'
       + '<button id="trialClose" aria-label="닫기" style="position:absolute;top:12px;right:14px;border:0;background:transparent;font-size:24px;line-height:1;color:#aaa;cursor:pointer;">&times;</button>'
       + '<div style="font-size:18px;font-weight:800;color:#2a2a2a;margin-bottom:4px;">🎁 무료로 1편 받아보기</div>'
       + '<div style="font-size:13px;color:#888;margin-bottom:18px;">관심 주제를 고르면 지금 바로 카카오톡으로 샘플 1편을 보내드려요.</div>'
@@ -10422,7 +10421,29 @@ function onKakaoChannelClick() {
     if (hp && hp.value) document.getElementById('trialPhone').value = hp.value;
     loadTrialSubtopics();
   };
-  function closeTrial(){ var ov = document.getElementById('trialOverlay'); if (ov) ov.style.display = 'none'; }
+  var _trialAutoEntry = false;
+  function _odToday(){ var d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+  function _couponSeenToday(){ try{ return localStorage.getItem('odeco_coupon_popup_seen')===_odToday(); }catch(e){ return false; } }
+  function _trialSeenToday(){ try{ return localStorage.getItem('odeco_trial_popup_seen')===_odToday(); }catch(e){ return false; } }
+  function closeTrial(){
+    var ov = document.getElementById('trialOverlay'); if (ov) ov.style.display = 'none';
+    if (_trialAutoEntry){
+      _trialAutoEntry = false;
+      try{ localStorage.setItem('odeco_trial_popup_seen', _odToday()); }catch(e){}
+      if (!_couponSeenToday() && typeof showCouponPopup === 'function'){ setTimeout(showCouponPopup, 250); }
+    }
+  }
+  // [v239] 진입 자동 팝업: 무료체험 먼저 → 닫으면 쿠폰 (각 하루 1회)
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(function(){
+      if (!_trialSeenToday()){
+        _trialAutoEntry = true;
+        if (typeof window.openTrialModal === 'function') window.openTrialModal();
+      } else if (!_couponSeenToday() && typeof showCouponPopup === 'function'){
+        showCouponPopup();
+      }
+    }, 900);
+  });
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeTrial(); });
 
   function submitTrial(){

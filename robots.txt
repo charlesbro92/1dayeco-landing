@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://onedayeco.com/sitemap.xml

@@ -1801,7 +1801,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v240</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v241</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -9888,7 +9888,8 @@ function onKakaoChannelClick() {
         if(rEl) rEl.innerHTML = '<span style="color:#F87171;font-weight:700">선착순 발급이 마감되었습니다 🙏</span>';
         var f=document.getElementById('couponPopupForm'); if(f) f.style.display='none';
       }else{
-        if(rEl) rEl.innerHTML = '🔥 <b style="color:var(--gold-light)">'+remain+'명</b> 남음 (선착순 '+(d.limit||100)+'명)';
+        // [v241] 표시만 '전량 소진'(FOMO). 발급 폼·할인은 그대로 동작.
+        if(rEl) rEl.innerHTML = '🔥 <b style="color:var(--gold-light)">선착순 '+(d.limit||100)+'명 전량 소진</b> <span style="opacity:.85">· 추가 물량 소진 임박</span>';
       }
     }catch(e){ if(rEl) rEl.textContent=''; }
   }

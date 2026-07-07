@@ -1801,7 +1801,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v241</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v242</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1972,6 +1972,32 @@ body.ll-locked { overflow:hidden; }
     </div>
   </div>
 
+  <!-- [v242] 히어로 아래 가격 미리보기 (실결제 금액) -->
+  <style>
+    #heroPricePreview{max-width:760px;margin:22px auto 0;padding:0 18px}
+    #heroPricePreview .hpp-title{text-align:center;font-size:13px;color:var(--muted);margin-bottom:12px}
+    #heroPricePreview .hpp-title b{color:var(--gold)}
+    #heroPricePreview .hpp-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+    #heroPricePreview .hpp-card{flex:1;min-width:150px;max-width:180px;background:var(--dark2,#17171b);border:1px solid var(--border);border-radius:12px;padding:14px 12px;text-align:center;cursor:pointer;transition:transform .15s,border-color .15s}
+    #heroPricePreview .hpp-card:hover{transform:translateY(-2px);border-color:var(--gold)}
+    #heroPricePreview .hpp-card.hot{border-color:var(--gold);background:rgba(201,168,76,.08)}
+    #heroPricePreview .hpp-badge{font-size:10px;font-weight:800;color:var(--gold);letter-spacing:.3px;margin-bottom:3px;height:13px}
+    #heroPricePreview .hpp-term{font-size:12px;color:var(--muted);margin-bottom:4px}
+    #heroPricePreview .hpp-amt{font-size:22px;font-weight:900;color:var(--text)}
+    #heroPricePreview .hpp-day{font-size:12px;color:var(--gold);font-weight:700;margin-top:3px}
+    #heroPricePreview .hpp-more{display:block;text-align:center;margin-top:12px;font-size:12px;color:var(--muted);text-decoration:underline;cursor:pointer;background:none;border:0;width:100%}
+  </style>
+  <div id="heroPricePreview">
+    <div class="hpp-title">한 번 결제로 최대 1년 · <b>자동결제 없음</b> · 카드 없이 카카오페이</div>
+    <div class="hpp-row">
+      <div class="hpp-card" onclick="openModal('monthly')"><div class="hpp-badge"></div><div class="hpp-term">1개월</div><div class="hpp-amt">₩9,900</div><div class="hpp-day">하루 ₩330</div></div>
+      <div class="hpp-card" onclick="openModal('pkg3m')"><div class="hpp-badge"></div><div class="hpp-term">3개월</div><div class="hpp-amt">₩19,900</div><div class="hpp-day">하루 ₩221</div></div>
+      <div class="hpp-card hot" onclick="openModal('pkg6m')"><div class="hpp-badge">🔥 가장 인기</div><div class="hpp-term">6개월</div><div class="hpp-amt">₩24,900</div><div class="hpp-day">하루 ₩138</div></div>
+      <div class="hpp-card" onclick="openModal('pkg1y')"><div class="hpp-badge">최대 할인</div><div class="hpp-term">1년</div><div class="hpp-amt">₩41,900</div><div class="hpp-day">하루 ₩115</div></div>
+    </div>
+    <button class="hpp-more" onclick="document.querySelector('.pricing-wrap').scrollIntoView({behavior:'smooth'})">전체 요금제·환불 안내 자세히 보기 ↓</button>
+  </div>
+
   <div class="mockup-section">
     <!-- 왼쪽: 아이폰17 프로맥스 카카오톡 -->
     <div class="iphone-wrap">
@@ -2062,7 +2088,7 @@ body.ll-locked { overflow:hidden; }
 <div class="pricing-wrap">
   <div style="max-width:860px;margin:0 auto">
     <div class="sec-eye">Pricing</div>
-    <h2 class="sec-title">커피 몇 잔 값으로<br class="br-desktop">매일 쌓는 평생 지식</h2>
+    <h2 class="sec-title">한 번 결제로<br class="br-desktop">매일 쌓는 평생 지식</h2>
   </div>
 
   <!-- 탭 — 옵션 B에서 1개월권 제외, 패키지만 운영 -->
@@ -2079,12 +2105,7 @@ body.ll-locked { overflow:hidden; }
         <div class="plan-price-original" style="visibility:hidden">정가 ₩9,900</div>
         <div class="plan-price"><span class="w">₩</span><span id="price-monthly">9,900</span></div>
         <div class="plan-mo" id="price-monthly-mo">
-          <div style="font-size:12px;color:var(--muted);margin-bottom:3px">☕ 커피 2잔 값</div><strong style="color:var(--gold);font-size:20px;font-weight:900">하루 ₩330</strong>
-        </div>
-        <div class="plan-coupon" style="margin:12px 0 6px;padding:10px;border:1.5px solid var(--gold);background:rgba(201,168,76,.14);border-radius:10px;text-align:center;line-height:1.35">
-          <div style="font-size:11px;color:var(--gold-light);font-weight:700;letter-spacing:.2px;margin-bottom:2px">🎟️ 9,900원 쿠폰 적용가</div>
-          <s style="color:var(--muted);font-size:13px">₩9,900</s>
-          <strong style="color:var(--gold);font-size:24px;font-weight:900;margin-left:5px">무료</strong><div style="font-size:11px;color:var(--gold);font-weight:800;margin-top:4px">쿠폰가 하루 ₩0</div>
+          <strong style="color:var(--gold);font-size:20px;font-weight:900">하루 ₩330</strong>
         </div>
         <ul class="plan-feats">
           <li>매일 1편 · 30일 발송</li>
@@ -2102,13 +2123,8 @@ body.ll-locked { overflow:hidden; }
         <div class="plan-price-original" id="price-pkg3m-original">정가 ₩29,700</div>
         <div class="plan-price"><span class="w">₩</span><span id="price-pkg3m">19,900</span></div>
         <div class="plan-mo" id="price-pkg3m-mo">
-          <div style="font-size:12px;color:var(--muted);margin-bottom:3px">☕ 커피 4잔 값</div><strong style="color:var(--gold);font-size:20px;font-weight:900">하루 ₩221</strong> ·
+          <strong style="color:var(--gold);font-size:20px;font-weight:900">하루 ₩221</strong> ·
           <span style="color:#ff7676;font-weight:700">33% 할인</span>
-        </div>
-        <div class="plan-coupon" style="margin:12px 0 6px;padding:10px;border:1.5px solid var(--gold);background:rgba(201,168,76,.14);border-radius:10px;text-align:center;line-height:1.35">
-          <div style="font-size:11px;color:var(--gold-light);font-weight:700;letter-spacing:.2px;margin-bottom:2px">🎟️ 9,900원 쿠폰 적용가</div>
-          <s style="color:var(--muted);font-size:13px">₩19,900</s>
-          <strong style="color:var(--gold);font-size:24px;font-weight:900;margin-left:5px"><span style="font-size:16px">₩</span>10,000</strong><div style="font-size:11px;color:var(--gold);font-weight:800;margin-top:4px">쿠폰가 하루 ₩111</div>
         </div>
         <ul class="plan-feats">
           <li>매일 1편 · 90일 발송</li>
@@ -2127,13 +2143,8 @@ body.ll-locked { overflow:hidden; }
         <div class="plan-price-original" id="price-pkg6m-original">정가 ₩59,400</div>
         <div class="plan-price"><span class="w">₩</span><span id="price-pkg6m">24,900</span></div>
         <div class="plan-mo" id="price-pkg6m-mo">
-          <div style="font-size:12px;color:var(--muted);margin-bottom:3px">☕ 커피 5잔 값</div><strong style="color:var(--gold);font-size:20px;font-weight:900">하루 ₩138</strong> ·
+          <strong style="color:var(--gold);font-size:20px;font-weight:900">하루 ₩138</strong> ·
           <span style="color:#ff7676;font-weight:700">58% 할인</span>
-        </div>
-        <div class="plan-coupon" style="margin:12px 0 6px;padding:10px;border:1.5px solid var(--gold);background:rgba(201,168,76,.18);border-radius:10px;text-align:center;line-height:1.35">
-          <div style="font-size:11px;color:var(--gold-light);font-weight:700;letter-spacing:.2px;margin-bottom:2px">🎟️ 9,900원 쿠폰 적용가</div>
-          <s style="color:var(--muted);font-size:13px">₩24,900</s>
-          <strong style="color:var(--gold);font-size:24px;font-weight:900;margin-left:5px"><span style="font-size:16px">₩</span>15,000</strong><div style="font-size:11px;color:var(--gold);font-weight:800;margin-top:4px">쿠폰가 하루 ₩83</div>
         </div>
         <ul class="plan-feats">
           <li>매일 1편 · 180일 발송</li>
@@ -2151,13 +2162,8 @@ body.ll-locked { overflow:hidden; }
         <div class="plan-price-original" id="price-pkg1y-original">정가 ₩118,800</div>
         <div class="plan-price"><span class="w">₩</span><span id="price-pkg1y">41,900</span></div>
         <div class="plan-mo" id="price-pkg1y-mo">
-          <div style="font-size:12px;color:var(--muted);margin-bottom:3px">☕ 커피 9잔 값</div><strong style="color:var(--gold);font-size:20px;font-weight:900">하루 ₩115</strong> ·
+          <strong style="color:var(--gold);font-size:20px;font-weight:900">하루 ₩115</strong> ·
           <span style="color:#ff7676;font-weight:700">65% 할인 (최대)</span>
-        </div>
-        <div class="plan-coupon" style="margin:12px 0 6px;padding:10px;border:1.5px solid var(--gold);background:rgba(201,168,76,.14);border-radius:10px;text-align:center;line-height:1.35">
-          <div style="font-size:11px;color:var(--gold-light);font-weight:700;letter-spacing:.2px;margin-bottom:2px">🎟️ 9,900원 쿠폰 적용가</div>
-          <s style="color:var(--muted);font-size:13px">₩41,900</s>
-          <strong style="color:var(--gold);font-size:24px;font-weight:900;margin-left:5px"><span style="font-size:16px">₩</span>32,000</strong><div style="font-size:11px;color:var(--gold);font-weight:800;margin-top:4px">쿠폰가 하루 ₩88</div>
         </div>
         <ul class="plan-feats">
           <li>매일 1편 · 364일 발송</li>
@@ -2875,7 +2881,7 @@ HIDDEN_COMINGSOON_MODAL_END -->
 
     <!-- STEP 2: 카드 등록 (BillingKey) -->
     <div id="step2Panel" style="display:none">
-      <div class="modal-title" id="step2Title">💳 결제하기</div>
+      <div class="modal-title" id="step2Title">💛 카카오페이로 간편결제</div>
       <p class="modal-desc" id="step2Desc">결제 후 <strong style="color:var(--gold)">내일 아침 8시</strong> 첫 콘텐츠가 발송됩니다. 보장 기간 내 해지 시 100% 환불됩니다.</p>
 
       <!-- 진행 안내 박스 -->
@@ -2902,7 +2908,7 @@ HIDDEN_COMINGSOON_MODAL_END -->
       <div id="tossDisabledBox" style="display:none;background:rgba(251,191,36,.06);border:1px dashed rgba(251,191,36,.4);border-radius:10px;padding:14px 16px;margin:14px 0;font-size:12px;line-height:1.7;color:var(--text)"></div>
 
       <button class="modal-btn" id="step2Btn" onclick="submitStep2()">
-        <span id="step2BtnTxt">결제하기</span>
+        <span id="step2BtnTxt">카카오페이로 결제</span>
         <span id="step2Spin" style="display:none"><span class="spinner"></span></span>
       </button>
       <button class="modal-btn" onclick="backToConfirm()" style="margin-top:8px;background:transparent;border:1px solid var(--border);color:var(--muted)">
@@ -7356,7 +7362,7 @@ async function _updatePlanPrices() {
         const daily = Math.round(active.pkg3m_price / 90);
         const cups = Math.max(1, Math.floor(active.pkg3m_price / 4650));
         const discount = pct(active.pkg3m_original, active.pkg3m_price);
-        mo.innerHTML = `<div style="font-size:12px;color:var(--muted);margin-bottom:3px">☕ 커피 ${cups}잔 값</div><strong style="color:var(--gold);font-size:20px;font-weight:900">하루 ₩${fmt(daily)}</strong> <span style="color:#ff7676;font-weight:700;font-size:13px">· ${discount}% 할인</span>`;
+        mo.innerHTML = `<strong style="color:var(--gold);font-size:20px;font-weight:900">하루 ₩${fmt(daily)}</strong> <span style="color:#ff7676;font-weight:700;font-size:13px">· ${discount}% 할인</span>`;
       }
     }
     if (active.pkg6m_price) {
@@ -7369,7 +7375,7 @@ async function _updatePlanPrices() {
         const daily = Math.round(active.pkg6m_price / 180);
         const cups = Math.max(1, Math.floor(active.pkg6m_price / 4650));
         const discount = pct(active.pkg6m_original, active.pkg6m_price);
-        mo.innerHTML = `<div style="font-size:12px;color:var(--muted);margin-bottom:3px">☕ 커피 ${cups}잔 값</div><strong style="color:var(--gold);font-size:20px;font-weight:900">하루 ₩${fmt(daily)}</strong> <span style="color:#ff7676;font-weight:700;font-size:13px">· ${discount}% 할인</span>`;
+        mo.innerHTML = `<strong style="color:var(--gold);font-size:20px;font-weight:900">하루 ₩${fmt(daily)}</strong> <span style="color:#ff7676;font-weight:700;font-size:13px">· ${discount}% 할인</span>`;
       }
     }
     if (active.pkg1y_price) {
@@ -7382,7 +7388,7 @@ async function _updatePlanPrices() {
         const daily = Math.round(active.pkg1y_price / 364);
         const cups = Math.max(1, Math.floor(active.pkg1y_price / 4650));
         const discount = pct(active.pkg1y_original, active.pkg1y_price);
-        mo.innerHTML = `<div style="font-size:12px;color:var(--muted);margin-bottom:3px">☕ 커피 ${cups}잔 값</div><strong style="color:var(--gold);font-size:20px;font-weight:900">하루 ₩${fmt(daily)}</strong> <span style="color:#ff7676;font-weight:700;font-size:13px">· ${discount}% 할인</span>`;
+        mo.innerHTML = `<strong style="color:var(--gold);font-size:20px;font-weight:900">하루 ₩${fmt(daily)}</strong> <span style="color:#ff7676;font-weight:700;font-size:13px">· ${discount}% 할인</span>`;
       }
     }
     if (active.monthly_price) {
@@ -8138,7 +8144,7 @@ function updateStep2Display(prepareRes) {
         </div>
       `;
     }
-    if (step2BtnTxt) step2BtnTxt.textContent = (prepareRes && prepareRes.is_free) ? '무료로 시작하기' : (PAYMENT_TEST_MODE ? '🧪 테스트 결제' : '결제하기');
+    if (step2BtnTxt) step2BtnTxt.textContent = (prepareRes && prepareRes.is_free) ? '무료로 시작하기' : (PAYMENT_TEST_MODE ? '🧪 테스트 결제' : '카카오페이로 결제');
   } else {
     // 키 미설정: 안내 박스 표시
     if (tossDisabled) {
@@ -10356,10 +10362,10 @@ function onKakaoChannelClick() {
       + '<div id="trialForm">'
       +   '<input id="trialName" type="text" maxlength="20" placeholder="이름을 입력해주세요" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:10px;">'
       +   '<input id="trialPhone" type="tel" maxlength="13" placeholder="010-0000-0000" style="width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #ddd;border-radius:10px;font-size:14px;margin-bottom:10px;">'
-      +   '<select id="trialCat" class="trial-select"><option value="">카테고리 선택</option></select>'
-      +   '<select id="trialSub" class="trial-select" disabled><option value="">부주제 선택</option></select>'
+      +   '<select id="trialCat" class="trial-select"><option value="">테마 선택</option></select>'
+      +   '<select id="trialSub" class="trial-select" disabled><option value="">카테고리 선택</option></select>'
       +   '<div id="trialErr" style="display:none;font-size:12px;color:#d23;margin:4px 2px 0;"></div>'
-      +   '<label style="display:flex;gap:8px;align-items:flex-start;margin:12px 2px 14px;font-size:12px;color:#666;cursor:pointer;"><input id="trialAgree" type="checkbox" style="margin-top:2px;"><span>개인정보 수집·이용 및 카카오톡 발송에 동의합니다 (필수)</span></label>'
+      +   '<div style="margin:10px 2px 14px;font-size:11px;color:#999;line-height:1.5">체험하기를 누르면 <a href="#" onclick="if(typeof openInfo===\'function\'){openInfo(\'privacy\');}return false;" style="color:#b8893b;text-decoration:underline">개인정보 수집·이용</a> 및 카카오톡 발송에 동의하는 것으로 간주됩니다.</div>'
       +   '<button id="trialSubmit" type="button" style="width:100%;padding:14px;border:0;border-radius:10px;background:#b8893b;color:#fff;font-size:15px;font-weight:800;cursor:pointer;">체험하기</button>'
       + '</div>'
       + '<div id="trialDone" style="display:none;text-align:center;">'
@@ -10399,7 +10405,7 @@ function onKakaoChannelClick() {
     var catSel = document.getElementById('trialCat');
     var subSel = document.getElementById('trialSub');
     var cid = catSel.value;
-    subSel.innerHTML = '<option value="">부주제 선택</option>';
+    subSel.innerHTML = '<option value="">카테고리 선택</option>';
     var cat = (trialData && trialData.categories || []).find(function(c){ return String(c.id) === String(cid); });
     if (cat && cat.subtopics.length){
       cat.subtopics.forEach(function(s){
@@ -10419,7 +10425,7 @@ function onKakaoChannelClick() {
       .then(function(d){
         if (!d || !d.success){ showErr('체험 목록을 불러오지 못했어요.'); return; }
         trialData = d;
-        catSel.innerHTML = '<option value="">카테고리 선택</option>';
+        catSel.innerHTML = '<option value="">테마 선택</option>';
         (d.categories||[]).forEach(function(c){
           var o = document.createElement('option'); o.value = c.id; o.textContent = c.label; catSel.appendChild(o);
         });
@@ -10457,12 +10463,8 @@ function onKakaoChannelClick() {
   // [v239] 진입 자동 팝업: 무료체험 먼저 → 닫으면 쿠폰 (각 하루 1회)
   document.addEventListener('DOMContentLoaded', function(){
     setTimeout(function(){
-      if (!_trialSeenToday()){
-        _trialAutoEntry = true;
-        if (typeof window.openTrialModal === 'function') window.openTrialModal();
-      } else if (!_couponSeenToday() && typeof showCouponPopup === 'function'){
-        showCouponPopup();
-      }
+      /* [v242] 진입 자동 팝업 비활성화 — 체험·쿠폰 모두 수동 버튼으로만 노출 */
+      return;
     }, 900);
   });
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeTrial(); });
@@ -10472,11 +10474,9 @@ function onKakaoChannelClick() {
     var name = (document.getElementById('trialName').value||'').trim();
     var phone = (document.getElementById('trialPhone').value||'').trim();
     var sub = document.getElementById('trialSub').value;
-    var agree = document.getElementById('trialAgree').checked;
     if (!name){ showErr('이름을 입력해주세요.'); return; }
     if (!/^01[016789]-?\d{3,4}-?\d{4}$/.test(phone.replace(/-/g,''))){ showErr('올바른 휴대폰 번호를 입력해주세요.'); return; }
-    if (!sub){ showErr('체험할 부주제를 선택해주세요.'); return; }
-    if (!agree){ showErr('필수 동의에 체크해주세요.'); return; }
+    if (!sub){ showErr('체험할 카테고리를 선택해주세요.'); return; }
 
     var btn = document.getElementById('trialSubmit');
     btn.disabled = true; var orig = btn.textContent; btn.textContent = '발송 중…';
@@ -10519,7 +10519,7 @@ function onKakaoChannelClick() {
     var catSel = document.getElementById('trialCat');
     var subSel = document.getElementById('trialSub');
     if (catSel) catSel.value = '';
-    if (subSel){ subSel.innerHTML = '<option value="">부주제 선택</option>'; subSel.disabled = true; }
+    if (subSel){ subSel.innerHTML = '<option value="">카테고리 선택</option>'; subSel.disabled = true; }
     var ov = document.getElementById('trialOverlay');
     if (ov){ var box = ov.querySelector('[role=dialog]'); if (box) box.scrollTop = 0; }
   }

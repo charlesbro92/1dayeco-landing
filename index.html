@@ -1080,6 +1080,9 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
 }
 .modal-btn:hover:not(:disabled) { background:var(--gold-light); }
 .modal-btn:disabled { opacity:.55; cursor:not-allowed; }
+/* [v243] 카카오페이 결제 버튼 강조 (카카오 옐로우) */
+#step2Btn:not(:disabled){ background:#FEE500; color:#1A1300; font-weight:900; box-shadow:0 6px 20px rgba(254,229,0,.4); }
+#step2Btn:not(:disabled):hover{ background:#FADA0A; }
 
 /* ── SPINNER ── */
 .spinner {
@@ -1801,7 +1804,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v242</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v243</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1914,34 +1917,22 @@ body.ll-locked { overflow:hidden; }
   </p>
 
   <div class="signup-wrap">
-    <div class="form-hint">📱 이름 + 전화번호 입력 → 내일 아침 첫 메시지 발송</div>
+    <div class="form-hint">📱 이름 + 전화번호만 입력하면 <b style="color:var(--gold)">지금 바로 무료 1편</b>을 카톡으로 보내드려요</div>
     <div style="margin-bottom:10px">
       <input type="text" class="phone-input" id="heroName" placeholder="이름을 입력해주세요"
              maxlength="20" style="width:100%;box-sizing:border-box"
-             onkeydown="if(event.key==='Enter')heroSubmit()">
+             onkeydown="if(event.key==='Enter')heroFreeTrial()">
       <div class="agree-err" id="heroNameErr">이름을 입력해 주세요</div>
     </div>
     <div class="input-row">
       <input type="tel" class="phone-input" id="heroPhone" placeholder="010-0000-0000"
-             maxlength="13" oninput="fmtPhone(this)" onkeydown="if(event.key==='Enter')heroSubmit()">
-      <button class="submit-btn" id="heroBtn" onclick="heroSubmit()" style="opacity:0.6">지금 시작</button>
+             maxlength="13" oninput="fmtPhone(this)" onkeydown="if(event.key==='Enter')heroFreeTrial()">
+      <button class="submit-btn" id="heroBtn" onclick="heroFreeTrial()">🎁 무료로 1편 받기</button>
     </div>
     <div class="agree-err" id="heroPhoneErr">올바른 전화번호를 입력해 주세요</div>
-    <!-- 개인정보 동의 체크박스 -->
-    <div style="margin-top:10px">
-      <div class="agree-row">
-        <input type="checkbox" id="heroAgree" onchange="updateHeroBtn()">
-        <label for="heroAgree" style="cursor:pointer">
-          <a onclick="openInfo('privacy');return false;" href="#">개인정보처리방침</a>에 동의합니다 (필수)
-        </label>
-      </div>
-      <div class="agree-row" style="margin-top:6px">
-        <input type="checkbox" id="heroAgreeTrial" onchange="updateHeroBtn()">
-        <label for="heroAgreeTrial" style="cursor:pointer">
-          <a onclick="openInfo('terms');return false;" href="#">환불 정책 및 이용약관</a>에 동의합니다 (필수)
-        </label>
-      </div>
-      <div class="agree-err" id="heroAgreeErr">필수 약관에 모두 동의해 주세요</div>
+    <!-- [v243] 홈 필수 체크박스 숨김 — 동의는 결제창에서만 -->
+    <div style="margin-top:8px;font-size:11px;color:var(--muted);text-align:center;line-height:1.5">
+      무료 1편은 결제·약정 없이 바로 발송됩니다. 버튼을 누르면 <a onclick="openInfo('privacy');return false;" href="#" style="color:var(--gold)">개인정보 수집·이용</a> 및 카카오톡 발송에 동의 간주됩니다.
     </div>
     <!-- [v235] 카운트다운 → 쿠폰받기 → 무료1편받기 : 데스크톱 한 줄 / 모바일 세로 1개씩 -->
     <style>
@@ -1953,22 +1944,9 @@ body.ll-locked { overflow:hidden; }
     </style>
     <div id="ctaRow">
       <div id="couponCountdown" style="display:none;align-items:center;gap:6px;padding:10px 12px;border-radius:8px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.35);white-space:nowrap;flex:0 0 auto">
-        <span style="font-size:11px;color:var(--gold);font-weight:700">🔥 쿠폰 종료까지</span>
+        <span style="font-size:11px;color:var(--gold);font-weight:700">🔥 오픈 특가 종료까지</span>
         <span id="couponCountdownClock" style="font-size:13px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums;letter-spacing:.3px">--:--:--</span>
       </div>
-      <a href="https://onedayeco.com/event.html"
-         onclick="showCouponPopup();return false;"
-         style="display:inline-flex;align-items:center;justify-content:center;padding:11px 16px;border:1.5px solid var(--gold);color:var(--gold);border-radius:8px;font-size:13px;font-weight:700;letter-spacing:.2px;text-decoration:none;transition:background .2s;white-space:nowrap;flex:0 0 auto"
-         onmouseover="this.style.background='rgba(201,168,76,.1)'"
-         onmouseout="this.style.background='transparent'">
-        🎟️ 9,900원 쿠폰 받기
-      </a>
-      <button type="button" onclick="openTrialModal()"
-         style="display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:11px 16px;border:0;border-radius:8px;background:var(--gold);color:#fff;font-size:13px;font-weight:800;letter-spacing:.2px;cursor:pointer;box-shadow:0 6px 18px rgba(201,168,76,.35);transition:transform .15s,box-shadow .15s;white-space:nowrap;flex:0 0 auto"
-         onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 8px 22px rgba(201,168,76,.45)'"
-         onmouseout="this.style.transform='none';this.style.boxShadow='0 6px 18px rgba(201,168,76,.35)'">
-        🎁 무료로 1편 받기
-      </button>
     </div>
   </div>
 
@@ -2908,7 +2886,7 @@ HIDDEN_COMINGSOON_MODAL_END -->
       <div id="tossDisabledBox" style="display:none;background:rgba(251,191,36,.06);border:1px dashed rgba(251,191,36,.4);border-radius:10px;padding:14px 16px;margin:14px 0;font-size:12px;line-height:1.7;color:var(--text)"></div>
 
       <button class="modal-btn" id="step2Btn" onclick="submitStep2()">
-        <span id="step2BtnTxt">카카오페이로 결제</span>
+        <span id="step2BtnTxt">💬 카카오페이로 결제</span>
         <span id="step2Spin" style="display:none"><span class="spinner"></span></span>
       </button>
       <button class="modal-btn" onclick="backToConfirm()" style="margin-top:8px;background:transparent;border:1px solid var(--border);color:var(--muted)">
@@ -7547,6 +7525,38 @@ async function apiPost(path, body) {
 }
 
 // ── 히어로 폼 ────────────────────────────────────────────────
+// [v243] 홈 메인 CTA — 이름·전화 입력 후 바로 무료 1편 체험으로
+function heroFreeTrial() {
+  const nameEl  = document.getElementById('heroName');
+  const phoneEl = document.getElementById('heroPhone');
+  const nameErr = document.getElementById('heroNameErr');
+  const phoneErr= document.getElementById('heroPhoneErr');
+  const name  = (nameEl && nameEl.value || '').trim();
+  const phoneRaw = (phoneEl && phoneEl.value || '');
+  const phone = phoneRaw.replace(/[^0-9]/g,'');
+  if (nameErr) nameErr.style.display='none';
+  if (phoneErr) phoneErr.style.display='none';
+  if (!name){ if(nameErr){nameErr.style.display='block';} if(nameEl) nameEl.focus(); return; }
+  if (!/^01[016789]\d{7,8}$/.test(phone)){ if(phoneErr){phoneErr.style.display='block';} if(phoneEl) phoneEl.focus(); return; }
+  // [v243] 자동채움용 저장 (이 번호로 다음에 이름/전화 자동 입력)
+  try { localStorage.setItem('odeco_name', name); localStorage.setItem('odeco_phone', phoneRaw); } catch(e){}
+  if (typeof openTrialModal === 'function') openTrialModal();
+}
+
+// [v243] 저장된 이름/전화 자동 채움 (무료체험 했던 번호)
+(function _prefillContact(){
+  function fill(){
+    try {
+      var nm = localStorage.getItem('odeco_name') || '';
+      var ph = localStorage.getItem('odeco_phone') || '';
+      if (nm){ var hn=document.getElementById('heroName'); if(hn && !hn.value) hn.value=nm; }
+      if (ph){ var hp=document.getElementById('heroPhone'); if(hp && !hp.value){ hp.value=ph; if(typeof fmtPhone==='function'){ try{fmtPhone(hp);}catch(e){} } } }
+    } catch(e){}
+  }
+  if (document.readyState !== 'loading') fill();
+  else document.addEventListener('DOMContentLoaded', fill);
+})();
+
 function heroSubmit() {
   const name   = document.getElementById('heroName')?.value.trim() || '';
   const p      = document.getElementById('heroPhone').value;
@@ -7649,9 +7659,15 @@ function openModal(plan) {
     }
   }
 
-  // 히어로 폰 미리채우기
-  const hp = document.getElementById('heroPhone').value;
-  if (hp) document.getElementById('mPhone').value = hp;
+  // 히어로/저장값 미리채우기 ([v243] 무료체험 번호 자동채움)
+  let _pName = document.getElementById('heroName')?.value || '';
+  let _pPhone = document.getElementById('heroPhone')?.value || '';
+  try {
+    if (!_pName)  _pName  = localStorage.getItem('odeco_name')  || '';
+    if (!_pPhone) _pPhone = localStorage.getItem('odeco_phone') || '';
+  } catch(e){}
+  if (_pName)  document.getElementById('mName').value  = _pName;
+  if (_pPhone){ document.getElementById('mPhone').value = _pPhone; if (typeof fmtPhone==='function'){ try{ fmtPhone(document.getElementById('mPhone')); }catch(e){} } }
 
   // 체크박스 동기화
   const heroAgreed = document.getElementById('heroAgree')?.checked;
@@ -8144,7 +8160,7 @@ function updateStep2Display(prepareRes) {
         </div>
       `;
     }
-    if (step2BtnTxt) step2BtnTxt.textContent = (prepareRes && prepareRes.is_free) ? '무료로 시작하기' : (PAYMENT_TEST_MODE ? '🧪 테스트 결제' : '카카오페이로 결제');
+    if (step2BtnTxt) step2BtnTxt.textContent = (prepareRes && prepareRes.is_free) ? '무료로 시작하기' : (PAYMENT_TEST_MODE ? '🧪 테스트 결제' : '💬 카카오페이로 결제');
   } else {
     // 키 미설정: 안내 박스 표시
     if (tossDisabled) {
@@ -10492,6 +10508,7 @@ function onKakaoChannelClick() {
         var hn = document.getElementById('heroName'), hp = document.getElementById('heroPhone');
         if (hn && !hn.value) hn.value = name;
         if (hp && !hp.value){ hp.value = phone; if (typeof fmtPhone==='function'){ try{ fmtPhone(hp); }catch(e){} } }
+        try { localStorage.setItem('odeco_name', name); localStorage.setItem('odeco_phone', phone); } catch(e){}
         var msg = '“' + (res.j.subtopic_name||'') + '” 1편을 카카오톡으로 보내드렸어요.\\n잠시 후 메시지를 확인해보세요!';
         document.getElementById('trialDoneMsg').textContent = msg;
         try { if (typeof fnTrack === 'function') fnTrack('trial_sent'); } catch(e){}

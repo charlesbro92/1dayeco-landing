@@ -1804,7 +1804,7 @@ body.ll-locked { overflow:hidden; }
 <nav>
   <div class="nav-logo-wrap">
     <div class="logo" onclick="showCategory('intro')" style="cursor:pointer">1DAYECO</div>
-    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v243</span>
+    <span class="deploy-badge" id="deployBadge" onclick="showDeployInfo()" title="클릭: 배포 정보">landing-v244</span>
   </div>
   <div class="nav-tabs">
     <button class="nav-tab active" onclick="showCategory('intro', this)">소개</button>
@@ -1825,7 +1825,7 @@ body.ll-locked { overflow:hidden; }
   <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="다크/라이트 모드 전환" aria-label="테마 전환">
     <span id="themeIcon">☀️</span>
   </button>
-  <button class="nav-cta" onclick="document.querySelector('.pricing-wrap').scrollIntoView({behavior:'smooth'})">지금 시작하기</button>
+  <button class="nav-cta" onclick="goPricing()">지금 시작하기</button>
   <!-- 모바일 햄버거 버튼 (모바일에서만 표시) -->
   <button class="mobile-hamburger" onclick="toggleMobileMenu()" aria-label="메뉴 열기">
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
@@ -1862,7 +1862,7 @@ body.ll-locked { overflow:hidden; }
       COMING SOON <span class="mmp-badge" id="mmpComingSoonBadge">0</span>
     </button>
     <div class="mmp-divider"></div>
-    <button class="mmp-cta" onclick="document.querySelector('.pricing-wrap').scrollIntoView({behavior:'smooth'}); closeMobileMenu();">지금 시작하기</button>
+    <button class="mmp-cta" onclick="goPricing(); closeMobileMenu();">지금 시작하기</button>
   </div>
 </aside>
 <style>
@@ -1934,6 +1934,13 @@ body.ll-locked { overflow:hidden; }
     <div style="margin-top:8px;font-size:11px;color:var(--muted);text-align:center;line-height:1.5">
       무료 1편은 결제·약정 없이 바로 발송됩니다. 버튼을 누르면 <a onclick="openInfo('privacy');return false;" href="#" style="color:var(--gold)">개인정보 수집·이용</a> 및 카카오톡 발송에 동의 간주됩니다.
     </div>
+    <!-- [v244] 카카오페이 간편결제 강조 배지 -->
+    <div style="margin-top:14px;text-align:center">
+      <span style="display:inline-flex;align-items:center;gap:7px;background:#FEE500;color:#1A1300;font-weight:800;font-size:13px;padding:9px 16px;border-radius:999px;box-shadow:0 6px 16px rgba(254,229,0,.4)">
+        💬 결제도 간편하게 — <b>카드 등록 없이 카카오페이</b>
+      </span>
+      <div style="margin-top:6px;font-size:11px;color:var(--muted)">한 번 결제로 최대 1년 · 자동결제·카드정보 저장 없음</div>
+    </div>
     <!-- [v235] 카운트다운 → 쿠폰받기 → 무료1편받기 : 데스크톱 한 줄 / 모바일 세로 1개씩 -->
     <style>
       #ctaRow{margin-top:14px;display:flex;flex-wrap:nowrap;gap:8px;justify-content:center;align-items:center;width:100%}
@@ -1964,6 +1971,11 @@ body.ll-locked { overflow:hidden; }
     #heroPricePreview .hpp-amt{font-size:22px;font-weight:900;color:var(--text)}
     #heroPricePreview .hpp-day{font-size:12px;color:var(--gold);font-weight:700;margin-top:3px}
     #heroPricePreview .hpp-more{display:block;text-align:center;margin-top:12px;font-size:12px;color:var(--muted);text-decoration:underline;cursor:pointer;background:none;border:0;width:100%}
+    /* [v244] 모바일: 가격 카드 2×2 배열 */
+    @media (max-width:560px){
+      #heroPricePreview .hpp-row{gap:8px}
+      #heroPricePreview .hpp-card{flex:0 0 calc(50% - 4px);max-width:calc(50% - 4px);min-width:0}
+    }
   </style>
   <div id="heroPricePreview">
     <div class="hpp-title">한 번 결제로 최대 1년 · <b>자동결제 없음</b> · 카드 없이 카카오페이</div>
@@ -1973,7 +1985,7 @@ body.ll-locked { overflow:hidden; }
       <div class="hpp-card hot" onclick="openModal('pkg6m')"><div class="hpp-badge">🔥 가장 인기</div><div class="hpp-term">6개월</div><div class="hpp-amt">₩24,900</div><div class="hpp-day">하루 ₩138</div></div>
       <div class="hpp-card" onclick="openModal('pkg1y')"><div class="hpp-badge">최대 할인</div><div class="hpp-term">1년</div><div class="hpp-amt">₩41,900</div><div class="hpp-day">하루 ₩115</div></div>
     </div>
-    <button class="hpp-more" onclick="document.querySelector('.pricing-wrap').scrollIntoView({behavior:'smooth'})">전체 요금제·환불 안내 자세히 보기 ↓</button>
+    <button type="button" class="hpp-more" onclick="goPricing();return false;">전체 요금제 자세히 보기 ↓</button>
   </div>
 
   <div class="mockup-section">
@@ -2452,7 +2464,7 @@ body.ll-locked { overflow:hidden; }
   <h2 class="hero-title" style="font-size:clamp(30px,5vw,58px)">가만히 있어도<br><span class="gold">매일 새로운 지식</span><br class="br-desktop"><span class="thin"> 환불 보장으로 시작하세요</span></h2>
   <p style="color:var(--muted);margin:18px 0 36px;font-size:15px">최대 7일 100% 환불 보장 · 월 ₩9,900부터 · 이후 일할 환불 (위약금 10%)</p>
   <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-    <button class="submit-btn" style="font-size:15px;padding:16px 44px;border-radius:10px;background:none;border:1px solid var(--gold);color:var(--gold)" onclick="document.querySelector('.pricing-wrap').scrollIntoView({behavior:'smooth'})">
+    <button class="submit-btn" style="font-size:15px;padding:16px 44px;border-radius:10px;background:none;border:1px solid var(--gold);color:var(--gold)" onclick="goPricing()">
       💳 요금제 보기
     </button>
     <button class="submit-btn" style="font-size:15px;padding:16px 44px;border-radius:10px" onclick="openModalWithCategory('economy')">
@@ -10598,6 +10610,18 @@ function onKakaoChannelClick() {
   if (document.readyState !== 'loading') init();
   else document.addEventListener('DOMContentLoaded', init);
 })();
+</script>
+<script>
+window.goPricing = function(){
+  var el = document.querySelector('.pricing-wrap'); if(!el) return false;
+  var y = el.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0) - 8;
+  try { window.scrollTo({top:y, behavior:'smooth'}); } catch(e){ window.scrollTo(0, y); }
+  setTimeout(function(){
+    var cur = window.pageYOffset || document.documentElement.scrollTop || 0;
+    if (Math.abs(cur - y) > 80){ window.scrollTo(0, y); document.documentElement.scrollTop = y; document.body.scrollTop = y; }
+  }, 450);
+  return false;
+};
 </script>
 </body>
 </html>

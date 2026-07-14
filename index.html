@@ -1957,35 +1957,29 @@ body.ll-locked { overflow:hidden; }
     </div>
   </div>
 
-  <!-- [v242] 히어로 아래 가격 미리보기 (실결제 금액) -->
+  <!-- [v245] 히어로 아래 카테고리 타일 (구 가격 미리보기 대체) -->
   <style>
-    #heroPricePreview{max-width:760px;margin:22px auto 0;padding:0 18px}
-    #heroPricePreview .hpp-title{text-align:center;font-size:13px;color:var(--muted);margin-bottom:12px}
-    #heroPricePreview .hpp-title b{color:var(--gold)}
-    #heroPricePreview .hpp-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-    #heroPricePreview .hpp-card{flex:1;min-width:150px;max-width:180px;background:var(--dark2,#17171b);border:1px solid var(--border);border-radius:12px;padding:14px 12px;text-align:center;cursor:pointer;transition:transform .15s,border-color .15s}
-    #heroPricePreview .hpp-card:hover{transform:translateY(-2px);border-color:var(--gold)}
-    #heroPricePreview .hpp-card.hot{border-color:var(--gold);background:rgba(201,168,76,.08)}
-    #heroPricePreview .hpp-badge{font-size:10px;font-weight:800;color:var(--gold);letter-spacing:.3px;margin-bottom:3px;height:13px}
-    #heroPricePreview .hpp-term{font-size:12px;color:var(--muted);margin-bottom:4px}
-    #heroPricePreview .hpp-amt{font-size:22px;font-weight:900;color:var(--text)}
-    #heroPricePreview .hpp-day{font-size:12px;color:var(--gold);font-weight:700;margin-top:3px}
-    #heroPricePreview .hpp-more{display:block;text-align:center;margin-top:12px;font-size:12px;color:var(--muted);text-decoration:underline;cursor:pointer;background:none;border:0;width:100%}
-    /* [v244] 모바일: 가격 카드 2×2 배열 */
+    #heroCategoryTiles{max-width:760px;margin:26px auto 0;padding:0 18px}
+    #heroCategoryTiles .hct-title{text-align:center;font-size:13px;color:var(--muted);margin-bottom:14px}
+    #heroCategoryTiles .hct-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    #heroCategoryTiles .hct-tile{background:linear-gradient(160deg,var(--dark3,#1a1a17),var(--dark2,#17171b));border:1px solid var(--border);border-radius:14px;padding:18px 10px;text-align:center;cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s}
+    #heroCategoryTiles .hct-tile:hover{transform:translateY(-3px);border-color:var(--gold);box-shadow:0 8px 20px rgba(0,0,0,.3)}
+    #heroCategoryTiles .hct-ico{width:44px;height:44px;margin:0 auto 8px;border-radius:50%;background:var(--gold-dim,rgba(201,168,76,.12));display:flex;align-items:center;justify-content:center;font-size:21px}
+    #heroCategoryTiles .hct-name{font-weight:800;font-size:13px;color:var(--text)}
     @media (max-width:560px){
-      #heroPricePreview .hpp-row{gap:8px}
-      #heroPricePreview .hpp-card{flex:0 0 calc(50% - 4px);max-width:calc(50% - 4px);min-width:0}
+      #heroCategoryTiles .hct-grid{grid-template-columns:repeat(2,1fr);gap:10px}
     }
   </style>
-  <div id="heroPricePreview">
-    <div class="hpp-title">한 번 결제로 최대 1년 · <b>자동결제 없음</b> · 카드 없이 카카오페이</div>
-    <div class="hpp-row">
-      <div class="hpp-card" onclick="openModal('monthly')"><div class="hpp-badge"></div><div class="hpp-term">1개월</div><div class="hpp-amt">₩9,900</div><div class="hpp-day">하루 ₩330</div></div>
-      <div class="hpp-card" onclick="openModal('pkg3m')"><div class="hpp-badge"></div><div class="hpp-term">3개월</div><div class="hpp-amt">₩19,900</div><div class="hpp-day">하루 ₩221</div></div>
-      <div class="hpp-card hot" onclick="openModal('pkg6m')"><div class="hpp-badge">🔥 가장 인기</div><div class="hpp-term">6개월</div><div class="hpp-amt">₩24,900</div><div class="hpp-day">하루 ₩138</div></div>
-      <div class="hpp-card" onclick="openModal('pkg1y')"><div class="hpp-badge">최대 할인</div><div class="hpp-term">1년</div><div class="hpp-amt">₩41,900</div><div class="hpp-day">하루 ₩115</div></div>
+  <div id="heroCategoryTiles">
+    <div class="hct-title">관심 있는 <b style="color:var(--gold)">카테고리</b>를 선택하면 토픽을 바로 볼 수 있어요</div>
+    <div class="hct-grid">
+      <div class="hct-tile" onclick="showCategory('list-finance', this)"><div class="hct-ico">💰</div><div class="hct-name">금융·투자</div></div>
+      <div class="hct-tile" onclick="showCategory('list-tech', this)"><div class="hct-ico">💻</div><div class="hct-name">테크·디지털</div></div>
+      <div class="hct-tile" onclick="showCategory('list-language', this)"><div class="hct-ico">🌐</div><div class="hct-name">외국어</div></div>
+      <div class="hct-tile" onclick="showCategory('list-work', this)"><div class="hct-ico">💼</div><div class="hct-name">일·업무</div></div>
+      <div class="hct-tile" onclick="showCategory('list-knowledge', this)"><div class="hct-ico">📚</div><div class="hct-name">교양·지식</div></div>
+      <div class="hct-tile" onclick="showCategory('list-wellness', this)"><div class="hct-ico">🌱</div><div class="hct-name">건강·일상</div></div>
     </div>
-    <button type="button" class="hpp-more" onclick="goPricing();return false;">전체 요금제 자세히 보기 ↓</button>
   </div>
 
   <div class="mockup-section">
@@ -2482,8 +2476,8 @@ body.ll-locked { overflow:hidden; }
   <div style="width:100%;max-width:1100px;margin:0 auto;padding:60px 24px;box-sizing:border-box">
     <div style="text-align:center;margin-bottom:36px">
       <div id="catListEyebrow" style="font-size:11px;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:14px">CATEGORIES</div>
-      <h2 class="category-title" id="catListTitle" style="margin-bottom:14px">전체 카테고리</h2>
-      <p class="category-subtitle" id="catListSubtitle" style="margin-left:auto;margin-right:auto;text-align:center">관심 있는 카테고리를 선택하면 자세한 소개를 확인할 수 있어요.</p>
+      <h2 class="category-title" id="catListTitle" style="margin-bottom:14px">전체 토픽</h2>
+      <p class="category-subtitle" id="catListSubtitle" style="margin-left:auto;margin-right:auto;text-align:center">관심 있는 토픽을 선택하면 자세한 소개를 확인할 수 있어요.</p>
     </div>
     <div class="cs-grid" id="catListGrid">
       <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:13px">불러오는 중...</div>
@@ -2503,7 +2497,7 @@ body.ll-locked { overflow:hidden; }
     <p class="category-subtitle" id="cdpSubtitle">—</p>
     <div class="category-coming" id="cdpDelivery">매일 1편</div>
     <div class="cat-hero-btns">
-      <button class="category-back" id="cdpBackBtn" onclick="showCategory('list-all')">← 카테고리 목록</button>
+      <button class="category-back" id="cdpBackBtn" onclick="showCategory('list-all')">← 토픽 목록</button>
       <button class="cta-subscribe-btn" id="cdpHeroCta" onclick="openModalWithCategory(window._currentCatId)">📬 신청하기 →</button>
     </div>
   </div>
@@ -2569,7 +2563,7 @@ body.ll-locked { overflow:hidden; }
   <!-- v136: 하단 네비게이션 — 소개 / 전체 카테고리 -->
   <div style="text-align:center;margin:32px auto 60px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:0 24px">
     <button class="category-back" onclick="showCategory('intro')">← 소개로 돌아가기</button>
-    <button class="category-back" onclick="showCategory('list-all')">📋 전체 카테고리</button>
+    <button class="category-back" onclick="showCategory('list-all')">📋 전체 토픽</button>
   </div>
 </div>
 
@@ -6234,10 +6228,10 @@ function renderCategoryDetailPage(catId) {
   if (_heroCta) _heroCta.onclick = function() { openModalWithCategory(window._currentCatId); };
   const _finalCta = document.getElementById('cdpFinalCta');
   if (_finalCta) _finalCta.onclick = function() { openModalWithCategory(window._currentCatId); };
-  // 뒤로가기 버튼도 카테고리 목록으로 원복
+  // 뒤로가기 버튼도 토픽 목록으로 원복
   const _backBtn = document.getElementById('cdpBackBtn');
   if (_backBtn) {
-    _backBtn.textContent = '← 카테고리 목록';
+    _backBtn.textContent = '← 토픽 목록';
     _backBtn.onclick = function() { showCategory('list-all'); };
   }
 
@@ -6488,7 +6482,7 @@ async function renderCategoryListPage(filter) {
   // [v152] 모바일 친화 — 헤더 컴팩트화 + 카테고리만 평면 표시
   // filter: 'all' | 'finance' | 'tech' | 'language' | 'work' | 'knowledge' | 'wellness'
   const SUPER_CATS = {
-    all:       { eyebrow: 'ALL',             title: '전체 카테고리',     sub: '관심 있는 카테고리를 선택해주세요.' },
+    all:       { eyebrow: 'ALL',             title: '전체 토픽',         sub: '관심 있는 토픽을 선택해주세요.' },
     finance:   { eyebrow: 'FINANCE',         title: '💰 금융·투자',     sub: '경제 흐름과 시장 움직임을 짧게.' },
     tech:      { eyebrow: 'TECH',            title: '💻 테크·디지털',   sub: 'IT·AI·디지털 도구 트렌드.' },
     language:  { eyebrow: 'LANGUAGE',        title: '🌐 외국어',         sub: '비즈니스부터 여행까지.' },
@@ -6519,37 +6513,23 @@ async function renderCategoryListPage(filter) {
 
   const grid = document.getElementById('catListGrid');
   if (filteredActive.length === 0 && filteredComing.length === 0) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:13px">해당 분류의 카테고리가 아직 없습니다.</div>';
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:13px">해당 카테고리의 토픽이 아직 없습니다.</div>';
     return;
   }
 
-  const buildActiveCard = (c) => {
-    const id = c.id;
-    const name = c.name || id;
+  // [v245] 카테고리(c) 안의 토픽(소주제)을 하나씩 카드로 펼쳐서 렌더 — 그룹명은 카드 위 태그로만 표시
+  const buildTopicCards = (c, comingSoon) => {
     const emoji = c.emoji || '📌';
-    const desc = c.description || '매일 새로운 콘텐츠를 만나보세요.';
-    return `
-      <div class="cat-card" onclick="showCategory('${id}')">
+    const groupName = c.name || c.id;
+    const topics = (c.subtopics || []).filter(s => s.active);
+    if (topics.length === 0) return '';
+    return topics.map(s => `
+      <div class="cat-card${comingSoon ? ' coming-soon' : ''}" onclick="showCategory('${c.id}')">
+        ${comingSoon ? '<div class="coming-badge">출시 예정</div>' : ''}
         <div class="cat-card-icon">${emoji}</div>
-        <div class="cat-card-name">${name}</div>
-        <p class="cat-card-desc">${desc}</p>
-        <div class="cat-card-tag" data-cat-subtopics="${id}" style="font-size:12px;color:var(--gold);letter-spacing:.3px;min-height:0;display:none"></div>
-      </div>`;
-  };
-  const buildComingCard = (c) => {
-    const id = c.id;
-    const name = c.name || c.id;
-    const emoji = c.emoji || '📌';
-    const desc = c.description || '곧 만나볼 카테고리입니다.';
-    return `
-      <div class="cat-card coming-soon">
-        <div class="coming-badge">출시 예정</div>
-        <div class="cat-card-icon">${emoji}</div>
-        <div class="cat-card-name">${name}</div>
-        <p class="cat-card-desc">${desc}</p>
-        <div class="cat-card-tag" data-cat-subtopics="${id}" style="font-size:12px;color:var(--gold);letter-spacing:.3px;opacity:.7;min-height:0;display:none"></div>
-        <div class="cat-card-sample">출시 준비 중 ⏳</div>
-      </div>`;
+        <div class="cat-card-name">${s.name}</div>
+        <div class="cat-card-tag" style="font-size:11px;color:var(--gold);background:var(--gold-dim,rgba(201,168,76,.12));display:inline-block;padding:3px 9px;border-radius:999px;margin-top:8px${comingSoon ? ';opacity:.7' : ''}">${groupName}</div>
+      </div>`).join('');
   };
 
   // [v152] 단순화: 대분류 선택 시 그 그룹의 카테고리만 평면 표시 (소그룹 헤더 제거)
@@ -6586,7 +6566,7 @@ async function renderCategoryListPage(filter) {
         <span style="font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px">${s.label}</span>
         <span style="font-size:11px;color:var(--muted);margin-left:auto">${total}개</span>
       </div>`;
-      return header + g.active.map(buildActiveCard).join('') + g.coming.map(buildComingCard).join('');
+      return header + g.active.map(c => buildTopicCards(c, false)).join('') + g.coming.map(c => buildTopicCards(c, true)).join('');
     }).join('');
     const ungroupedTotal = ungrouped.active.length + ungrouped.coming.length;
     const ungroupedHtml = ungroupedTotal > 0
@@ -6594,12 +6574,12 @@ async function renderCategoryListPage(filter) {
           <span style="font-size:18px">📌</span>
           <span style="font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px">기타</span>
           <span style="font-size:11px;color:var(--muted);margin-left:auto">${ungroupedTotal}개</span>
-        </div>` + ungrouped.active.map(buildActiveCard).join('') + ungrouped.coming.map(buildComingCard).join('')
+        </div>` + ungrouped.active.map(c => buildTopicCards(c, false)).join('') + ungrouped.coming.map(c => buildTopicCards(c, true)).join('')
       : '';
     grid.innerHTML = html + ungroupedHtml;
   } else {
-    // 대분류 탭: 평면 표시 (active 먼저, coming_soon 뒤) — 그룹 헤더 없이 카테고리만
-    grid.innerHTML = filteredActive.map(buildActiveCard).join('') + filteredComing.map(buildComingCard).join('');
+    // 카테고리 탭: 평면 표시 (active 먼저, coming_soon 뒤) — 그룹 헤더 없이 토픽 카드만
+    grid.innerHTML = filteredActive.map(c => buildTopicCards(c, false)).join('') + filteredComing.map(c => buildTopicCards(c, true)).join('');
   }
   // 부제목 채우기 (비동기)
   _hydrateCardSubtopics();

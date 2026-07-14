@@ -1852,12 +1852,12 @@ body.ll-locked { overflow:hidden; }
     <button class="mmp-item" onclick="showCategory('intro'); closeMobileMenu();">소개</button>
     <div class="mmp-section-title">카테고리</div>
     <button class="mmp-item" onclick="showCategory('list-all'); closeMobileMenu();">전체</button>
-    <button class="mmp-item" onclick="showCategory('list-finance'); closeMobileMenu();">💰 금융·투자</button>
-    <button class="mmp-item" onclick="showCategory('list-tech'); closeMobileMenu();">💻 테크·디지털</button>
-    <button class="mmp-item" onclick="showCategory('list-language'); closeMobileMenu();">🌐 외국어</button>
-    <button class="mmp-item" onclick="showCategory('list-work'); closeMobileMenu();">💼 일·업무</button>
-    <button class="mmp-item" onclick="showCategory('list-knowledge'); closeMobileMenu();">📚 교양·지식</button>
-    <button class="mmp-item" onclick="showCategory('list-wellness'); closeMobileMenu();">🌱 건강·일상</button>
+    <button class="mmp-item" onclick="showCategory('list-finance'); closeMobileMenu();">금융·투자</button>
+    <button class="mmp-item" onclick="showCategory('list-tech'); closeMobileMenu();">테크·디지털</button>
+    <button class="mmp-item" onclick="showCategory('list-language'); closeMobileMenu();">외국어</button>
+    <button class="mmp-item" onclick="showCategory('list-work'); closeMobileMenu();">일·업무</button>
+    <button class="mmp-item" onclick="showCategory('list-knowledge'); closeMobileMenu();">교양·지식</button>
+    <button class="mmp-item" onclick="showCategory('list-wellness'); closeMobileMenu();">건강·일상</button>
     <button class="mmp-item mmp-item-soon" id="mmpComingSoon" onclick="showCategory('comingsoon'); closeMobileMenu();" style="display:none">
       COMING SOON <span class="mmp-badge" id="mmpComingSoonBadge">0</span>
     </button>
@@ -1979,12 +1979,12 @@ body.ll-locked { overflow:hidden; }
   <div id="heroCategoryTiles">
     <div class="hct-title">관심 있는 <b style="color:var(--gold)">카테고리</b>를 선택하면 토픽을 바로 볼 수 있어요</div>
     <div class="hct-grid">
-      <div class="hct-tile" onclick="showCategory('list-finance', this)"><div class="hct-ico">💰</div><div class="hct-name">금융·투자</div></div>
-      <div class="hct-tile" onclick="showCategory('list-tech', this)"><div class="hct-ico">💻</div><div class="hct-name">테크·디지털</div></div>
-      <div class="hct-tile" onclick="showCategory('list-language', this)"><div class="hct-ico">🌐</div><div class="hct-name">외국어</div></div>
-      <div class="hct-tile" onclick="showCategory('list-work', this)"><div class="hct-ico">💼</div><div class="hct-name">일·업무</div></div>
-      <div class="hct-tile" onclick="showCategory('list-knowledge', this)"><div class="hct-ico">📚</div><div class="hct-name">교양·지식</div></div>
-      <div class="hct-tile" onclick="showCategory('list-wellness', this)"><div class="hct-ico">🌱</div><div class="hct-name">건강·일상</div></div>
+      <div class="hct-tile" onclick="showCategory('list-finance', this)"><div class="hct-name">금융·투자</div></div>
+      <div class="hct-tile" onclick="showCategory('list-tech', this)"><div class="hct-name">테크·디지털</div></div>
+      <div class="hct-tile" onclick="showCategory('list-language', this)"><div class="hct-name">외국어</div></div>
+      <div class="hct-tile" onclick="showCategory('list-work', this)"><div class="hct-name">일·업무</div></div>
+      <div class="hct-tile" onclick="showCategory('list-knowledge', this)"><div class="hct-name">교양·지식</div></div>
+      <div class="hct-tile" onclick="showCategory('list-wellness', this)"><div class="hct-name">건강·일상</div></div>
     </div>
   </div>
 
@@ -6392,29 +6392,29 @@ function _renderCategoryDetailFallback(catId) {
   if (!cat) {
     const HARDCODED_FALLBACK = {
       // 일·업무
-      career:        { id: 'career',        name: '커리어',         emoji: '💼', super_category: 'work',     description: '회사에서 한 단계 올라가는 커리어 인사이트.' },
-      productivity:  { id: 'productivity',  name: '생산성',         emoji: '⏱️', super_category: 'work',     description: '업무 효율을 극대화하는 매일의 한 가지 팁.' },
+      career:        { id: 'career',        name: '커리어', super_category: 'work',     description: '회사에서 한 단계 올라가는 커리어 인사이트.' },
+      productivity:  { id: 'productivity',  name: '생산성', super_category: 'work',     description: '업무 효율을 극대화하는 매일의 한 가지 팁.' },
       // 외국어
-      english:       { id: 'english',       name: '영어',           emoji: '🇬🇧', super_category: 'language', description: '비즈니스부터 일상까지, 매일 영어 한 표현.' },
-      daily_english: { id: 'daily_english', name: '데일리 영어',    emoji: '🗣️', super_category: 'language', description: '매일 쓰는 영어 표현으로 입을 트이는 습관.' },
-      japanese:      { id: 'japanese',      name: '일본어',         emoji: '🇯🇵', super_category: 'language', description: '여행부터 비즈니스까지, 매일 한 표현씩.' },
-      vietnamese:    { id: 'vietnamese',    name: '베트남어',       emoji: '🇻🇳', super_category: 'language', description: '베트남 생활·비즈니스에 바로 쓰는 표현.' },
+      english:       { id: 'english',       name: '영어', super_category: 'language', description: '비즈니스부터 일상까지, 매일 영어 한 표현.' },
+      daily_english: { id: 'daily_english', name: '데일리 영어', super_category: 'language', description: '매일 쓰는 영어 표현으로 입을 트이는 습관.' },
+      japanese:      { id: 'japanese',      name: '일본어', super_category: 'language', description: '여행부터 비즈니스까지, 매일 한 표현씩.' },
+      vietnamese:    { id: 'vietnamese',    name: '베트남어', super_category: 'language', description: '베트남 생활·비즈니스에 바로 쓰는 표현.' },
       // 테크·디지털
-      it_news:       { id: 'it_news',       name: 'IT 뉴스',        emoji: '💻', super_category: 'tech',     description: '꼭 알아야 할 IT·테크 핵심 뉴스 한 가지.' },
-      digital_tools: { id: 'digital_tools', name: '디지털 도구',    emoji: '🛠️', super_category: 'tech',     description: '업무·일상을 효율화하는 디지털 도구 추천.' },
+      it_news:       { id: 'it_news',       name: 'IT 뉴스', super_category: 'tech',     description: '꼭 알아야 할 IT·테크 핵심 뉴스 한 가지.' },
+      digital_tools: { id: 'digital_tools', name: '디지털 도구', super_category: 'tech',     description: '업무·일상을 효율화하는 디지털 도구 추천.' },
       // 금융·투자
-      economy:       { id: 'economy',       name: '경제',           emoji: '📊', super_category: 'finance',  description: '매일 아침 1분, 경제 기본기를 차곡차곡.' },
-      kr_stock:      { id: 'kr_stock',      name: '한국 증시',      emoji: '🇰🇷', super_category: 'finance',  description: '한국 증시 핵심 종목·이슈 한 줄 정리.' },
-      us_stock:      { id: 'us_stock',      name: '미국 증시',      emoji: '🇺🇸', super_category: 'finance',  description: '미국 주요 종목·시장 흐름 매일 1분.' },
-      crypto:        { id: 'crypto',        name: '암호화폐',       emoji: '₿',  super_category: 'finance',  description: '비트코인·이더리움 등 암호화폐 트렌드.' },
-      realestate:    { id: 'realestate',    name: '부동산',         emoji: '🏠', super_category: 'finance',  description: '부동산 시장 동향과 실용 정보.' },
+      economy:       { id: 'economy',       name: '경제', super_category: 'finance',  description: '매일 아침 1분, 경제 기본기를 차곡차곡.' },
+      kr_stock:      { id: 'kr_stock',      name: '한국 증시', super_category: 'finance',  description: '한국 증시 핵심 종목·이슈 한 줄 정리.' },
+      us_stock:      { id: 'us_stock',      name: '미국 증시', super_category: 'finance',  description: '미국 주요 종목·시장 흐름 매일 1분.' },
+      crypto:        { id: 'crypto',        name: '암호화폐',  super_category: 'finance',  description: '비트코인·이더리움 등 암호화폐 트렌드.' },
+      realestate:    { id: 'realestate',    name: '부동산', super_category: 'finance',  description: '부동산 시장 동향과 실용 정보.' },
       // 건강·일상
-      fitness:       { id: 'fitness',       name: '피트니스',       emoji: '💪', super_category: 'wellness', description: '집에서 할 수 있는 운동 한 가지부터 시작.' },
-      minimal:       { id: 'minimal',       name: '미니멀',         emoji: '🌱', super_category: 'wellness', description: '덜어내고 더 가벼워지는 일상의 한 걸음.' },
+      fitness:       { id: 'fitness',       name: '피트니스', super_category: 'wellness', description: '집에서 할 수 있는 운동 한 가지부터 시작.' },
+      minimal:       { id: 'minimal',       name: '미니멀', super_category: 'wellness', description: '덜어내고 더 가벼워지는 일상의 한 걸음.' },
       // 교양·지식
-      trivia:        { id: 'trivia',        name: '상식',           emoji: '🧠', super_category: 'knowledge',description: '매일 아침 1분, 세상이 더 흥미로워지는 지식.' },
-      reading:       { id: 'reading',       name: '독서',           emoji: '📚', super_category: 'knowledge',description: '책 한 권의 핵심을 매일 한 입씩.' },
-      law:           { id: 'law',           name: '법률·생활',      emoji: '⚖️', super_category: 'knowledge',description: '일상에서 알아두면 도움 되는 법률·제도 한 가지.' },
+      trivia:        { id: 'trivia',        name: '상식', super_category: 'knowledge',description: '매일 아침 1분, 세상이 더 흥미로워지는 지식.' },
+      reading:       { id: 'reading',       name: '독서', super_category: 'knowledge',description: '책 한 권의 핵심을 매일 한 입씩.' },
+      law:           { id: 'law',           name: '법률·생활', super_category: 'knowledge',description: '일상에서 알아두면 도움 되는 법률·제도 한 가지.' },
     };
     cat = HARDCODED_FALLBACK[catId];
   }
@@ -6489,12 +6489,12 @@ async function renderCategoryListPage(filter) {
   // filter: 'all' | 'finance' | 'tech' | 'language' | 'work' | 'knowledge' | 'wellness'
   const SUPER_CATS = {
     all:       { eyebrow: 'ALL',             title: '전체 토픽',         sub: '관심 있는 토픽을 선택해주세요.' },
-    finance:   { eyebrow: 'FINANCE',         title: '💰 금융·투자',     sub: '경제 흐름과 시장 움직임을 짧게.' },
-    tech:      { eyebrow: 'TECH',            title: '💻 테크·디지털',   sub: 'IT·AI·디지털 도구 트렌드.' },
-    language:  { eyebrow: 'LANGUAGE',        title: '🌐 외국어',         sub: '비즈니스부터 여행까지.' },
-    work:      { eyebrow: 'WORK',            title: '💼 일·업무',       sub: '회사에서 한 단계 올라가는 인사이트.' },
-    knowledge: { eyebrow: 'KNOWLEDGE',       title: '📚 교양·지식',     sub: '내 삶에 도움 되는 실용 지식.' },
-    wellness:  { eyebrow: 'WELLNESS',        title: '🌱 건강·일상',     sub: '몸과 일상을 가볍게 정돈.' },
+    finance:   { eyebrow: 'FINANCE',         title: '금융·투자',     sub: '경제 흐름과 시장 움직임을 짧게.' },
+    tech:      { eyebrow: 'TECH',            title: '테크·디지털',   sub: 'IT·AI·디지털 도구 트렌드.' },
+    language:  { eyebrow: 'LANGUAGE',        title: '외국어',         sub: '비즈니스부터 여행까지.' },
+    work:      { eyebrow: 'WORK',            title: '일·업무',       sub: '회사에서 한 단계 올라가는 인사이트.' },
+    knowledge: { eyebrow: 'KNOWLEDGE',       title: '교양·지식',     sub: '내 삶에 도움 되는 실용 지식.' },
+    wellness:  { eyebrow: 'WELLNESS',        title: '건강·일상',     sub: '몸과 일상을 가볍게 정돈.' },
   };
   const meta = SUPER_CATS[filter] || SUPER_CATS.all;
   document.getElementById('catListEyebrow').textContent = meta.eyebrow;
@@ -6525,7 +6525,6 @@ async function renderCategoryListPage(filter) {
 
   // [v245] 카테고리(c) 안의 토픽(소주제)을 하나씩 카드로 펼쳐서 렌더 — 그룹명은 카드 위 태그로만 표시
   const buildTopicCards = (c, comingSoon) => {
-    const emoji = c.emoji || '📌';
     const groupName = c.name || c.id;
     const topics = (c.subtopics || []).filter(s => s.active);
     if (topics.length === 0) return '';
@@ -6534,7 +6533,6 @@ async function renderCategoryListPage(filter) {
     return topics.map(s => `
       <div class="cat-card${comingSoon ? ' coming-soon' : ''}" onclick="showCategory('${c.id}').then(function(){ openSubtopicDetail('${c.id}', ${s.id}, '${(s.name || '').replace(/'/g, "\\'")}'); })">
         ${comingSoon ? '<div class="coming-badge">출시 예정</div>' : ''}
-        <div class="cat-card-icon">${emoji}</div>
         <div class="cat-card-name">${s.name}</div>
         <div class="cat-card-tag" style="font-size:11px;color:var(--gold);background:var(--gold-dim,rgba(201,168,76,.12));display:inline-block;padding:3px 9px;border-radius:999px;margin-top:8px${comingSoon ? ';opacity:.7' : ''}">${groupName}</div>
       </div>`).join('');
@@ -6544,12 +6542,12 @@ async function renderCategoryListPage(filter) {
   // 전체 탭: 대분류별 그룹핑 유지
   if (filter === 'all') {
     const SUPER_CATS_LIST = [
-      { id: 'finance',   emoji: '💰', label: '금융·투자' },
-      { id: 'tech',      emoji: '💻', label: '테크·디지털' },
-      { id: 'language',  emoji: '🌐', label: '외국어' },
-      { id: 'work',      emoji: '💼', label: '일·업무' },
-      { id: 'knowledge', emoji: '📚', label: '교양·지식' },
-      { id: 'wellness',  emoji: '🌱', label: '건강·일상' },
+      { id: 'finance', label: '금융·투자' },
+      { id: 'tech', label: '테크·디지털' },
+      { id: 'language', label: '외국어' },
+      { id: 'work', label: '일·업무' },
+      { id: 'knowledge', label: '교양·지식' },
+      { id: 'wellness', label: '건강·일상' },
     ];
     const grouped = {};
     SUPER_CATS_LIST.forEach(s => { grouped[s.id] = { active: [], coming: [] }; });
@@ -6570,7 +6568,6 @@ async function renderCategoryListPage(filter) {
       const total = g.active.length + g.coming.length;
       if (total === 0) return '';
       const header = `<div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:18px 0 6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.15)">
-        <span style="font-size:18px">${s.emoji}</span>
         <span style="font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px">${s.label}</span>
         <span style="font-size:11px;color:var(--muted);margin-left:auto">${total}개</span>
       </div>`;
@@ -6579,7 +6576,6 @@ async function renderCategoryListPage(filter) {
     const ungroupedTotal = ungrouped.active.length + ungrouped.coming.length;
     const ungroupedHtml = ungroupedTotal > 0
       ? `<div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:18px 0 6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.15)">
-          <span style="font-size:18px">📌</span>
           <span style="font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px">기타</span>
           <span style="font-size:11px;color:var(--muted);margin-left:auto">${ungroupedTotal}개</span>
         </div>` + ungrouped.active.map(c => buildTopicCards(c, false)).join('') + ungrouped.coming.map(c => buildTopicCards(c, true)).join('')
@@ -6967,24 +6963,24 @@ async function loadCategoriesFromAPI() {
     // 폴백 (API 실패 시): 18개 카테고리 전부 active로 가정
     const fallback = {
       active: [
-        { id: 'career',        name: '커리어',        emoji: '💼', super_category: 'work' },
-        { id: 'productivity',  name: '생산성',        emoji: '⏱️', super_category: 'work' },
-        { id: 'english',       name: '영어',          emoji: '🇬🇧', super_category: 'language' },
-        { id: 'daily_english', name: '데일리 영어',   emoji: '🗣️', super_category: 'language' },
-        { id: 'japanese',      name: '일본어',        emoji: '🇯🇵', super_category: 'language' },
-        { id: 'vietnamese',    name: '베트남어',      emoji: '🇻🇳', super_category: 'language' },
-        { id: 'it_news',       name: 'IT 뉴스',       emoji: '💻', super_category: 'tech' },
-        { id: 'digital_tools', name: '디지털 도구',   emoji: '🛠️', super_category: 'tech' },
-        { id: 'economy',       name: '경제',          emoji: '📊', super_category: 'finance' },
-        { id: 'kr_stock',      name: '한국 증시',     emoji: '🇰🇷', super_category: 'finance' },
-        { id: 'us_stock',      name: '미국 증시',     emoji: '🇺🇸', super_category: 'finance' },
-        { id: 'crypto',        name: '암호화폐',      emoji: '₿',  super_category: 'finance' },
-        { id: 'realestate',    name: '부동산',        emoji: '🏠', super_category: 'finance' },
-        { id: 'fitness',       name: '피트니스',      emoji: '💪', super_category: 'wellness' },
-        { id: 'minimal',       name: '미니멀',        emoji: '🌱', super_category: 'wellness' },
-        { id: 'trivia',        name: '상식',          emoji: '🧠', super_category: 'knowledge' },
-        { id: 'reading',       name: '독서',          emoji: '📚', super_category: 'knowledge' },
-        { id: 'law',           name: '법률·생활',     emoji: '⚖️', super_category: 'knowledge' },
+        { id: 'career',        name: '커리어', super_category: 'work' },
+        { id: 'productivity',  name: '생산성', super_category: 'work' },
+        { id: 'english',       name: '영어', super_category: 'language' },
+        { id: 'daily_english', name: '데일리 영어', super_category: 'language' },
+        { id: 'japanese',      name: '일본어', super_category: 'language' },
+        { id: 'vietnamese',    name: '베트남어', super_category: 'language' },
+        { id: 'it_news',       name: 'IT 뉴스', super_category: 'tech' },
+        { id: 'digital_tools', name: '디지털 도구', super_category: 'tech' },
+        { id: 'economy',       name: '경제', super_category: 'finance' },
+        { id: 'kr_stock',      name: '한국 증시', super_category: 'finance' },
+        { id: 'us_stock',      name: '미국 증시', super_category: 'finance' },
+        { id: 'crypto',        name: '암호화폐',  super_category: 'finance' },
+        { id: 'realestate',    name: '부동산', super_category: 'finance' },
+        { id: 'fitness',       name: '피트니스', super_category: 'wellness' },
+        { id: 'minimal',       name: '미니멀', super_category: 'wellness' },
+        { id: 'trivia',        name: '상식', super_category: 'knowledge' },
+        { id: 'reading',       name: '독서', super_category: 'knowledge' },
+        { id: 'law',           name: '법률·생활', super_category: 'knowledge' },
       ],
       coming_soon: [],
       hidden: [],
@@ -7071,12 +7067,12 @@ async function _initCategoryVisibility() {
         introActiveGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);font-size:13px">현재 운영 중인 카테고리가 없습니다.</div>';
       } else {
         const SUPER_CATS = [
-          { id: 'finance',   emoji: '💰', label: '금융·투자' },
-          { id: 'tech',      emoji: '💻', label: '테크·디지털' },
-          { id: 'language',  emoji: '🌐', label: '외국어' },
-          { id: 'work',      emoji: '💼', label: '일·업무' },
-          { id: 'knowledge', emoji: '📚', label: '교양·지식' },
-          { id: 'wellness',  emoji: '🌱', label: '건강·일상' },
+          { id: 'finance', label: '금융·투자' },
+          { id: 'tech', label: '테크·디지털' },
+          { id: 'language', label: '외국어' },
+          { id: 'work', label: '일·업무' },
+          { id: 'knowledge', label: '교양·지식' },
+          { id: 'wellness', label: '건강·일상' },
         ];
         const grouped = {};
         SUPER_CATS.forEach(s => { grouped[s.id] = []; });
@@ -7090,12 +7086,10 @@ async function _initCategoryVisibility() {
         const buildCardHtml = (c) => {
           const id    = c.id;
           const name  = c.name || id;
-          const emoji = c.emoji || '📌';
           const desc  = c.description || '매일 새로운 콘텐츠를 만나보세요.';
           // v107: 카테고리 리스트 페이지와 동일한 순서 (이모지→제목→설명→부제목)
           return `
             <div class="cat-card" onclick="showCategory('${id}')">
-              <div class="cat-card-icon">${emoji}</div>
               <div class="cat-card-name">${name}</div>
               <p class="cat-card-desc">${desc}</p>
               <div class="cat-card-tag" data-cat-subtopics="${id}" style="font-size:12px;color:var(--gold);letter-spacing:.3px;min-height:0;display:none"></div>
@@ -7106,7 +7100,6 @@ async function _initCategoryVisibility() {
           const cats = grouped[s.id];
           if (!cats || cats.length === 0) return '';
           const header = `<div class="cat-swipe-header" style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:18px 0 6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.15)">
-            <span style="font-size:18px">${s.emoji}</span>
             <span style="font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px">${s.label}</span>
             <span style="font-size:11px;color:var(--muted);margin-left:auto">${cats.length}개</span>
           </div>`;
@@ -7116,7 +7109,6 @@ async function _initCategoryVisibility() {
         }).join('');
         const ungroupedHtml = ungrouped.length > 0
           ? `<div class="cat-super-group" data-super="other"><div class="cat-swipe-header" style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:18px 0 6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.15)">
-              <span style="font-size:18px">📌</span>
               <span style="font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px">기타</span>
               <span style="font-size:11px;color:var(--muted);margin-left:auto">${ungrouped.length}개</span>
             </div><div class="cat-swipe-rail" data-super="other">` + ungrouped.map(buildCardHtml).join('') + `</div><div class="cat-rail-dots" data-super="other" data-count="${ungrouped.length}" aria-hidden="true"></div></div>`
@@ -7144,12 +7136,10 @@ async function _initCategoryVisibility() {
         introCsGrid.innerHTML = preview.map(c => {
           const id    = c.id;
           const name  = c.name || c.id;
-          const emoji = c.emoji || '📌';
           const desc  = c.description || '곧 만나볼 카테고리입니다.';
           return `
             <div class="cat-card coming-soon">
               <div class="coming-badge">출시 예정</div>
-              <div class="cat-card-icon">${emoji}</div>
               <div class="cat-card-name">${name}</div>
               <p class="cat-card-desc">${desc}</p>
               <div class="cat-card-tag" data-cat-subtopics="${id}" style="font-size:12px;color:var(--gold);letter-spacing:.3px;opacity:.7;min-height:0;display:none"></div>
@@ -7184,12 +7174,12 @@ async function _initCategoryVisibility() {
         csEmptyState.style.display = 'none';
 
         const SUPER_CATS_CS = [
-          { id: 'finance',   emoji: '💰', label: '금융·투자' },
-          { id: 'tech',      emoji: '💻', label: '테크·디지털' },
-          { id: 'language',  emoji: '🌐', label: '외국어' },
-          { id: 'work',      emoji: '💼', label: '일·업무' },
-          { id: 'knowledge', emoji: '📚', label: '교양·지식' },
-          { id: 'wellness',  emoji: '🌱', label: '건강·일상' },
+          { id: 'finance', label: '금융·투자' },
+          { id: 'tech', label: '테크·디지털' },
+          { id: 'language', label: '외국어' },
+          { id: 'work', label: '일·업무' },
+          { id: 'knowledge', label: '교양·지식' },
+          { id: 'wellness', label: '건강·일상' },
         ];
         const groupedCS = {};
         SUPER_CATS_CS.forEach(s => { groupedCS[s.id] = []; });
@@ -7203,13 +7193,11 @@ async function _initCategoryVisibility() {
         const buildCsCard = (c) => {
           const id = c.id;
           const name  = c.name || c.id;
-          const emoji = c.emoji || '📌';
           const desc  = c.description || '곧 만나볼 카테고리입니다.';
           // v107: 다른 카드와 동일한 순서 (이모지→제목→설명→부제목→샘플)
           return `
             <div class="cat-card coming-soon">
               <div class="coming-badge">출시 예정</div>
-              <div class="cat-card-icon">${emoji}</div>
               <div class="cat-card-name">${name}</div>
               <p class="cat-card-desc">${desc}</p>
               <div class="cat-card-tag" data-cat-subtopics="${id}" style="font-size:12px;color:var(--gold);letter-spacing:.3px;opacity:.7;min-height:0;display:none"></div>
@@ -7221,7 +7209,6 @@ async function _initCategoryVisibility() {
           const cats = groupedCS[s.id];
           if (!cats || cats.length === 0) return '';
           const header = `<div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:18px 0 6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.15)">
-            <span style="font-size:18px">${s.emoji}</span>
             <span style="font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px">${s.label}</span>
             <span style="font-size:11px;color:var(--muted);margin-left:auto">${cats.length}개</span>
           </div>`;
@@ -7229,7 +7216,6 @@ async function _initCategoryVisibility() {
         }).join('');
         const csUngroupedHtml = ungroupedCS.length > 0
           ? `<div style="grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:18px 0 6px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.15)">
-              <span style="font-size:18px">📌</span>
               <span style="font-size:14px;font-weight:700;color:var(--gold);letter-spacing:.5px">기타</span>
               <span style="font-size:11px;color:var(--muted);margin-left:auto">${ungroupedCS.length}개</span>
             </div>` + ungroupedCS.map(buildCsCard).join('')
@@ -8648,8 +8634,7 @@ async function renderModalCategoryButtons() {
   sel.innerHTML = activeCats.map(c => {
     const id    = c.id;
     const name  = c.name || id;
-    const emoji = c.emoji || '📌';
-    return `<button type="button" class="cat-btn" data-cat="${id}" onclick="toggleCat('${id}')">${emoji} ${name}</button>`;
+    return `<button type="button" class="cat-btn" data-cat="${id}" onclick="toggleCat('${id}')">${name}</button>`;
   }).join('');
 
   // v130: 모바일 select 옵션도 함께 렌더
@@ -8658,8 +8643,7 @@ async function renderModalCategoryButtons() {
       activeCats.map(c => {
         const id    = c.id;
         const name  = c.name || id;
-        const emoji = c.emoji || '📌';
-        return `<option value="${id}">${emoji} ${name}</option>`;
+        return `<option value="${id}">${name}</option>`;
       })
     );
     selectEl.innerHTML = opts.join('');

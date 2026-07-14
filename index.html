@@ -1959,15 +1959,21 @@ body.ll-locked { overflow:hidden; }
 
   <!-- [v245] 히어로 아래 카테고리 타일 (구 가격 미리보기 대체) -->
   <style>
-    #heroCategoryTiles{max-width:760px;margin:26px auto 0;padding:0 18px}
-    #heroCategoryTiles .hct-title{text-align:center;font-size:13px;color:var(--muted);margin-bottom:14px}
-    #heroCategoryTiles .hct-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-    #heroCategoryTiles .hct-tile{background:linear-gradient(160deg,var(--dark3,#1a1a17),var(--dark2,#17171b));border:1px solid var(--border);border-radius:14px;padding:18px 10px;text-align:center;cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s}
+    /* position:relative — 히어로 배경 장식(.grid-lines, absolute)이 클릭을 가로채지 않도록 스택 순서를 올림 */
+    #heroCategoryTiles{position:relative;z-index:1;max-width:980px;margin:26px auto 0;padding:0 18px;width:100%;box-sizing:border-box}
+    #heroCategoryTiles .hct-title{text-align:center;font-size:13px;color:var(--muted);margin-bottom:16px}
+    #heroCategoryTiles .hct-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+    #heroCategoryTiles .hct-tile{background:linear-gradient(160deg,var(--dark3,#1a1a17),var(--dark2,#17171b));border:1px solid var(--border);border-radius:16px;padding:26px 12px;text-align:center;cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s}
     #heroCategoryTiles .hct-tile:hover{transform:translateY(-3px);border-color:var(--gold);box-shadow:0 8px 20px rgba(0,0,0,.3)}
-    #heroCategoryTiles .hct-ico{width:44px;height:44px;margin:0 auto 8px;border-radius:50%;background:var(--gold-dim,rgba(201,168,76,.12));display:flex;align-items:center;justify-content:center;font-size:21px}
-    #heroCategoryTiles .hct-name{font-weight:800;font-size:13px;color:var(--text)}
+    #heroCategoryTiles .hct-ico{width:60px;height:60px;margin:0 auto 12px;border-radius:50%;background:var(--gold-dim,rgba(201,168,76,.12));display:flex;align-items:center;justify-content:center;font-size:28px}
+    #heroCategoryTiles .hct-name{font-weight:800;font-size:15px;color:var(--text)}
+    @media (max-width:900px){
+      #heroCategoryTiles .hct-grid{grid-template-columns:repeat(3,1fr);gap:12px}
+    }
     @media (max-width:560px){
       #heroCategoryTiles .hct-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+      #heroCategoryTiles .hct-tile{padding:20px 10px}
+      #heroCategoryTiles .hct-ico{width:48px;height:48px;font-size:22px}
     }
   </style>
   <div id="heroCategoryTiles">
@@ -6523,8 +6529,10 @@ async function renderCategoryListPage(filter) {
     const groupName = c.name || c.id;
     const topics = (c.subtopics || []).filter(s => s.active);
     if (topics.length === 0) return '';
+    // [v245] 토픽 카드 클릭 → category-detail-page를 먼저 렌더(내부 DOM 준비)한 뒤
+    // 토픽 상세(있으면) 또는 신청 모달로 즉시 덮어씀 — 그룹 개요 화면은 사용자에게 노출되지 않음
     return topics.map(s => `
-      <div class="cat-card${comingSoon ? ' coming-soon' : ''}" onclick="showCategory('${c.id}')">
+      <div class="cat-card${comingSoon ? ' coming-soon' : ''}" onclick="showCategory('${c.id}').then(function(){ openSubtopicDetail('${c.id}', ${s.id}, '${(s.name || '').replace(/'/g, "\\'")}'); })">
         ${comingSoon ? '<div class="coming-badge">출시 예정</div>' : ''}
         <div class="cat-card-icon">${emoji}</div>
         <div class="cat-card-name">${s.name}</div>

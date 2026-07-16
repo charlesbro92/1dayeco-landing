@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>전화번호 연결 | 1DAYECO 원데이에코</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/favicon.ico">
+<style>
+  :root{
+    --gold:#C9A84C; --gold-light:#E8C97A; --gold-dim:rgba(201,168,76,0.12);
+    --dark:#0A0A08; --dark2:#111110; --dark3:#1A1A17;
+    --border:rgba(201,168,76,0.2); --text:#E8E4D9; --muted:#88887F; --error:#F87171;
+    --sans:'Noto Sans KR', sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100vh; background:var(--dark); color:var(--text);
+    font-family:var(--sans); display:flex; align-items:center; justify-content:center;
+  }
+  .card{
+    width:100%; max-width:380px; margin:24px; padding:44px 32px;
+    background:var(--dark2); border:1px solid var(--border); border-radius:18px;
+  }
+  .logo{color:var(--gold); font-weight:800; font-size:18px; letter-spacing:.5px; margin-bottom:14px; text-align:center}
+  h1{font-size:17px; font-weight:700; color:var(--gold-light); margin:0 0 8px; text-align:center}
+  p.sub{font-size:13px; color:var(--muted); margin:0 0 28px; line-height:1.6; text-align:center}
+  label{font-size:12px; color:var(--muted); display:block; margin-bottom:6px}
+  input{
+    width:100%; background:rgba(255,255,255,.05); border:1.5px solid var(--border);
+    border-radius:10px; padding:13px 16px; font-size:15px; color:var(--text);
+    font-family:var(--sans); outline:none; margin-bottom:6px;
+  }
+  input:focus{ border-color:var(--gold) }
+  .err{ font-size:12px; color:var(--error); min-height:16px; margin-bottom:14px }
+  button{
+    width:100%; background:var(--gold); color:#1A1300; font-weight:800; font-size:15px;
+    padding:14px 0; border-radius:10px; border:none; cursor:pointer;
+  }
+  button:disabled{ opacity:.6; cursor:default }
+  button:hover:not(:disabled){ background:var(--gold-light) }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="logo">1DAYECO</div>
+  <h1>전화번호를 연결해 주세요</h1>
+  <p class="sub">1DAYECO 가입 시 사용한 전화번호를 입력하면<br>구독 정보를 카카오 계정과 연결해드려요.</p>
+
+  <label for="phone">전화번호</label>
+  <input type="tel" id="phone" placeholder="010-0000-0000" maxlength="13">
+  <div class="err" id="err"></div>
+  <button id="submitBtn" onclick="linkPhone()">연결하고 시작하기</button>
+</div>
+
+<script>
+const API_BASE = 'https://web-production-761cd.up.railway.app';
+
+async function linkPhone() {
+  const input = document.getElementById('phone');
+  const errEl = document.getElementById('err');
+  const btn = document.getElementById('submitBtn');
+  const phone = input.value.replace(/-/g, '').trim();
+
+  if (!phone || phone.length < 10) {
+    errEl.textContent = '올바른 전화번호를 입력해 주세요.';
+    return;
+  }
+  errEl.textContent = '';
+  btn.disabled = true;
+  btn.textContent = '연결하는 중...';
+
+  try {
+    const res = await fetch(API_BASE + '/auth/kakao/link-phone', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone }),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      errEl.textContent = data.message || '연결에 실패했습니다. 다시 시도해 주세요.';
+      btn.disabled = false;
+      btn.textContent = '연결하고 시작하기';
+      return;
+    }
+    window.location.href = '/my.html';
+  } catch (e) {
+    errEl.textContent = '네트워크 오류가 발생했습니다.';
+    btn.disabled = false;
+    btn.textContent = '연결하고 시작하기';
+  }
+}
+
+document.getElementById('phone').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') linkPhone();
+});
+</script>
+</body>
+</html>

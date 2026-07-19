@@ -1968,7 +1968,7 @@ body.ll-locked { overflow:hidden; }
   <div class="signup-wrap">
     <!-- [v247] 카카오 로그인 — 기본 진입 경로. 로그인하면 아래 이름/전화가 자동 입력됨 -->
     <div id="kakaoLoginPrompt" style="text-align:center;margin-bottom:14px">
-      <button type="button" onclick="window.location.href='https://web-production-761cd.up.railway.app/auth/kakao/login'"
+      <button type="button" onclick="window.location.href='https://api.onedayeco.com/auth/kakao/login'"
         style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;box-sizing:border-box;background:#FEE500;color:#1A1300;font-weight:800;font-size:14px;padding:13px 0;border:none;border-radius:10px;cursor:pointer">
         💬 카카오로 3초만에 시작하기
       </button>
@@ -3290,7 +3290,7 @@ async function fetchAndShowVisitorCount(){
   const numEl  = document.getElementById('llVisitorsNum');
   if (!wrap || !numEl) return;
   // API_BASE는 메인 script 후반부에 선언되므로 const로 직접 지정 (의존성 분리)
-  const BACKEND = 'https://web-production-761cd.up.railway.app';
+  const BACKEND = 'https://api.onedayeco.com';
   try {
     const res = await fetch(`${BACKEND}/api/visitor/count`, {
       method: 'POST',
@@ -3341,7 +3341,7 @@ function doLandingLogin(){
 }
 
 // ── 설정 ─────────────────────────────────────────────────────
-const API_BASE        = 'https://web-production-761cd.up.railway.app';
+const API_BASE        = 'https://api.onedayeco.com';
 
 // 포트원 V2 설정 (포트원 콘솔 > 결제연동 > 연동 정보)
 const PORTONE_STORE_ID    = 'store-3a0615b4-5d94-46c6-9e1b-45da9a7436d7';     // Store ID (V2용)
@@ -7371,7 +7371,7 @@ document.addEventListener('DOMContentLoaded', checkKakaoSession);
 //  heroName/heroPhone만 채우면 충분함 — 중복 로직 불필요)
 async function checkKakaoSession() {
   try {
-    const res = await fetch('https://web-production-761cd.up.railway.app/api/me', { credentials: 'include' });
+    const res = await fetch('https://api.onedayeco.com/api/me', { credentials: 'include' });
     if (!res.ok) return;  // 401 등 — 비로그인 상태, 조용히 무시
     const data = await res.json();
     if (!data.success) return;
@@ -10307,7 +10307,7 @@ function onKakaoChannelClick() {
 <script>
 // ── [v219] 쿠폰 이벤트 팝업 ──────────────────────────────────────
 (function(){
-  var CP_API = (typeof API_BASE !== 'undefined' && API_BASE) ? API_BASE : 'https://web-production-761cd.up.railway.app';
+  var CP_API = (typeof API_BASE !== 'undefined' && API_BASE) ? API_BASE : 'https://api.onedayeco.com';
   var CP_KEY = 'odeco_coupon_popup_seen';      // 하루 1회 노출용
   var cpIssuing = false;
 
@@ -10637,7 +10637,7 @@ function onKakaoChannelClick() {
 <!-- [v230] 방문자 통계 — 배지 5회 클릭 시 팝업(오늘/누적 방문자) ─────────── -->
 <script>
 (function(){
-  var BACKEND = 'https://web-production-761cd.up.railway.app';
+  var BACKEND = 'https://api.onedayeco.com';
 
   // ── 1) 페이지 로드 시 방문 기록 (브라우저 세션당 1회) ──────────────
   function recordVisit(){
@@ -10740,7 +10740,7 @@ function onKakaoChannelClick() {
 <!-- [v231] 무료 1편 체험 + 쿠폰 카운트다운 ───────────────────────── -->
 <script>
 (function(){
-  var BACKEND = 'https://web-production-761cd.up.railway.app';
+  var BACKEND = 'https://api.onedayeco.com';
 
   // ───────── 1) 쿠폰 카운트다운 ─────────
   var cdTimer = null;
@@ -10987,7 +10987,7 @@ function onKakaoChannelClick() {
 <!-- [v234] 전환 퍼널 추적 ───────────────────────────────────── -->
 <script>
 (function(){
-  var BACKEND = 'https://web-production-761cd.up.railway.app';
+  var BACKEND = 'https://api.onedayeco.com';
 
   // 세션 ID (브라우저 세션 단위)
   function sid(){

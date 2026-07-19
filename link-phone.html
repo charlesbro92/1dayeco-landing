@@ -114,7 +114,9 @@ async function linkPhone() {
       btn.textContent = '연결하고 시작하기';
       return;
     }
-    window.location.href = '/my.html';
+    // 최초 연결/번호 변경 완료 후 — 마이페이지가 아니라 홈으로. 카카오 로그인은
+    // 기존 홈 화면을 대체하지 않고 이름/전화번호 자동입력을 도와주는 보조 기능이어야 함.
+    window.location.href = '/';
   } catch (e) {
     errEl.textContent = '네트워크 오류가 발생했습니다.';
     btn.disabled = false;

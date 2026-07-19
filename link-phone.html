@@ -39,22 +39,52 @@
   }
   button:disabled{ opacity:.6; cursor:default }
   button:hover:not(:disabled){ background:var(--gold-light) }
+  .back-link{ display:block; text-align:center; margin-top:16px; font-size:12px; color:var(--muted); text-decoration:none }
+  .back-link:hover{ color:var(--text) }
 </style>
 </head>
 <body>
 <div class="card">
   <div class="logo">1DAYECO</div>
-  <h1>전화번호를 연결해 주세요</h1>
-  <p class="sub">1DAYECO 가입 시 사용한 전화번호를 입력하면<br>구독 정보를 카카오 계정과 연결해드려요.</p>
+  <h1 id="pageTitle">전화번호를 연결해 주세요</h1>
+  <p class="sub" id="pageSub">1DAYECO 가입 시 사용한 전화번호를 입력하면<br>구독 정보를 카카오 계정과 연결해드려요.</p>
 
   <label for="phone">전화번호</label>
   <input type="tel" id="phone" placeholder="010-0000-0000" maxlength="13">
   <div class="err" id="err"></div>
   <button id="submitBtn" onclick="linkPhone()">연결하고 시작하기</button>
+  <a class="back-link" id="backLink" href="/" style="display:none">← 마이페이지로 돌아가기</a>
 </div>
 
 <script>
 const API_BASE = 'https://web-production-761cd.up.railway.app';
+
+function fmtPhone(v) {
+  const d = v.replace(/\D/g, '');
+  if (d.length <= 3) return d;
+  if (d.length <= 7) return d.slice(0,3) + '-' + d.slice(3);
+  return d.slice(0,3) + '-' + d.slice(3,7) + '-' + d.slice(7,11);
+}
+
+// 이미 전화번호가 연결된 상태(=번호 변경 목적으로 온 경우)면 현재 번호를 미리 채워주고
+// 문구/뒤로가기 링크를 '변경' 맥락으로 바꿔줌. 최초 연결(아직 phone 없음)이면 /api/me가
+// 401을 반환하므로 기본 문구 그대로 둠 — 한 페이지로 두 상황 모두 자연스럽게 처리.
+async function checkExistingPhone() {
+  try {
+    const res = await fetch(API_BASE + '/api/me', { credentials: 'include' });
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data.success || !data.phone) return;
+    document.getElementById('pageTitle').textContent = '전화번호를 변경해 주세요';
+    document.getElementById('pageSub').innerHTML = '새 전화번호를 입력하면<br>기존 연결을 이 번호로 교체해드려요.';
+    document.getElementById('phone').value = fmtPhone(data.phone);
+    document.getElementById('submitBtn').textContent = '변경하기';
+    const back = document.getElementById('backLink');
+    back.href = '/my.html';
+    back.style.display = 'block';
+  } catch (e) { /* 조용히 무시 — 기본(최초 연결) 문구 유지 */ }
+}
+checkExistingPhone();
 
 async function linkPhone() {
   const input = document.getElementById('phone');

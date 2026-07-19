@@ -123,6 +123,41 @@ body.light-mode .modal {
   transform:rotate(15deg);
 }
 
+/* 장바구니 아이콘 (우상단 nav 내부) */
+.nav-cart-btn {
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:34px;
+  height:34px;
+  background:transparent;
+  border:1px solid var(--border);
+  border-radius:50%;
+  cursor:pointer;
+  font-size:15px;
+  margin-right:8px;
+  flex-shrink:0;
+  transition:background .15s, border-color .15s;
+}
+.nav-cart-btn:hover {
+  background:rgba(201,168,76,.08);
+  border-color:rgba(201,168,76,.5);
+}
+.nav-cart-badge {
+  position:absolute;
+  top:-4px; right:-4px;
+  min-width:16px; height:16px;
+  padding:0 3px;
+  border-radius:8px;
+  background:var(--gold, #C9A84C);
+  color:#231A05;
+  font-size:10px;
+  font-weight:800;
+  line-height:16px;
+  text-align:center;
+}
+
 * { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior:smooth; }
 body { background:var(--dark); color:var(--text); font-family:var(--sans); overflow-x:hidden; word-break:keep-all; word-wrap:break-word; }
@@ -1315,9 +1350,16 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   margin-top:16px;
 }
 .cat-hero-btns .category-back,
-.cat-hero-btns .cta-subscribe-btn {
+.cat-hero-btns .cta-subscribe-btn,
+.cat-hero-btns .cta-cart-btn {
   white-space:nowrap;
 }
+.cta-cart-btn {
+  background:transparent; border:1px solid var(--gold);
+  color:var(--gold); padding:12px 20px; font-size:14px; font-family:var(--sans);
+  font-weight:700; border-radius:6px; cursor:pointer; transition:all .2s;
+}
+.cta-cart-btn:hover { background:rgba(201,168,76,.08); }
 
 /* ── 카테고리 long-form 섹션들 ── */
 .cat-section {
@@ -1827,6 +1869,10 @@ body.ll-locked { overflow:hidden; }
   <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="다크/라이트 모드 전환" aria-label="테마 전환">
     <span id="themeIcon">☀️</span>
   </button>
+  <!-- 장바구니 아이콘 (게스트 포함 누구나 사용 가능) -->
+  <button class="nav-cart-btn" id="navCartBtn" onclick="openCartDrawer()" title="장바구니" aria-label="장바구니">
+    🛒<span class="nav-cart-badge" id="navCartBadge" style="display:none">0</span>
+  </button>
   <button class="nav-cta" onclick="goPricing()">지금 시작하기</button>
   <!-- 모바일 햄버거 버튼 (모바일에서만 표시) -->
   <button class="mobile-hamburger" onclick="toggleMobileMenu()" aria-label="메뉴 열기">
@@ -1864,6 +1910,7 @@ body.ll-locked { overflow:hidden; }
       COMING SOON <span class="mmp-badge" id="mmpComingSoonBadge">0</span>
     </button>
     <div class="mmp-divider"></div>
+    <button class="mmp-item" onclick="openCartDrawer(); closeMobileMenu();">🛒 장바구니 <span id="mmpCartBadge"></span></button>
     <button class="mmp-cta" onclick="goPricing(); closeMobileMenu();">지금 시작하기</button>
   </div>
 </aside>
@@ -2517,6 +2564,7 @@ body.ll-locked { overflow:hidden; }
     <div class="category-coming" id="cdpDelivery">매일 1편</div>
     <div class="cat-hero-btns">
       <button class="category-back" id="cdpBackBtn" onclick="showCategory('list-all')">← 토픽 목록</button>
+      <button class="cta-cart-btn" id="cdpCartBtn" onclick="addCurrentSubtopicToCart()">🛒 장바구니에 담기</button>
       <button class="cta-subscribe-btn" id="cdpHeroCta" onclick="openModalWithCategory(window._currentCatId)">📬 신청하기 →</button>
     </div>
   </div>
@@ -2980,6 +3028,40 @@ HIDDEN_COMINGSOON_MODAL_END -->
       <button class="modal-btn" id="doneConfirmBtn" style="margin-top:8px;opacity:.45;cursor:not-allowed" onclick="if(window._kakaoChannelAdded)closeModal()" disabled>
         채널 추가 후 신청 완료
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── 장바구니 드로어 ── -->
+<!-- 로그인 여부와 무관하게 누구나 사용 가능. 담긴 항목은 localStorage(odeco_cart)에 저장. -->
+<div class="overlay" id="cartOverlay" onclick="if(event.target.id==='cartOverlay')closeCartDrawer()">
+  <div class="modal" id="cartDrawer" style="max-width:440px">
+    <button class="modal-x" onclick="closeCartDrawer()">✕</button>
+    <div class="modal-title">🛒 장바구니</div>
+
+    <div id="cartItemsList" style="margin-top:14px"></div>
+    <div id="cartEmptyState" style="display:none;text-align:center;padding:32px 0;color:var(--muted);font-size:13px">담긴 토픽이 없어요.</div>
+
+    <div id="cartSummary" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+        <span style="color:var(--muted)">표시가 합계</span>
+        <span id="cartSumList">₩0</span>
+      </div>
+      <div id="cartDiscountRow" style="display:none;justify-content:space-between;font-size:13px;margin-bottom:6px">
+        <span style="color:var(--muted)">장바구니 할인 (<span id="cartDiscountPct">0</span>%)</span>
+        <span id="cartDiscountAmt" style="color:#4ADE80;font-weight:700">−₩0</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:16px;font-weight:800;margin-top:8px;padding-top:8px;border-top:1px dashed var(--border)">
+        <span>최종 결제액</span>
+        <span id="cartSumFinal">₩0</span>
+      </div>
+
+      <div style="margin-top:16px">
+        <input type="text" id="cartName" placeholder="이름" style="width:100%;margin-bottom:8px;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);background:rgba(255,255,255,.05);color:var(--text);font-size:14px;font-family:var(--sans)">
+        <input type="tel" id="cartPhone" placeholder="전화번호" maxlength="13" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);background:rgba(255,255,255,.05);color:var(--text);font-size:14px;font-family:var(--sans)">
+      </div>
+
+      <button class="modal-btn" id="cartCheckoutBtn" onclick="submitCartCheckout()" style="margin-top:14px">한꺼번에 결제하기</button>
     </div>
   </div>
 </div>
@@ -7295,6 +7377,8 @@ async function checkKakaoSession() {
     if (!data.success) return;
     window._kakaoSession = data;
 
+    await _mergeCartOnLogin(data.phone);
+
     const nameEl = document.getElementById('heroName');
     const phoneEl = document.getElementById('heroPhone');
     if (nameEl && !nameEl.value) nameEl.value = data.nickname || '';
@@ -7319,6 +7403,42 @@ async function checkKakaoSession() {
     }
   } catch (e) {
     // 네트워크 오류 등 — 비로그인 상태로 조용히 진행 (기존 수동 입력 흐름 그대로 유지)
+  }
+}
+
+// [장바구니] 로그인 시 브라우저 장바구니 + 서버 장바구니(cart_items) 병합.
+// 같은 토픽이 양쪽에 다 있으면 최근에 담은 쪽(added_at 큰 값) 기준으로 하나만 남김.
+// 로그아웃 시 로컬 장바구니를 지우는 로직은 의도적으로 없음(확정된 요구사항).
+async function _mergeCartOnLogin(phone) {
+  try {
+    const localCart = getCart();
+    const res = await fetch(API_BASE + '/api/cart', { credentials: 'include' });
+    const serverItems = res.ok ? ((await res.json()).items || []) : [];
+    const serverCart = serverItems.map(r => ({
+      subtopic_id: r.subtopic_id, category_id: r.category_id,
+      subtopic_name: r.subtopic_name, plan: r.plan,
+      list_price: _cartListPrice(r.category_id, r.plan),
+      added_at: r.updated_at ? new Date(r.updated_at).getTime() : 0,
+    }));
+
+    const merged = new Map();
+    for (const item of serverCart) merged.set(item.subtopic_id, item);
+    for (const item of localCart) {
+      const existing = merged.get(item.subtopic_id);
+      if (!existing || (item.added_at || 0) > (existing.added_at || 0)) {
+        merged.set(item.subtopic_id, item);
+      }
+    }
+    const mergedArr = Array.from(merged.values());
+    setCart(mergedArr);
+
+    await fetch(API_BASE + '/api/cart', {
+      method: 'PUT', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: mergedArr }),
+    });
+  } catch (e) {
+    console.warn('장바구니 병합 실패 (무시):', e);
   }
 }
 
@@ -7641,6 +7761,286 @@ function heroSubmit() {
   if (mAutopay) { mAutopay.checked = true; }
   updateModalBtn();
 }
+
+// ── 장바구니 ─────────────────────────────────────────────────
+// 로그인 여부와 무관하게 누구나 담기·결제 가능. localStorage(odeco_cart)에 기본 저장되고,
+// 로그인 시에만 서버 cart_items와 동기화(_mergeCartOnLogin, checkKakaoSession 안에서 호출).
+const CART_KEY = 'odeco_cart';
+const CART_PLAN_LABELS = { monthly: '1개월', pkg3m: '3개월', pkg6m: '6개월', pkg1y: '1년' };
+const CART_FALLBACK_PRICE = { monthly: 9900, pkg3m: 19900, pkg6m: 24900, pkg1y: 41900 };
+
+function discountForCount(n) { return n <= 1 ? 0 : n === 2 ? 0.15 : 0.30; }
+
+function getCart() {
+  try { return JSON.parse(localStorage.getItem(CART_KEY) || '[]'); } catch (e) { return []; }
+}
+function setCart(items) {
+  try { localStorage.setItem(CART_KEY, JSON.stringify(items)); } catch (e) {}
+  updateCartBadge();
+  renderCartDrawer();
+}
+function updateCartBadge() {
+  const n = getCart().length;
+  const navBadge = document.getElementById('navCartBadge');
+  if (navBadge) { navBadge.style.display = n ? 'flex' : 'none'; navBadge.textContent = n; }
+  const mmpBadge = document.getElementById('mmpCartBadge');
+  if (mmpBadge) mmpBadge.textContent = n ? `(${n})` : '';
+}
+
+function _cartListPrice(catId, plan) {
+  const catPrices = window._CAT_PRICES && window._CAT_PRICES[catId];
+  return (catPrices && catPrices[plan] && catPrices[plan].price) || CART_FALLBACK_PRICE[plan] || CART_FALLBACK_PRICE.pkg6m;
+}
+
+// [주의] list_price(할인 전 표시가)만 저장 — 화면에 보여줄 실제 금액은 항상
+// list_price * (1 - discountForCount(cart.length))로 그때그때 계산한다(이중할인 방지).
+function addToCart(subtopicId, categoryId, subtopicName, plan) {
+  const cart = getCart();
+  if (cart.some(i => i.subtopic_id === subtopicId)) {
+    showToast('이미 장바구니에 담긴 토픽입니다', 'ng');
+    return;
+  }
+  cart.push({
+    subtopic_id: subtopicId, category_id: categoryId, subtopic_name: subtopicName,
+    plan: plan || 'pkg6m', list_price: _cartListPrice(categoryId, plan || 'pkg6m'),
+    added_at: Date.now(),
+  });
+  setCart(cart);
+  showToast(`${subtopicName} 장바구니에 담겼습니다`, 'ok');
+}
+function removeFromCart(subtopicId) {
+  setCart(getCart().filter(i => i.subtopic_id !== subtopicId));
+}
+function changeCartItemPlan(subtopicId, newPlan) {
+  const cart = getCart();
+  const item = cart.find(i => i.subtopic_id === subtopicId);
+  if (!item) return;
+  item.plan = newPlan;
+  item.list_price = _cartListPrice(item.category_id, newPlan);
+  setCart(cart);
+}
+
+function addCurrentSubtopicToCart() {
+  const catId  = window._currentCatId;
+  const subId  = window._currentSubtopicId;
+  const subName = window._currentSubtopicName || '토픽';
+  if (!catId || !subId) {
+    showToast('담을 토픽을 먼저 선택해주세요', 'ng');
+    return;
+  }
+  addToCart(subId, catId, subName, 'pkg6m');
+}
+
+function openCartDrawer() {
+  renderCartDrawer();
+  document.getElementById('cartOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeCartDrawer() {
+  document.getElementById('cartOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function renderCartDrawer() {
+  const listEl = document.getElementById('cartItemsList');
+  const emptyEl = document.getElementById('cartEmptyState');
+  const summaryEl = document.getElementById('cartSummary');
+  if (!listEl || !emptyEl || !summaryEl) return;  // 드로어 마크업 로딩 전 방어
+
+  const cart = getCart();
+  if (!cart.length) {
+    listEl.innerHTML = '';
+    emptyEl.style.display = 'block';
+    summaryEl.style.display = 'none';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  summaryEl.style.display = 'block';
+
+  const discount = discountForCount(cart.length);
+  let listTotal = 0;
+
+  listEl.innerHTML = cart.map(item => {
+    listTotal += item.list_price;
+    const effectivePrice = Math.round(item.list_price * (1 - discount));
+    return `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px">
+        <div>
+          <div style="font-weight:700">${item.subtopic_name || '토픽'}</div>
+          <select onchange="changeCartItemPlan(${item.subtopic_id}, this.value)" style="margin-top:4px;font-size:11.5px;padding:4px 6px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text);font-family:var(--sans)">
+            ${Object.entries(CART_PLAN_LABELS).map(([k, label]) => `<option value="${k}" ${item.plan === k ? 'selected' : ''}>${label}</option>`).join('')}
+          </select>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-variant-numeric:tabular-nums;font-weight:700">₩${effectivePrice.toLocaleString()}</span>
+          <button onclick="removeFromCart(${item.subtopic_id})" aria-label="삭제" style="background:none;border:none;color:#F87171;font-size:16px;cursor:pointer;padding:0 2px">×</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const discountAmt = Math.round(listTotal * discount);
+  const final = listTotal - discountAmt;
+  document.getElementById('cartSumList').textContent = '₩' + listTotal.toLocaleString();
+  document.getElementById('cartSumFinal').textContent = '₩' + final.toLocaleString();
+  const discountRow = document.getElementById('cartDiscountRow');
+  if (discount > 0) {
+    discountRow.style.display = 'flex';
+    document.getElementById('cartDiscountPct').textContent = Math.round(discount * 100);
+    document.getElementById('cartDiscountAmt').textContent = '−₩' + discountAmt.toLocaleString();
+  } else {
+    discountRow.style.display = 'none';
+  }
+
+  // 이름/전화 프리필 — openModal()과 동일한 우선순위(히어로 필드 → localStorage)
+  const nameEl = document.getElementById('cartName');
+  const phoneEl = document.getElementById('cartPhone');
+  if (nameEl && !nameEl.value) {
+    nameEl.value = document.getElementById('heroName')?.value ||
+      (function () { try { return localStorage.getItem('odeco_name') || ''; } catch (e) { return ''; } })();
+  }
+  if (phoneEl && !phoneEl.value) {
+    phoneEl.value = document.getElementById('heroPhone')?.value ||
+      (function () { try { return localStorage.getItem('odeco_phone') || ''; } catch (e) { return ''; } })();
+    if (phoneEl.value && typeof fmtPhone === 'function') { try { fmtPhone(phoneEl); } catch (e) {} }
+  }
+}
+
+async function submitCartCheckout() {
+  const cart = getCart();
+  if (!cart.length) { showToast('장바구니가 비어 있습니다', 'ng'); return; }
+
+  const name  = document.getElementById('cartName').value.trim();
+  const phone = document.getElementById('cartPhone').value.replace(/-/g, '');
+  if (!name)  { showToast('이름을 입력해주세요', 'ng'); return; }
+  if (phone.length < 10) { showToast('올바른 전화번호를 입력해주세요', 'ng'); return; }
+
+  const btn = document.getElementById('cartCheckoutBtn');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '준비 중...';
+
+  try {
+    const res = await apiPost('/api/cart/prepare', {
+      name, phone, notify_d1: true,
+      items: cart.map(i => ({ subtopic_id: i.subtopic_id, category_id: i.category_id, plan: i.plan })),
+    });
+    if (res && res.success === false) {
+      throw new Error(res.message || '장바구니 준비 중 오류가 발생했습니다');
+    }
+    window._cartPrepareRes = res;
+    window._cartCheckoutName = name;
+    window._cartCheckoutPhone = phone;
+    await submitCartPayment();
+  } catch (e) {
+    showToast(e.message || '오류가 발생했습니다', 'ng');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalText;
+  }
+}
+
+async function submitCartPayment() {
+  const res = window._cartPrepareRes;
+  if (!res) return;
+
+  if (typeof PortOne === 'undefined') {
+    showToast('결제 SDK 로딩 실패. 새로고침 후 다시 시도해주세요.', 'ng');
+    return;
+  }
+
+  const name  = window._cartCheckoutName;
+  const phone = window._cartCheckoutPhone;
+  const paymentId = 'pay_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
+
+  try {
+    sessionStorage.setItem('cart_billing_ctx', JSON.stringify({
+      bundleId: res.bundle_id, paymentId, meta: res._meta, ts: Date.now(),
+    }));
+  } catch (e) {}
+
+  try {
+    const response = await PortOne.requestPayment({
+      storeId:     PORTONE_STORE_ID,
+      channelKey:  PORTONE_CHANNEL_KEY,
+      paymentId:   paymentId,
+      orderName:   `1DAYECO 장바구니 (${getCart().length}건)`,
+      totalAmount: res.total_amount,
+      currency:    'CURRENCY_KRW',
+      payMethod:   'EASY_PAY',
+      easyPay:     { easyPayProvider: 'EASY_PAY_PROVIDER_KAKAOPAY' },
+      customer:    { customerId: res.customer_uid, fullName: name, phoneNumber: phone },
+      customData:  JSON.stringify({ bundle_id: res.bundle_id, ...res._meta }),
+      redirectUrl: location.origin + location.pathname + '?payment_complete=1&cart=1',
+    });
+
+    if (response && response.code !== undefined) {
+      const userCancelled = response.code === 'PORTONE_FAILED_TO_PROCESS' ||
+                           (response.message && response.message.includes('취소'));
+      if (!userCancelled) showToast(response.message || '결제가 취소되었습니다', 'ng');
+      return;
+    }
+
+    const completedPaymentId = response?.paymentId || paymentId;
+    const verify = await apiPost('/api/cart/verify', {
+      bundle_id: res.bundle_id, payment_id: completedPaymentId, _meta: res._meta,
+    });
+    if (verify && verify.success) {
+      try { sessionStorage.removeItem('cart_billing_ctx'); } catch (e) {}
+      setCart([]);
+      closeCartDrawer();
+      showToast('결제 완료! 오늘부터 매일 콘텐츠가 발송됩니다.', 'ok');
+    } else {
+      showToast((verify && verify.message) || '결제 검증 실패', 'ng');
+    }
+  } catch (e) {
+    console.error('cart PortOne.requestPayment error:', e);
+    showToast(e.message || '결제 처리 중 오류가 발생했습니다', 'ng');
+  }
+}
+
+// 모바일 redirect 복귀 (카카오페이 등) — 장바구니 결제 전용, ?cart=1로 구분
+(async function handleCartPaymentRedirect() {
+  const urlParams = new URLSearchParams(location.search);
+  if (!urlParams.has('cart') || !urlParams.has('payment_complete')) return;
+
+  const paymentIdParam = urlParams.get('paymentId') || '';
+  const code = urlParams.get('code');
+  history.replaceState(null, '', location.pathname);
+
+  let ctx = null;
+  try {
+    const raw = sessionStorage.getItem('cart_billing_ctx');
+    if (raw) ctx = JSON.parse(raw);
+  } catch (e) {}
+
+  if (code) {
+    try { sessionStorage.removeItem('cart_billing_ctx'); } catch (e) {}
+    showToast('결제가 완료되지 않았습니다.', 'ng');
+    return;
+  }
+  if (!ctx) return;
+
+  const finalPaymentId = paymentIdParam || ctx.paymentId;
+  showToast('결제 완료! 오늘부터 매일 콘텐츠가 발송됩니다.', 'ok');
+  setCart([]);
+
+  apiPost('/api/cart/verify', {
+    bundle_id: ctx.bundleId, payment_id: finalPaymentId, _meta: ctx.meta,
+  }).then(verify => {
+    if (verify && verify.success) {
+      try { sessionStorage.removeItem('cart_billing_ctx'); } catch (e) {}
+    } else {
+      console.error('cart verify 실패:', verify);
+      showToast(verify?.message || '결제 검증 실패. 고객센터로 문의해주세요.', 'ng');
+    }
+  }).catch(e => {
+    console.error('cart verify error:', e);
+  });
+})();
+
+document.addEventListener('DOMContentLoaded', updateCartBadge);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCartDrawer(); });
 
 // ── 모달 ─────────────────────────────────────────────────────
 function openModal(plan) {
@@ -8573,6 +8973,8 @@ async function submitStep2() {
 // ── 모바일 redirect 콜백 처리 V2 (일반결제 완료 후 복귀) ──
 (async function handlePaymentRedirect() {
   const urlParams = new URLSearchParams(location.search);
+  // 장바구니 결제 복귀는 handleCartPaymentRedirect()가 전담 처리 (cart=1)
+  if (urlParams.has('cart')) return;
   // [옵션 B v102] payment_complete 또는 billing_complete (legacy URL 호환) 둘 다 처리
   if (!urlParams.has('payment_complete') && !urlParams.has('billing_complete')) return;
 

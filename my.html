@@ -24,7 +24,9 @@
   .profile{display:flex; align-items:center; gap:14px; margin-bottom:36px}
   .avatar{width:52px; height:52px; border-radius:50%; background:var(--gold-dim); display:flex; align-items:center; justify-content:center; font-size:22px}
   .profile h1{font-size:18px; margin:0 0 4px; color:var(--gold-light)}
-  .profile p{font-size:13px; color:var(--muted); margin:0}
+  .profile p{font-size:13px; color:var(--muted); margin:0; display:flex; align-items:center; gap:8px}
+  .change-phone-link{color:var(--gold); font-size:12px; text-decoration:none; border-bottom:1px solid transparent}
+  .change-phone-link:hover{ border-bottom-color:var(--gold) }
 
   .sec-title{font-size:13px; color:var(--gold); letter-spacing:1px; text-transform:uppercase; margin-bottom:14px}
 
@@ -102,7 +104,10 @@ function render(data) {
       <div class="avatar">💬</div>
       <div>
         <h1>${data.nickname || '회원'}님</h1>
-        <p>${data.phone ? data.phone.replace(/(\\d{3})(\\d{3,4})(\\d{4})/, '$1-$2-$3') : ''}</p>
+        <p>
+          <span>${data.phone ? data.phone.replace(/(\\d{3})(\\d{3,4})(\\d{4})/, '$1-$2-$3') : ''}</span>
+          <a class="change-phone-link" href="/link-phone.html">번호 변경</a>
+        </p>
       </div>
     </div>
     <div class="sec-title">내 구독</div>

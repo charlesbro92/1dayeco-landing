@@ -2103,26 +2103,6 @@ body.ll-locked { overflow:hidden; }
         <div class="event-desc">토픽을 장바구니에 여러 개 담으면 표시가 기준으로 추가 할인</div>
       </div>
     </div>
-
-    <p class="bundle-sub-title">담는 개수별 추가 할인율</p>
-    <div class="bundle-steps">
-      <div class="bundle-step">
-        <div class="count">1개 담기</div>
-        <div class="rate">0%</div>
-        <div class="desc">일반 결제와 동일</div>
-      </div>
-      <div class="bundle-step">
-        <div class="count">2개 담기</div>
-        <div class="rate">15%</div>
-        <div class="desc">두 번째 토픽부터 할인</div>
-      </div>
-      <div class="bundle-step hot">
-        <div class="count">3개까지</div>
-        <div class="rate">30%</div>
-      </div>
-    </div>
-
-    <button class="bundle-cta-btn" onclick="openCartDrawer()">🛒 장바구니 담아보기</button>
   </div>
 
   <!-- [v245] 히어로 아래 카테고리 타일 (구 가격 미리보기 대체) -->
@@ -2343,6 +2323,41 @@ body.ll-locked { overflow:hidden; }
 
   <!-- (v102: 1개월권 패널 제거됨 — 옵션 B에서 운영 안 함) -->
 
+</div>
+
+<!-- ─────────── 장바구니 담기 할인 이벤트 (요금제 섹션 바로 아래) ─────────── -->
+<style>
+.cart-event-section { max-width:900px; margin:0 auto; padding:72px 24px; text-align:center; }
+.cart-event-section .sec-eye,
+.cart-event-section .sec-title,
+.cart-event-section .sec-sub { text-align:center; margin-left:auto; margin-right:auto; }
+.cart-event-section .sec-sub { max-width:480px; }
+.cart-event-section .bundle-steps { margin-top:36px; }
+</style>
+<div class="cart-event-section">
+  <div class="sec-eye">Bundle Event</div>
+  <h2 class="sec-title">장바구니 담기 할인 이벤트</h2>
+  <p class="sec-sub">플랜 하나만 결제해도 되지만, 토픽을 장바구니에 여러 개 담으면 표시가 기준으로 추가 할인이 붙습니다.</p>
+
+  <p class="bundle-sub-title" style="margin-top:32px">담는 개수별 추가 할인율</p>
+  <div class="bundle-steps">
+    <div class="bundle-step">
+      <div class="count">1개 담기</div>
+      <div class="rate">0%</div>
+      <div class="desc">일반 결제와 동일</div>
+    </div>
+    <div class="bundle-step">
+      <div class="count">2개 담기</div>
+      <div class="rate">15%</div>
+      <div class="desc">두 번째 토픽부터 할인</div>
+    </div>
+    <div class="bundle-step hot">
+      <div class="count">3개까지</div>
+      <div class="rate">30%</div>
+    </div>
+  </div>
+
+  <button class="bundle-cta-btn" onclick="openCartDrawer()" style="margin-top:20px">🛒 장바구니 담아보기</button>
 </div>
 
 <!-- ─────────── 4개 카테고리 미리보기 ─────────── -->

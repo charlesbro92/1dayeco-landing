@@ -2287,17 +2287,52 @@ body.ll-locked { overflow:hidden; }
   box-shadow:0 4px 16px rgba(201,168,76,.25);
 }
 .bundle-cta-btn:hover { filter:brightness(1.06); }
+.event-cards {
+  display:grid; grid-template-columns:1fr 1fr; gap:16px;
+  margin:36px 0 44px; max-width:720px; margin-left:auto; margin-right:auto;
+}
+.event-card {
+  background:linear-gradient(180deg, var(--dark2), var(--dark3));
+  border:1px solid var(--gold); border-radius:16px; padding:30px 22px;
+  box-shadow:0 12px 32px rgba(201,168,76,.12); text-align:left;
+}
+.event-card .event-num {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:24px; height:24px; border-radius:50%; background:var(--gold); color:var(--dark);
+  font-size:12px; font-weight:800; margin-bottom:14px;
+}
+.event-card .event-label { font-size:13px; color:var(--muted); font-weight:700; margin-bottom:6px; }
+.event-card .event-rate { font-family:var(--serif); font-size:38px; font-weight:800; color:var(--gold); line-height:1.1; }
+.event-card .event-desc { font-size:12.5px; color:var(--muted); margin-top:10px; line-height:1.6; }
+.bundle-sub-title { font-size:14px; font-weight:700; color:var(--text); margin-bottom:4px; }
 @media (max-width:600px) {
+  .event-cards { grid-template-columns:1fr; gap:12px; }
   .bundle-steps { grid-template-columns:1fr; gap:10px; }
   .bundle-step { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; text-align:left; }
   .bundle-step .count { margin-bottom:0; }
 }
 </style>
 <div class="bundle-promo">
-  <div class="sec-eye">Bundle Discount</div>
-  <h2 class="sec-title">여러 토픽 담으면<br class="br-desktop">자동으로 할인</h2>
-  <p class="sec-sub">관심 있는 토픽을 장바구니에 담아 한 번에 결제하세요. 담는 개수가 많을수록 표시가 기준으로 할인율이 올라갑니다.</p>
+  <div class="sec-eye">Event</div>
+  <h2 class="sec-title">지금 결제하면<br class="br-desktop">받는 혜택 두 가지</h2>
+  <p class="sec-sub">플랜을 고르는 것만으로 기본 할인이 붙고, 토픽을 여러 개 담으면 거기에 중복으로 할인이 더 붙습니다.</p>
 
+  <div class="event-cards">
+    <div class="event-card">
+      <div class="event-num">1</div>
+      <div class="event-label">기본 할인 적용</div>
+      <div class="event-rate">최대 64.7%</div>
+      <div class="event-desc">1년 플랜 기준 · 플랜마다 할인율은 다릅니다</div>
+    </div>
+    <div class="event-card">
+      <div class="event-num">2</div>
+      <div class="event-label">원하는 대로 고르고, 중복 할인</div>
+      <div class="event-rate">최대 30%</div>
+      <div class="event-desc">토픽을 장바구니에 여러 개 담으면 표시가 기준으로 추가 할인</div>
+    </div>
+  </div>
+
+  <p class="bundle-sub-title">담는 개수별 추가 할인율</p>
   <div class="bundle-steps">
     <div class="bundle-step">
       <div class="count">1개 담기</div>

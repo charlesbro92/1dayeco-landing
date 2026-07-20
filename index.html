@@ -1357,15 +1357,28 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   box-shadow:0 4px 16px rgba(201,168,76,.25);
 }
 
-/* 카테고리 hero 버튼 영역 - 일렬 배치 + 매일1편 배지와 간격 좁히기 */
+/* 카테고리 hero 버튼 영역 — 신청하기(주 CTA)를 위에 크게, 뒤로/장바구니를
+   아래 보조 줄에 나란히. 3개를 한 줄에 배치하려던 이전 방식은 폭에 따라
+   flex-wrap이 애매하게 걸려 버튼 위치가 겹쳐 보이는 문제가 있었음 —
+   한 줄에 최대 2개만 두도록 구조 자체를 바꿔서 해결 */
 .cat-hero-btns {
-  display:flex; gap:10px; flex-wrap:nowrap; justify-content:center; align-items:flex-start;
+  display:flex; flex-direction:column; align-items:center; gap:10px;
   margin-top:16px;
 }
+.cat-hero-btns-row {
+  display:flex; gap:10px; justify-content:center; align-items:center;
+}
+/* 근본 원인 발견: .category-back/.cta-subscribe-btn는 이 파일에 다른 용도로
+   쓰이는 중복 정의가 있고(297번째 줄 근처), 거기 margin-top:32px가 있는데
+   이 hero-btns 컨텍스트에도 그대로 적용되어(같은 특이도, 프로퍼티 미충돌이라
+   안 덮어써짐) 같은 줄의 버튼들끼리 세로로 밀려서 어긋나 보였던 것 —
+   margin을 여기서 명시적으로 0으로 재설정. 높이도 고정해서 확실히 통일. */
 .cat-hero-btns .category-back,
 .cat-hero-btns .cta-subscribe-btn,
 .cat-hero-btns .cta-cart-btn {
-  white-space:nowrap; line-height:1.3;
+  white-space:nowrap; line-height:1.3; margin:0 !important;
+  height:46px !important; box-sizing:border-box !important;
+  display:inline-flex !important; align-items:center !important; justify-content:center !important;
 }
 .cta-cart-btn {
   background:transparent; border:1px solid var(--gold);
@@ -1547,14 +1560,15 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   .cat-persona-grid { grid-template-columns:1fr; }
   .cat-section-title { font-size:24px; }
   .cat-hero { padding:75px 16px 24px; }
-  /* 모바일에서 3개 버튼(뒤로/장바구니/신청하기)이 flex-wrap으로 애매하게
-     줄바꿈되며 위치가 겹쳐 보이는 문제 — 세로로 명확하게 쌓아서 순서/위치를
-     예측 가능하게 함 */
-  .cat-hero-btns { gap:8px; flex-direction:column; align-items:stretch; }
+  .cat-hero-btns { gap:8px; align-items:stretch; }
+  .cat-hero-btns-row { gap:8px; }
+  .cat-hero-btns .cta-subscribe-btn { width:100%; }
+  .cat-hero-btns-row .category-back,
+  .cat-hero-btns-row .cta-cart-btn { flex:1; }
   .cat-hero-btns .category-back,
   .cat-hero-btns .cta-subscribe-btn,
   .cat-hero-btns .cta-cart-btn {
-    padding:12px 16px; font-size:13px; width:100%; text-align:center;
+    padding:12px 16px; font-size:13px; text-align:center;
   }
   .cat-section { padding:48px 20px; }
 }
@@ -2656,9 +2670,11 @@ body.ll-locked { overflow:hidden; }
     <p class="category-subtitle" id="cdpSubtitle">—</p>
     <div class="category-coming" id="cdpDelivery">매일 1편</div>
     <div class="cat-hero-btns">
-      <button class="category-back" id="cdpBackBtn" onclick="showCategory('list-all')">← 토픽 목록</button>
-      <button class="cta-cart-btn" id="cdpCartBtn" onclick="addCurrentSubtopicToCart()">🛒 장바구니에 담기</button>
       <button class="cta-subscribe-btn" id="cdpHeroCta" onclick="openModalWithCategory(window._currentCatId)">📬 신청하기 →</button>
+      <div class="cat-hero-btns-row">
+        <button class="category-back" id="cdpBackBtn" onclick="showCategory('list-all')">← 토픽 목록</button>
+        <button class="cta-cart-btn" id="cdpCartBtn" onclick="addCurrentSubtopicToCart()">🛒 장바구니에 담기</button>
+      </div>
     </div>
   </div>
 

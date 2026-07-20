@@ -716,6 +716,15 @@ nav {
   font-size:12px;
   letter-spacing:.5px;
 }
+/* 로그인/마이페이지/장바구니 — 메뉴 맨 위 고정 영역, 살짝 강조 */
+.mmp-item-pinned {
+  background:rgba(201,168,76,.06);
+  border:1px solid rgba(201,168,76,.18);
+  font-weight:700;
+}
+.mmp-item-pinned:hover, .mmp-item-pinned:active {
+  background:rgba(201,168,76,.12);
+}
 .mmp-badge {
   background:rgba(201,168,76,.2);
   color:var(--gold);
@@ -1538,11 +1547,14 @@ footer { padding:36px 24px; border-top:1px solid var(--border); text-align:cente
   .cat-persona-grid { grid-template-columns:1fr; }
   .cat-section-title { font-size:24px; }
   .cat-hero { padding:75px 16px 24px; }
-  .cat-hero-btns { gap:8px; flex-wrap:wrap; }
+  /* 모바일에서 3개 버튼(뒤로/장바구니/신청하기)이 flex-wrap으로 애매하게
+     줄바꿈되며 위치가 겹쳐 보이는 문제 — 세로로 명확하게 쌓아서 순서/위치를
+     예측 가능하게 함 */
+  .cat-hero-btns { gap:8px; flex-direction:column; align-items:stretch; }
   .cat-hero-btns .category-back,
   .cat-hero-btns .cta-subscribe-btn,
   .cat-hero-btns .cta-cart-btn {
-    padding:11px 16px; font-size:13px;
+    padding:12px 16px; font-size:13px; width:100%; text-align:center;
   }
   .cat-section { padding:48px 20px; }
 }
@@ -1903,6 +1915,11 @@ body.ll-locked { overflow:hidden; }
     </button>
   </div>
   <div class="mmp-body">
+    <!-- 로그인/마이페이지/장바구니 — 메뉴 맨 위 고정 (카테고리 목록 아래 묻히지 않게) -->
+    <a class="mmp-item mmp-item-pinned" id="mmpLoginItem" href="https://api.onedayeco.com/auth/kakao/login" style="text-decoration:none;display:block">💬 카카오로 로그인</a>
+    <button class="mmp-item mmp-item-pinned" id="mmpMyPageItem" onclick="openMyPage(); closeMobileMenu();" style="display:none">💬 마이페이지</button>
+    <button class="mmp-item mmp-item-pinned" onclick="openCartDrawer(); closeMobileMenu();">🛒 장바구니 <span id="mmpCartBadge"></span></button>
+    <div class="mmp-divider"></div>
     <button class="mmp-item" onclick="showCategory('intro'); closeMobileMenu();">소개</button>
     <div class="mmp-section-title">카테고리</div>
     <button class="mmp-item" onclick="showCategory('list-all'); closeMobileMenu();">전체</button>
@@ -1916,9 +1933,6 @@ body.ll-locked { overflow:hidden; }
       COMING SOON <span class="mmp-badge" id="mmpComingSoonBadge">0</span>
     </button>
     <div class="mmp-divider"></div>
-    <button class="mmp-item" onclick="openCartDrawer(); closeMobileMenu();">🛒 장바구니 <span id="mmpCartBadge"></span></button>
-    <a class="mmp-item" id="mmpLoginItem" href="https://api.onedayeco.com/auth/kakao/login" style="text-decoration:none;display:block">💬 카카오로 로그인</a>
-    <button class="mmp-item" id="mmpMyPageItem" onclick="openMyPage(); closeMobileMenu();" style="display:none">💬 마이페이지</button>
     <button class="mmp-cta" onclick="goPricing(); closeMobileMenu();">지금 시작하기</button>
   </div>
 </aside>

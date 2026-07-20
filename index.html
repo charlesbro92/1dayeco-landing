@@ -3267,6 +3267,21 @@ HIDDEN_COMINGSOON_MODAL_END -->
   </div>
 </div>
 
+<!-- ── 마이페이지 "구독 취소" 안내 팝업 — 실제 취소·환불은 본인확인이 필요한
+     기존 홈 하단 "취소/환불 요청" 플로우로 안내만 함 ── -->
+<div class="overlay" id="cancelGuideOverlay" onclick="if(event.target.id==='cancelGuideOverlay')closeCancelGuide()">
+  <div class="modal" id="cancelGuideModal" style="max-width:380px;text-align:center">
+    <button class="modal-x" onclick="closeCancelGuide()">✕</button>
+    <div style="font-size:40px;margin-bottom:12px">📍</div>
+    <div class="modal-title" style="font-size:18px">구독 취소는 여기서</div>
+    <p class="modal-desc" style="margin-top:8px;font-size:13.5px;line-height:1.7">
+      홈 화면 맨 아래로 스크롤하면 <strong style="color:var(--error)">"취소 / 환불 요청"</strong> 버튼이 있어요.<br>
+      거기서 이름·전화번호를 확인한 뒤 취소·환불을 진행하실 수 있습니다.
+    </p>
+    <button class="modal-btn" onclick="closeMyPage();closeCancelGuide();openCancelFlow();" style="margin-top:16px">지금 취소하러 가기</button>
+  </div>
+</div>
+
 <!-- ── 정보 팝업 ── -->
 <!-- ── 취소 / 환불 요청 팝업 ── -->
 <div class="info-overlay" id="cancelOverlay" onclick="if(event.target.id==='cancelOverlay')closeCancelFlow()">
@@ -8142,7 +8157,10 @@ function renderMyPage(data) {
     + '</div></div></div>'
     + '<div style="font-size:12px;color:var(--gold);letter-spacing:.5px;text-transform:uppercase;margin-bottom:12px">내 구독</div>'
     + subsHtml
-    + '<button onclick="myPageLogout()" style="width:100%;margin-top:20px;background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;padding:11px;border-radius:10px;cursor:pointer;font-family:var(--sans)">로그아웃</button>';
+    + (subs.length > 0
+        ? '<button onclick="openCancelGuide()" style="width:100%;margin-top:14px;background:none;border:1px solid var(--error);color:var(--error);font-size:13px;padding:11px;border-radius:10px;cursor:pointer;font-family:var(--sans)">구독 취소</button>'
+        : '')
+    + '<button onclick="myPageLogout()" style="width:100%;margin-top:10px;background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;padding:11px;border-radius:10px;cursor:pointer;font-family:var(--sans)">로그아웃</button>';
 }
 
 async function myPageLogout() {
@@ -8151,6 +8169,15 @@ async function myPageLogout() {
   } catch (e) {}
   closeMyPage();
   window.location.reload();
+}
+
+function openCancelGuide() {
+  document.getElementById('cancelGuideOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeCancelGuide() {
+  document.getElementById('cancelGuideOverlay').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 function renderCartDrawer() {

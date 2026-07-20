@@ -10272,6 +10272,8 @@ async function selectCancelSub(sub, totalSteps, skipStep2) {
       (catName ? '<br><span style="font-size:14px;font-weight:600;color:var(--text)">📌 ' + catName + '</span>' : '') +
       (subtopicName ? '<br><span style="font-size:12px;color:var(--muted)">' + subtopicName + '</span>' : '') +
       '<br><span style="font-size:12px;color:var(--muted)">시작일: <strong>' + startStr + '</strong> ~ 만료일: <strong>' + endStr + '</strong></span>';
+    // [장바구니] 번들 결제 여부는 계산 API 응답(is_bundle) 확인 후 아래에서 채워짐 —
+    // 여기서는 일단 단건 표시로 초기화만 해둠.
 
     // 환불액 계산 UI 초기화
     document.getElementById('refundCalcBox').style.display     = 'none';
@@ -10297,6 +10299,21 @@ async function selectCancelSub(sub, totalSteps, skipStep2) {
         calcData = { success: true, paid_amount: 24900, sent_days: 30, remaining_days: 150, total_send_days: 180, refund_amount: 18675 };
       }
       if (calcData && calcData.success) {
+        // [장바구니] 번들 결제면 이 항목 하나가 아니라 함께 결제한 항목 전체가 같이
+        // 전액환불되므로, "환불 요청 대상" 박스를 번들 전체 목록으로 다시 채운다.
+        if (calcData.is_bundle && Array.isArray(calcData.bundle_items) && calcData.bundle_items.length > 0) {
+          const itemsHtml = calcData.bundle_items.map(it => {
+            const itCat = catLabels(it.categories);
+            const itSub = (it.subtopic_name || '').trim();
+            return '<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border)">' +
+              '<span style="font-size:14px;font-weight:600;color:var(--text)">📌 ' + (itCat || planLabel(it.plan)) + '</span>' +
+              (itSub ? '<br><span style="font-size:12px;color:var(--muted)">' + itSub + '</span>' : '') +
+              '</div>';
+          }).join('');
+          document.getElementById('refundSubDetail').innerHTML =
+            '<span style="font-size:11px;color:var(--gold);font-weight:700">이 결제로 함께 담아 결제하신 ' + calcData.bundle_items.length + '개 항목 — 해지 시 전체가 함께 환불됩니다</span>' +
+            itemsHtml;
+        }
         const isFullRefund = calcData.refund_amount >= calcData.paid_amount;
         document.getElementById('refundOrigAmt').textContent  = '₩' + (calcData.paid_amount || 0).toLocaleString('ko-KR');
         document.getElementById('refundSentDays').textContent = (calcData.sent_days || 0) + '일 발송 완료';

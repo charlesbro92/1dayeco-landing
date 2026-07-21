@@ -8022,9 +8022,22 @@ function _cartListPrice(catId, plan) {
   return (catPrices && catPrices[plan] && catPrices[plan].price) || CART_FALLBACK_PRICE[plan] || CART_FALLBACK_PRICE.pkg6m;
 }
 
+// 출시 예정(coming_soon) 카테고리인지 확인 — _categoriesCache는 페이지 로드 시
+// 이미 채워져 있어야 정상이지만, 혹시 비어있으면 여기서는 막지 않는다(서버가
+// /api/cart/prepare에서 최종적으로 다시 막아줌 — api-v211 참고).
+function _isComingSoonCategory(categoryId) {
+  try {
+    return ((_categoriesCache && _categoriesCache.coming_soon) || []).some(c => c.id === categoryId);
+  } catch (e) { return false; }
+}
+
 // [주의] list_price(할인 전 표시가)만 저장 — 화면에 보여줄 실제 금액은 항상
 // list_price * (1 - discountForCount(cart.length))로 그때그때 계산한다(이중할인 방지).
 function addToCart(subtopicId, categoryId, subtopicName, plan) {
+  if (_isComingSoonCategory(categoryId)) {
+    showToast('아직 출시되지 않았습니다. 곧 찾아뵙겠습니다.', 'ng');
+    return;
+  }
   const cart = getCart();
   if (cart.some(i => i.subtopic_id === subtopicId)) {
     showToast('이미 장바구니에 담긴 토픽입니다', 'ng');

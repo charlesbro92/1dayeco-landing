@@ -2461,6 +2461,62 @@ body.ll-locked { overflow:hidden; }
   padding:3px 9px; border-radius:20px;
 }
 
+/* [2026-07-25] 토픽 리스트 카드(그룹 필터 페이지, 예: list-tech) — 기존
+   .cat-card는 인트로 캐러셀과 공유하는 클래스라 여기서 새로 건드리면 그쪽도
+   같이 바뀌므로, 이 화면 전용 클래스로 분리해서 이모지 없이 모노그램
+   배지 + 세리프 타이포로 좀 더 정제된 느낌을 준다. */
+.topic-card{
+  position:relative;overflow:hidden;
+  background:linear-gradient(165deg,var(--dark3) 0%,var(--dark2) 100%);
+  border:1px solid var(--border);border-radius:18px;
+  padding:26px 20px 22px;text-align:center;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;
+  box-shadow:0 1px 0 rgba(255,255,255,.03) inset,0 14px 26px -18px rgba(0,0,0,.5);
+  transition:transform .22s cubic-bezier(.2,.8,.2,1),border-color .22s,box-shadow .22s;
+}
+.topic-card::before{
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(130px 90px at 50% -10%,rgba(201,168,76,.14),transparent 70%);
+  opacity:0;transition:opacity .25s;
+}
+.topic-card:hover{
+  transform:translateY(-4px);border-color:rgba(201,168,76,.5);
+  box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 18px 32px -16px rgba(0,0,0,.55),0 0 0 1px rgba(201,168,76,.1);
+}
+.topic-card:hover::before{opacity:1}
+.topic-card-badge{
+  position:relative;width:44px;height:44px;margin-bottom:16px;border-radius:50%;
+  background:radial-gradient(circle at 32% 28%,rgba(232,201,122,.2),rgba(201,168,76,.07) 65%);
+  border:1px solid rgba(201,168,76,.3);
+  box-shadow:0 1px 2px rgba(0,0,0,.22) inset;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:16px;font-weight:700;color:var(--gold-light);
+  transition:transform .22s cubic-bezier(.2,.8,.2,1),border-color .22s;
+}
+.topic-card:hover .topic-card-badge{transform:scale(1.08);border-color:rgba(201,168,76,.6)}
+.topic-card-name{
+  position:relative;font-family:var(--serif);font-size:19px;font-weight:700;
+  color:var(--text);line-height:1.4;letter-spacing:.2px;margin-bottom:16px;
+  transition:color .22s;
+}
+.topic-card:hover .topic-card-name{color:var(--gold-light)}
+.topic-card-tag{
+  position:relative;margin-top:auto;padding-top:14px;width:100%;
+  border-top:1px dashed rgba(201,168,76,.18);
+  font-size:11px;color:var(--muted);letter-spacing:.2px;
+}
+.topic-card.coming-soon{opacity:.6;cursor:default}
+.topic-card.coming-soon:hover{transform:none;border-color:var(--border);box-shadow:0 1px 0 rgba(255,255,255,.03) inset,0 14px 26px -18px rgba(0,0,0,.5)}
+.topic-card.coming-soon:hover::before{opacity:0}
+.topic-card.coming-soon:hover .topic-card-name{color:var(--text)}
+.topic-card .topic-card-badge-comingsoon{filter:grayscale(70%);opacity:.7}
+.topic-card .coming-badge{
+  position:absolute;top:12px;right:12px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.5px;
+  padding:3px 9px;border-radius:20px;
+}
+
 /* Coming Soon 섹션 헤더 */
 .cat-section-divider {
   margin:48px 0 24px; text-align:center;
@@ -6867,15 +6923,19 @@ async function renderCategoryListPage(filter) {
   // [v245] 카테고리(c) 안의 토픽(소주제)을 하나씩 카드로 펼쳐서 렌더 — 그룹명은 카드 위 태그로만 표시
   const buildTopicCards = (c, comingSoon) => {
     const groupName = c.name || c.id;
+    // [2026-07-25] 이모지 대신 그룹명 첫 글자를 모노그램 배지로 사용 — 카테고리
+    // 타일에 쓴 골드링 원형 배지와 같은 모티프를 이모지 없이 재사용.
+    const monogram = (groupName || '').trim().charAt(0) || '·';
     const topics = (c.subtopics || []).filter(s => s.active);
     if (topics.length === 0) return '';
     // [v245] 토픽 카드 클릭 → category-detail-page를 먼저 렌더(내부 DOM 준비)한 뒤
     // 토픽 상세(있으면) 또는 신청 모달로 즉시 덮어씀 — 그룹 개요 화면은 사용자에게 노출되지 않음
     return topics.map(s => `
-      <div class="cat-card${comingSoon ? ' coming-soon' : ''}" onclick="showCategory('${c.id}').then(function(){ openSubtopicDetail('${c.id}', ${s.id}, '${(s.name || '').replace(/'/g, "\\'")}'); })">
+      <div class="topic-card${comingSoon ? ' coming-soon' : ''}" onclick="showCategory('${c.id}').then(function(){ openSubtopicDetail('${c.id}', ${s.id}, '${(s.name || '').replace(/'/g, "\\'")}'); })">
         ${comingSoon ? '<div class="coming-badge">출시 예정</div>' : ''}
-        <div class="cat-card-name">${s.name}</div>
-        <div class="cat-card-tag" style="font-size:11px;color:var(--gold);background:var(--gold-dim,rgba(201,168,76,.12));display:inline-block;padding:3px 9px;border-radius:999px;margin-top:8px${comingSoon ? ';opacity:.7' : ''}">${groupName}</div>
+        <div class="topic-card-badge${comingSoon ? ' topic-card-badge-comingsoon' : ''}">${monogram}</div>
+        <div class="topic-card-name">${s.name}</div>
+        <div class="topic-card-tag">${groupName}</div>
       </div>`).join('');
   };
 

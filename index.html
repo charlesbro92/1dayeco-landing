@@ -2109,30 +2109,60 @@ body.ll-locked { overflow:hidden; }
   <style>
     /* position:relative — 히어로 배경 장식(.grid-lines, absolute)이 클릭을 가로채지 않도록 스택 순서를 올림 */
     #heroCategoryTiles{position:relative;z-index:1;max-width:980px;margin:26px auto 0;padding:0 18px;width:100%;box-sizing:border-box}
-    #heroCategoryTiles .hct-title{text-align:center;font-size:13px;color:var(--muted);margin-bottom:16px}
+    #heroCategoryTiles .hct-title{text-align:center;font-size:13px;color:var(--muted);margin-bottom:18px}
     #heroCategoryTiles .hct-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
-    #heroCategoryTiles .hct-tile{background:linear-gradient(160deg,var(--dark3,#1a1a17),var(--dark2,#17171b));border:1px solid var(--border);border-radius:16px;padding:26px 12px;text-align:center;cursor:pointer;transition:transform .15s,border-color .15s,box-shadow .15s}
-    #heroCategoryTiles .hct-tile:hover{transform:translateY(-3px);border-color:var(--gold);box-shadow:0 8px 20px rgba(0,0,0,.3)}
-    #heroCategoryTiles .hct-ico{width:60px;height:60px;margin:0 auto 12px;border-radius:50%;background:var(--gold-dim,rgba(201,168,76,.12));display:flex;align-items:center;justify-content:center;font-size:28px}
-    #heroCategoryTiles .hct-name{font-weight:800;font-size:15px;color:var(--text)}
+    #heroCategoryTiles .hct-tile{
+      position:relative;overflow:hidden;
+      background:linear-gradient(165deg,var(--dark3,#1a1a17) 0%,var(--dark2,#111110) 100%);
+      border:1px solid var(--border);border-radius:20px;
+      padding:28px 14px 22px;text-align:center;cursor:pointer;
+      box-shadow:0 1px 0 rgba(255,255,255,.03) inset,0 14px 28px -18px rgba(0,0,0,.55);
+      transition:transform .22s cubic-bezier(.2,.8,.2,1),border-color .22s,box-shadow .22s;
+    }
+    #heroCategoryTiles .hct-tile::before{
+      content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+      background:radial-gradient(120px 90px at 50% -10%,rgba(201,168,76,.16),transparent 70%);
+      opacity:0;transition:opacity .25s;
+    }
+    #heroCategoryTiles .hct-tile:hover{
+      transform:translateY(-4px);border-color:rgba(201,168,76,.55);
+      box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 18px 34px -16px rgba(0,0,0,.6),0 0 0 1px rgba(201,168,76,.12);
+    }
+    #heroCategoryTiles .hct-tile:hover::before{opacity:1}
+    #heroCategoryTiles .hct-ico{
+      position:relative;width:56px;height:56px;margin:0 auto 14px;border-radius:50%;
+      background:radial-gradient(circle at 32% 28%,rgba(232,201,122,.22),rgba(201,168,76,.08) 65%);
+      border:1px solid rgba(201,168,76,.3);
+      box-shadow:0 1px 2px rgba(0,0,0,.25) inset,0 6px 14px -8px rgba(201,168,76,.35);
+      display:flex;align-items:center;justify-content:center;font-size:25px;
+      transition:transform .22s cubic-bezier(.2,.8,.2,1),border-color .22s;
+    }
+    #heroCategoryTiles .hct-tile:hover .hct-ico{transform:scale(1.08);border-color:rgba(201,168,76,.6)}
+    #heroCategoryTiles .hct-name{position:relative;font-weight:800;font-size:15px;color:var(--text);letter-spacing:-.1px}
+    #heroCategoryTiles .hct-arrow{
+      position:relative;display:block;margin-top:8px;font-size:11px;color:var(--gold);
+      opacity:0;transform:translateY(-2px);transition:opacity .22s,transform .22s;
+    }
+    #heroCategoryTiles .hct-tile:hover .hct-arrow{opacity:1;transform:translateY(0)}
     @media (max-width:900px){
       #heroCategoryTiles .hct-grid{grid-template-columns:repeat(3,1fr);gap:12px}
     }
     @media (max-width:560px){
       #heroCategoryTiles .hct-grid{grid-template-columns:repeat(2,1fr);gap:10px}
-      #heroCategoryTiles .hct-tile{padding:20px 10px}
-      #heroCategoryTiles .hct-ico{width:48px;height:48px;font-size:22px}
+      #heroCategoryTiles .hct-tile{padding:22px 10px 18px}
+      #heroCategoryTiles .hct-ico{width:48px;height:48px;font-size:21px;margin-bottom:11px}
+      #heroCategoryTiles .hct-arrow{display:none}
     }
   </style>
   <div id="heroCategoryTiles">
     <div class="hct-title">관심 있는 <b style="color:var(--gold)">카테고리</b>를 선택하면 토픽을 바로 볼 수 있어요</div>
     <div class="hct-grid">
-      <div class="hct-tile" onclick="showCategory('list-finance', this)"><div class="hct-name">금융·투자</div></div>
-      <div class="hct-tile" onclick="showCategory('list-tech', this)"><div class="hct-name">테크·디지털</div></div>
-      <div class="hct-tile" onclick="showCategory('list-language', this)"><div class="hct-name">외국어</div></div>
-      <div class="hct-tile" onclick="showCategory('list-work', this)"><div class="hct-name">일·업무</div></div>
-      <div class="hct-tile" onclick="showCategory('list-knowledge', this)"><div class="hct-name">교양·지식</div></div>
-      <div class="hct-tile" onclick="showCategory('list-wellness', this)"><div class="hct-name">건강·일상</div></div>
+      <div class="hct-tile" onclick="showCategory('list-finance', this)"><div class="hct-ico">📈</div><div class="hct-name">금융·투자</div><span class="hct-arrow">토픽 보기 →</span></div>
+      <div class="hct-tile" onclick="showCategory('list-tech', this)"><div class="hct-ico">💻</div><div class="hct-name">테크·디지털</div><span class="hct-arrow">토픽 보기 →</span></div>
+      <div class="hct-tile" onclick="showCategory('list-language', this)"><div class="hct-ico">🌐</div><div class="hct-name">외국어</div><span class="hct-arrow">토픽 보기 →</span></div>
+      <div class="hct-tile" onclick="showCategory('list-work', this)"><div class="hct-ico">💼</div><div class="hct-name">일·업무</div><span class="hct-arrow">토픽 보기 →</span></div>
+      <div class="hct-tile" onclick="showCategory('list-knowledge', this)"><div class="hct-ico">📚</div><div class="hct-name">교양·지식</div><span class="hct-arrow">토픽 보기 →</span></div>
+      <div class="hct-tile" onclick="showCategory('list-wellness', this)"><div class="hct-ico">🌿</div><div class="hct-name">건강·일상</div><span class="hct-arrow">토픽 보기 →</span></div>
     </div>
   </div>
 

@@ -1812,7 +1812,25 @@ body.ll-locked { overflow:hidden; }
 }
 
 </style>
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1272994871446737');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1272994871446737&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
+
 <body>
 
 <!-- ============================================================
@@ -8450,6 +8468,8 @@ async function submitCartPayment() {
     }));
   } catch (e) {}
 
+  try { if (typeof fbq === 'function') fbq('track', 'InitiateCheckout', { value: res.total_amount, currency: 'KRW' }); } catch(e){}
+
   try {
     const response = await PortOne.requestPayment({
       storeId:     PORTONE_STORE_ID,
@@ -8478,6 +8498,7 @@ async function submitCartPayment() {
     });
     if (verify && verify.success) {
       try { sessionStorage.removeItem('cart_billing_ctx'); } catch (e) {}
+      try { if (typeof fbq === 'function') fbq('track', 'Purchase', { value: res.total_amount, currency: 'KRW' }, { eventID: completedPaymentId }); } catch(e){}
       const doneItems = getCart().map(it => ({
         name: it.subtopic_name || '토픽',
         planLabel: CART_PLAN_LABELS[it.plan] || it.plan,
@@ -8529,6 +8550,7 @@ async function submitCartPayment() {
     });
     if (verify && verify.success) {
       try { sessionStorage.removeItem('cart_billing_ctx'); } catch (e) {}
+      try { if (typeof fbq === 'function') fbq('track', 'Purchase', { value: totalAmount, currency: 'KRW' }, { eventID: finalPaymentId }); } catch(e){}
       setCart([]);
       openCartDoneModal(doneItems, totalAmount);
     } else {
@@ -9406,6 +9428,7 @@ async function submitStep2() {
     };
 
     try { if (typeof fnTrack === 'function') fnTrack('pay_click'); } catch(e){}
+    try { if (typeof fbq === 'function') fbq('track', 'InitiateCheckout', { value: totalAmount, currency: 'KRW' }); } catch(e){}
     // [옵션 B v102] PortOne V2 일반결제 (requestPayment)
     const response = await PortOne.requestPayment({
       storeId:     PORTONE_STORE_ID,
@@ -9456,6 +9479,7 @@ async function submitStep2() {
       if (verify && verify.success) {
         try { sessionStorage.removeItem('billing_ctx'); } catch(e) {}
         try { if (typeof fnTrack === 'function') fnTrack('purchase', true); } catch(e){}
+        try { if (typeof fbq === 'function') fbq('track', 'Purchase', { value: totalAmount, currency: 'KRW' }, { eventID: completedPaymentId }); } catch(e){}
         showStep(3);
       } else {
         showToast(verify?.message || '결제 검증 실패', 'ng');
@@ -9536,13 +9560,16 @@ async function submitStep2() {
       if (nameEl  && ctx.name)  nameEl.value  = ctx.name;
       if (phoneEl && ctx.phone) { phoneEl.value = ctx.phone; if (typeof fmtPhone === 'function') fmtPhone(phoneEl); }
       try { if (typeof fnTrack === 'function') fnTrack('purchase', true); } catch(e){}
+      try { if (typeof fbq === 'function') fbq('track', 'Purchase', { value: ctx.amount, currency: 'KRW' }, { eventID: finalPaymentId }); } catch(e){}
       showStep(3);
     } catch(e) {
       try { if (typeof fnTrack === 'function') fnTrack('purchase', true); } catch(e){}
+      try { if (typeof fbq === 'function') fbq('track', 'Purchase', { value: ctx.amount, currency: 'KRW' }, { eventID: finalPaymentId }); } catch(e){}
       showToast('결제 완료! 내일 아침 8시 첫 콘텐츠를 보내드릴게요 🎉', 'ok');
     }
   } else {
     try { if (typeof fnTrack === 'function') fnTrack('purchase', true); } catch(e){}
+    try { if (typeof fbq === 'function') fbq('track', 'Purchase', { value: ctx?.amount, currency: 'KRW' }, { eventID: finalPaymentId }); } catch(e){}
     showToast('결제 완료! 내일 아침 8시 첫 콘텐츠를 보내드릴게요 🎉', 'ok');
   }
 
@@ -11469,6 +11496,7 @@ function onKakaoChannelClick() {
         var msg = '“' + (res.j.subtopic_name||'') + '” 1편을 카카오톡으로 보내드렸어요.\\n잠시 후 메시지를 확인해보세요!';
         document.getElementById('trialDoneMsg').textContent = msg;
         try { if (typeof fnTrack === 'function') fnTrack('trial_sent'); } catch(e){}
+        try { if (typeof fbq === 'function') fbq('track', 'Lead'); } catch(e){}
         document.getElementById('trialForm').style.display = 'none';
         document.getElementById('trialDone').style.display = 'block';
       } else {

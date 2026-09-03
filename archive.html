@@ -170,7 +170,7 @@
     background:var(--gold-dim); border:1px solid rgba(201,168,76,.25); color:var(--gold);
     padding:2px 9px; border-radius:14px; font-size:11.5px; font-weight:600;
   }
-  .card-date { color:var(--muted); }
+  .card-seq { color:var(--muted); }
   .card-headline {
     position:relative; font-family:var(--serif); font-size:17px; font-weight:700;
     line-height:1.5; color:var(--text); letter-spacing:.1px;
@@ -387,19 +387,10 @@ src="https://www.facebook.com/tr?id=1272994871446737&ev=PageView&noscript=1"
     let lastSubtopicId    = undefined;
     let currentCardsWrap  = null;
 
-    // ── 날짜 포맷: "9월 3일 (수)" (YYYY-MM-DD 문자열 입력) ──
-    function fmtDate(str) {
-      if (!str) return '';
-      const d = new Date(str + 'T00:00:00+09:00');
-      const days = ['일','월','화','수','목','금','토'];
-      return `${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]})`;
-    }
-
-    // ── 콘텐츠 카드에 표시할 날짜 (created_at 기준, date_str 미사용) ──
-    function fmtCardDate(item) {
-      if (item.date_str) return fmtDate(item.date_str);
-      if (item.created_at) return fmtDate(item.created_at.slice(0, 10));
-      return '';
+    // ── 콘텐츠 생성일(created_at)은 의미 없는 값이라 대신 주제 안에서
+    // 몇 번째 화인지(seq)를 "N번째"로 표시 ──
+    function fmtSeqLabel(item) {
+      return item.seq ? `${item.seq}번째` : '';
     }
 
     // ── 카테고리 정보 조회 (id → {name, emoji}) ──
@@ -556,12 +547,12 @@ src="https://www.facebook.com/tr?id=1272994871446737&ev=PageView&noscript=1"
         }
 
         const info = catInfo(item.category);
-        const dateHtml = fmtCardDate(item);
+        const seqHtml = fmtSeqLabel(item);
         card.innerHTML = `
           <div class="card-meta">
             <span class="card-emoji">${info.emoji}</span>
             <span class="card-category">${info.name}</span>
-            ${dateHtml ? `<span class="card-date">${dateHtml}</span>` : ''}
+            ${seqHtml ? `<span class="card-seq">${seqHtml}</span>` : ''}
           </div>
           <div class="card-headline">${escHtml(item.headline)}</div>
           ${tagsHtml}
@@ -576,11 +567,11 @@ src="https://www.facebook.com/tr?id=1272994871446737&ev=PageView&noscript=1"
     // ── 상세 보기 ──
     function openDetail(item) {
       const info = catInfo(item.category);
-      const dateHtml = fmtCardDate(item);
+      const seqHtml = fmtSeqLabel(item);
       document.getElementById('detail-meta').innerHTML = `
         <span class="card-emoji">${info.emoji}</span>
         <span class="card-category">${info.name}</span>
-        ${dateHtml ? `<span class="card-date">${dateHtml}</span>` : ''}
+        ${seqHtml ? `<span class="card-seq">${seqHtml}</span>` : ''}
         ${item.subtopics?.name ? `<span style="color:var(--muted)">· ${item.subtopics.name}</span>` : ''}
       `;
       document.getElementById('detail-headline').textContent = item.headline;

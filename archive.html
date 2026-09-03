@@ -135,8 +135,15 @@
   .filter-btn:hover { border-color:rgba(201,168,76,.5); color:var(--text); }
   .filter-btn.active { background:var(--gold-dim); border-color:var(--gold); color:var(--gold); font-weight:700; }
 
-  /* ── Content List ── */
-  .content-list { display:flex; flex-direction:column; gap:12px; }
+  /* ── Content List (주제/subtopic 단위로 그룹핑) ── */
+  .content-list { display:flex; flex-direction:column; }
+  .subtopic-header {
+    font-family:var(--serif); font-size:13.5px; font-weight:700; color:var(--gold);
+    letter-spacing:.2px; margin:26px 0 12px; padding-bottom:8px;
+    border-bottom:1px dashed rgba(201,168,76,.25);
+  }
+  .subtopic-section:first-child .subtopic-header { margin-top:0; }
+  .subtopic-cards { display:flex; flex-direction:column; gap:12px; }
 
   .content-card {
     position:relative; overflow:hidden;
@@ -376,6 +383,9 @@ src="https://www.facebook.com/tr?id=1272994871446737&ev=PageView&noscript=1"
     const PAGE_SIZE   = 20;
     let loading       = false;
     let hasMore       = true;
+    // 주제(subtopic) 단위 그룹핑 — 목록을 이어붙일 때 같은 주제면 새 섹션을 만들지 않음
+    let lastSubtopicId    = undefined;
+    let currentCardsWrap  = null;
 
     // ── 날짜 포맷: "9월 3일 (수)" (YYYY-MM-DD 문자열 입력) ──
     function fmtDate(str) {
@@ -430,6 +440,8 @@ src="https://www.facebook.com/tr?id=1272994871446737&ev=PageView&noscript=1"
       currentCat = cat;
       page = 0;
       hasMore = true;
+      lastSubtopicId = undefined;
+      currentCardsWrap = null;
       document.querySelectorAll('.filter-btn').forEach(b => {
         b.classList.toggle('active', b.dataset.cat === cat);
       });
@@ -443,18 +455,37 @@ src="https://www.facebook.com/tr?id=1272994871446737&ev=PageView&noscript=1"
       if (loading) return;
       loading = true;
 
-      let q = sb
-        .from('contents')
-        .select('id, date_str, category, headline, body, tags, subtopic_id, subtopics(name), created_at')
-        .eq('hidden', false)
-        .order('created_at', { ascending: false })
-        .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1);
+      // 정렬: 주제(subtopic) 안에서 seq(1화→2화) 순서로 읽히도록.
+      // subtopics.display_order는 카테고리 간에도 전역적으로 이어지는 값이라
+      // (금융→테크→외국어…) '전체' 보기에서도 대분류/카테고리 순서가 자연히 맞음.
+      //
+      // supabase-js의 .order(col, {foreignTable}) 옵션은 1:N 임베드 배열 내부를
+      // 정렬하는 `subtopics.order=` 파라미터를 만들어서, 이 페이지처럼 N:1로
+      // 임베드된 subtopics 컬럼 기준으로 바깥 contents 행 자체를 정렬하려는
+      // 목적에는 안 맞는다(직접 확인함). PostgREST가 지원하는
+      // `order=subtopics(display_order)` 문법을 쓰려면 REST 엔드포인트를
+      // 직접 fetch해야 해서, 이 조회만 supabase-js 빌더를 안 쓰고 직접 호출.
+      const params = new URLSearchParams();
+      params.set('select', 'id,date_str,category,headline,body,tags,subtopic_id,seq,subtopics(name,display_order),created_at');
+      params.set('hidden', 'eq.false');
+      if (currentCat !== 'all') params.set('category', 'eq.' + currentCat);
+      params.set('order', 'subtopics(display_order).asc,seq.asc');
+      params.set('limit', String(PAGE_SIZE));
+      params.set('offset', String(page * PAGE_SIZE));
 
-      if (currentCat !== 'all') {
-        q = q.eq('category', currentCat);
+      let data = null, error = null;
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/contents?${params.toString()}`, {
+          headers: { apikey: SUPABASE_ANON, Authorization: `Bearer ${SUPABASE_ANON}` }
+        });
+        if (res.ok) {
+          data = await res.json();
+        } else {
+          error = await res.json().catch(() => ({ message: 'request failed' }));
+        }
+      } catch (e) {
+        error = e;
       }
-
-      const { data, error } = await q;
 
       loading = false;
       const list = document.getElementById('content-list');
@@ -466,7 +497,11 @@ src="https://www.facebook.com/tr?id=1272994871446737&ev=PageView&noscript=1"
         return;
       }
 
-      if (!append) list.innerHTML = '';
+      if (!append) {
+        list.innerHTML = '';
+        lastSubtopicId = undefined;
+        currentCardsWrap = null;
+      }
 
       if (!data || data.length === 0) {
         if (!append) {
@@ -478,6 +513,34 @@ src="https://www.facebook.com/tr?id=1272994871446737&ev=PageView&noscript=1"
       }
 
       data.forEach(item => {
+        // 같은 주제(subtopic)가 이어지면 섹션을 새로 만들지 않고 카드만 이어붙임
+        // (load more로 페이지가 나뉘어도 같은 주제 중간이면 헤더가 중복되지 않음)
+        const subtopicKey = item.subtopic_id ?? null;
+        if (subtopicKey !== lastSubtopicId || !currentCardsWrap) {
+          lastSubtopicId = subtopicKey;
+          const info = catInfo(item.category);
+          const subName = item.subtopics?.name || null;
+
+          const section = document.createElement('div');
+          section.className = 'subtopic-section';
+
+          if (subName) {
+            const header = document.createElement('div');
+            header.className = 'subtopic-header';
+            header.textContent = currentCat === 'all'
+              ? `${info.emoji} ${info.name} · ${subName}`
+              : `${info.emoji} ${subName}`;
+            section.appendChild(header);
+          }
+
+          const cardsWrap = document.createElement('div');
+          cardsWrap.className = 'subtopic-cards';
+          section.appendChild(cardsWrap);
+
+          list.appendChild(section);
+          currentCardsWrap = cardsWrap;
+        }
+
         const card = document.createElement('div');
         card.className = 'content-card';
         card.addEventListener('click', () => openDetail(item));
@@ -503,7 +566,7 @@ src="https://www.facebook.com/tr?id=1272994871446737&ev=PageView&noscript=1"
           <div class="card-headline">${escHtml(item.headline)}</div>
           ${tagsHtml}
         `;
-        list.appendChild(card);
+        currentCardsWrap.appendChild(card);
       });
 
       hasMore = data.length === PAGE_SIZE;

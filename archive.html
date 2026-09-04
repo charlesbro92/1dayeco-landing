@@ -85,28 +85,31 @@
     background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
   }
 
-  /* ── Header ── */
+  /* ── Header — 스크롤과 무관하게 항상 고정 노출 ── */
   header {
-    display:flex; align-items:center; justify-content:space-between;
-    flex-wrap:wrap; gap:10px 20px;
-    max-width:760px; margin:0 auto; padding:24px 20px 0;
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
+    padding:14px 20px; padding-top:max(14px, env(safe-area-inset-top));
+    background:linear-gradient(to bottom, var(--dark) 65%, transparent);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
   }
-  .header-left { display:flex; align-items:center; gap:20px; flex-wrap:wrap; }
-  .logo { font-family:var(--serif); font-size:18px; font-weight:900; color:var(--gold); letter-spacing:.5px; text-decoration:none; }
-  header nav { display:flex; flex-wrap:wrap; gap:4px 16px; }
-  header nav a { color:var(--muted); text-decoration:none; font-size:13px; }
-  header nav a:hover { color:var(--text); }
-
-  .theme-toggle {
+  .header-icon-btn {
     display:inline-flex; align-items:center; justify-content:center;
-    width:32px; height:32px; background:transparent; border:1px solid var(--border);
-    border-radius:50%; cursor:pointer; color:var(--muted); font-size:14px;
-    flex-shrink:0; transition:background .15s, border-color .15s, color .15s, transform .2s;
+    width:38px; height:38px; background:transparent; border:1px solid var(--border);
+    border-radius:50%; cursor:pointer; color:var(--text); font-size:16px;
+    text-decoration:none; transition:background .15s, border-color .15s;
   }
-  .theme-toggle:hover { background:var(--gold-dim); border-color:rgba(201,168,76,.5); color:var(--text); transform:rotate(15deg); }
+  .header-icon-btn:hover { background:var(--gold-dim); border-color:rgba(201,168,76,.5); }
+  .header-menu-btn { justify-self:start; }
+  .header-back-btn { justify-self:end; }
+  .header-logo {
+    justify-self:center; font-family:var(--serif); font-size:17px; font-weight:900;
+    color:var(--gold); letter-spacing:.5px; text-decoration:none; white-space:nowrap;
+  }
 
   /* ── Main ── */
-  .wrap { max-width:760px; margin:0 auto; padding:0 20px 80px; }
+  .wrap { max-width:760px; margin:0 auto; padding:86px 20px 80px; }
 
   .hero { padding:40px 0 28px; }
   .hero-eyebrow {
@@ -125,8 +128,11 @@
   .hero h1 span { color:var(--text); }
   .hero p { font-size:14.5px; color:var(--muted); }
 
-  /* ── Category Filters ── */
-  .filters { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:26px; }
+  /* ── Category Filters (대분류 → 카테고리 2단계) ── */
+  .filters { display:flex; gap:8px; flex-wrap:wrap; }
+  .filters-row1 { margin-bottom:10px; }
+  .filters-row2 { margin-bottom:26px; padding-top:10px; border-top:1px dashed rgba(201,168,76,.2); display:none; }
+  .filters-row2.show { display:flex; }
   .filter-btn {
     padding:8px 16px; border:1px solid var(--border); border-radius:20px;
     background:transparent; color:var(--muted); font-size:13px; font-family:var(--sans);
@@ -134,6 +140,22 @@
   }
   .filter-btn:hover { border-color:rgba(201,168,76,.5); color:var(--text); }
   .filter-btn.active { background:var(--gold-dim); border-color:var(--gold); color:var(--gold); font-weight:700; }
+  .filter-btn.top5 { border-color:var(--gold); color:var(--gold); font-weight:700; }
+  .filter-btn.top5.active { background:var(--gold); color:var(--dark); }
+  .filter-btn.disabled { opacity:.4; cursor:not-allowed; }
+  .filter-btn.disabled:hover { border-color:var(--border); color:var(--muted); }
+
+  /* ── 준비중 토스트 ── */
+  .toast {
+    position:fixed; bottom:28px; left:50%; z-index:300;
+    transform:translateX(-50%) translateY(16px);
+    background:var(--dark2); border:1px solid var(--gold); color:var(--text);
+    padding:12px 22px; border-radius:10px; font-size:13.5px; font-weight:600;
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+    opacity:0; pointer-events:none; transition:opacity .25s, transform .25s;
+    white-space:nowrap;
+  }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
   /* ── Content List (주제/subtopic 단위로 그룹핑) ── */
   .content-list { display:flex; flex-direction:column; }
@@ -257,10 +279,54 @@
   footer.site-footer a:hover { color:var(--text); }
   footer.site-footer .copy { margin-top:8px; }
 
+  /* ── 모바일 슬라이드 메뉴 (index.html의 .mobile-menu-panel과 동일한 패턴) ── */
+  .mobile-menu-overlay {
+    position:fixed; inset:0; z-index:998;
+    background:rgba(0,0,0,.5); backdrop-filter:blur(2px);
+    opacity:0; pointer-events:none; transition:opacity .25s ease;
+  }
+  .mobile-menu-overlay.open { opacity:1; pointer-events:auto; }
+  .mobile-menu-panel {
+    position:fixed; top:0; left:0; right:auto;
+    width:80%; max-width:320px; height:100vh;
+    background:var(--dark2); border-right:1px solid var(--border);
+    z-index:999; transform:translateX(-100%); transition:transform .3s ease;
+    display:flex; flex-direction:column; box-shadow:8px 0 32px rgba(0,0,0,.4);
+  }
+  .mobile-menu-panel.open { transform:translateX(0); }
+  .mmp-header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 20px; border-bottom:1px solid var(--border);
+    padding-top:max(18px, env(safe-area-inset-top));
+  }
+  .mmp-close {
+    background:transparent; border:none; color:var(--muted);
+    width:36px; height:36px; border-radius:6px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px; transition:background .15s, color .15s;
+  }
+  .mmp-close:hover { background:var(--gold-dim); color:var(--text); }
+  .mmp-body { flex:1; overflow-y:auto; padding:14px 12px 20px; display:flex; flex-direction:column; gap:2px; }
+  .mmp-item {
+    display:block; background:transparent; border:none; color:var(--text);
+    text-align:left; padding:12px 14px; font-size:14px; font-family:var(--sans);
+    font-weight:500; letter-spacing:.3px; border-radius:8px; cursor:pointer;
+    text-decoration:none; transition:background .15s;
+  }
+  .mmp-item:hover { background:var(--gold-dim); color:var(--gold); }
+  .mmp-divider { height:1px; background:var(--border); margin:14px 12px; }
+  .mmp-cta {
+    display:block; text-align:center; background:var(--gold); color:var(--dark);
+    border:none; padding:14px 18px; font-size:14px; font-weight:700;
+    border-radius:10px; cursor:pointer; letter-spacing:.5px; margin:0 12px;
+    text-decoration:none; transition:transform .15s, box-shadow .15s;
+  }
+  .mmp-cta:hover { transform:translateY(-1px); box-shadow:0 6px 18px rgba(201,168,76,.3); }
+
   /* ── Mobile ── */
   @media (max-width:600px) {
-    header { padding:20px 16px 0; }
-    .wrap { padding:0 16px 60px; }
+    header { padding:12px 16px; padding-top:max(12px, env(safe-area-inset-top)); }
+    .wrap { padding:76px 16px 60px; }
     .hero { padding:28px 0 22px; }
     .content-card { padding:16px 18px; }
     .card-headline { font-size:15.5px; }
@@ -292,19 +358,29 @@ src="https://www.facebook.com/tr?id=1272994871446737&ev=PageView&noscript=1"
 <body>
 
   <header>
-    <div class="header-left">
-      <a class="logo" href="/">1DAYECO</a>
-      <nav>
-        <a href="/">홈</a>
-        <a href="/about.html">서비스 소개</a>
-        <a href="/terms.html">이용약관</a>
-        <a href="/privacy.html">개인정보처리방침</a>
-      </nav>
-    </div>
-    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="다크/라이트 모드 전환" aria-label="테마 전환">
-      <span id="themeIcon">☀️</span>
-    </button>
+    <button class="header-icon-btn header-menu-btn" onclick="toggleMobileMenu()" aria-label="메뉴 열기" title="메뉴">☰</button>
+    <a class="header-logo" href="/">1DAYECO</a>
+    <button class="header-icon-btn header-back-btn" onclick="history.length>1?history.back():location.href='/'" aria-label="뒤로가기" title="뒤로가기">←</button>
   </header>
+
+  <div class="mobile-menu-overlay" id="mobileMenuOverlay" onclick="closeMobileMenu()"></div>
+  <aside class="mobile-menu-panel" id="mobileMenuPanel">
+    <div class="mmp-header">
+      <span class="header-logo" style="font-size:16px">1DAYECO</span>
+      <button class="mmp-close" onclick="closeMobileMenu()" aria-label="닫기">✕</button>
+    </div>
+    <div class="mmp-body">
+      <a class="mmp-item" href="/">홈</a>
+      <a class="mmp-item" href="/about.html">서비스 소개</a>
+      <a class="mmp-item" href="/archive.html">무료 콘텐츠</a>
+      <a class="mmp-item" href="/terms.html">이용약관</a>
+      <a class="mmp-item" href="/privacy.html">개인정보처리방침</a>
+      <div class="mmp-divider"></div>
+      <a class="mmp-cta" href="/#pricingSec">지금 시작하기</a>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast"></div>
 
   <main class="wrap">
 
@@ -314,11 +390,11 @@ src="https://www.facebook.com/tr?id=1272994871446737&ev=PageView&noscript=1"
       <p>매일 아침 카카오톡으로 발송된 1분 지식을 로그인 없이 무료로 읽어보세요.</p>
     </div>
 
-    <!-- Category Filters -->
-    <div class="filters" id="filters">
-      <button class="filter-btn active" data-cat="all">전체</button>
-      <!-- JS에서 자동 생성 -->
+    <!-- Category Filters: 1단계(TOP5 + 대분류), 2단계(선택된 대분류의 카테고리) -->
+    <div class="filters filters-row1" id="filtersRow1">
+      <div class="loading" style="padding:20px">불러오는 중...</div>
     </div>
+    <div class="filters filters-row2" id="filtersRow2"></div>
 
     <!-- Content List -->
     <div id="content-list" class="content-list">
@@ -360,29 +436,43 @@ src="https://www.facebook.com/tr?id=1272994871446737&ev=PageView&noscript=1"
   </footer>
 
   <script>
-    // ── 다크/라이트 테마 토글 (index.html과 동일한 localStorage 키 공유) ──
-    function toggleTheme() {
-      const isLight = document.documentElement.classList.toggle('light-mode');
-      const icon = document.getElementById('themeIcon');
-      if (icon) icon.textContent = isLight ? '☀️' : '🌙';
-      try { localStorage.setItem('1dayeco_theme', isLight ? 'light' : 'dark'); } catch (_) {}
-    }
-    // 헤더의 아이콘은 DOM 준비 후에만 존재하므로 로드 시점에 맞춰 갱신
-    window.addEventListener('DOMContentLoaded', () => {
-      const icon = document.getElementById('themeIcon');
-      if (icon) icon.textContent = document.documentElement.classList.contains('light-mode') ? '☀️' : '🌙';
-    });
+    // 라이트/다크 전환 버튼은 없지만, index.html에서 저장한 테마는
+    // <head>의 FOUC 방지 스크립트가 계속 읽어서 그대로 반영함.
 
     // ── Supabase 초기화 ──
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
+    // ── 모바일 슬라이드 메뉴 ──
+    function toggleMobileMenu() {
+      document.getElementById('mobileMenuOverlay').classList.add('open');
+      document.getElementById('mobileMenuPanel').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeMobileMenu() {
+      document.getElementById('mobileMenuOverlay').classList.remove('open');
+      document.getElementById('mobileMenuPanel').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // ── "현재 준비중입니다" 토스트 ──
+    let toastTimer = null;
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
     // ── 상태 ──
-    let allCategories = [];
-    let currentCat    = 'all';
-    let page          = 0;
-    const PAGE_SIZE   = 20;
-    let loading       = false;
-    let hasMore       = true;
+    // viewMode: 'top5' (조회수 TOP5, 디폴트) | 'browse' (대분류/카테고리 탐색)
+    let viewMode         = 'top5';
+    let currentSuperCat  = null;   // 선택된 대분류 id
+    let currentCat       = null;   // 선택된 카테고리 id (null이면 대분류 전체)
+    let page             = 0;
+    const PAGE_SIZE       = 20;
+    let loading           = false;
+    let hasMore           = true;
     // 주제(subtopic) 단위 그룹핑 — 목록을 이어붙일 때 같은 주제면 새 섹션을 만들지 않음
     let lastSubtopicId    = undefined;
     let currentCardsWrap  = null;
@@ -393,52 +483,150 @@ src="https://www.facebook.com/tr?id=1272994871446737&ev=PageView&noscript=1"
       return item.seq ? `${item.seq}번째` : '';
     }
 
-    // ── 카테고리 정보 조회 (id → {name, emoji}) ──
-    let categoryMeta = {};
+    // ── 카드 하나 생성 (일반 탐색: "N번째" 배지 / TOP5: "N위" 배지) ──
+    function buildContentCard(item, badgeLabel) {
+      const card = document.createElement('div');
+      card.className = 'content-card';
+      card.addEventListener('click', () => openDetail(item));
+
+      let tagsHtml = '';
+      if (item.tags) {
+        const tagArr = typeof item.tags === 'string'
+          ? item.tags.split(',').map(t => t.trim())
+          : item.tags;
+        tagsHtml = '<div class="card-tags">' +
+          tagArr.slice(0, 4).map(t => `<span class="card-tag">${t.startsWith('#') ? t : '#' + t}</span>`).join('') +
+          '</div>';
+      }
+
+      const info = catInfo(item.category);
+      card.innerHTML = `
+        <div class="card-meta">
+          <span class="card-emoji">${info.emoji}</span>
+          <span class="card-category">${info.name}</span>
+          ${badgeLabel ? `<span class="card-seq">${badgeLabel}</span>` : ''}
+        </div>
+        <div class="card-headline">${escHtml(item.headline)}</div>
+        ${tagsHtml}
+      `;
+      return card;
+    }
+
+    // ── 카테고리/대분류 메타 ──
+    let superCategories      = [];        // [{id, name, emoji, display_order}]
+    let categoriesBySuper    = {};        // superId -> [{id, name, emoji, display_order}]
+    let categoryMeta         = {};        // catId -> {name, emoji, superId}
+    let categoriesWithContent = new Set(); // 실제 콘텐츠가 1건이라도 있는 카테고리 id
+    let superWithContent      = new Set(); // 위 카테고리를 하나라도 포함한 대분류 id
     function catInfo(id) {
       return categoryMeta[id] || { name: id, emoji: '📄' };
     }
 
-    // ── 카테고리 로드 ──
-    // contents.category 컬럼은 카테고리의 id(예: 'english')를 저장하므로
-    // 필터 버튼도 id를 키로 사용해야 함. 'coming_soon' 상태 카테고리는
-    // 아직 판매 전이므로 무료 아카이브에서도 노출하지 않음 (api.py의
-    // 판매중 카테고리 판정 로직과 동일한 기준).
-    async function loadCategories() {
-      const { data } = await sb
-        .from('categories')
-        .select('id, name, emoji, display_order, visibility')
-        .eq('active', true)
-        .order('display_order');
+    // ── 대분류 + 카테고리 + "콘텐츠 실제 존재 여부" 로드 ──
+    // contents.category 컬럼은 카테고리의 id(예: 'english')를 저장함.
+    // 'coming_soon' 상태 카테고리는 아직 판매 전이므로 무료 아카이브에서도
+    // 노출하지 않음 (api.py의 판매중 카테고리 판정 로직과 동일한 기준).
+    async function loadTaxonomy() {
+      const [superRes, catRes, contentCatRes] = await Promise.all([
+        sb.from('super_categories').select('id, name, emoji, display_order').eq('active', true).order('display_order'),
+        sb.from('categories').select('id, name, emoji, display_order, super_category, visibility').eq('active', true).order('display_order'),
+        sb.from('contents').select('category').eq('hidden', false)
+      ]);
 
-      if (!data) return;
-      allCategories = data.filter(c => (c.visibility || 'active') === 'active');
-      allCategories.forEach(c => { categoryMeta[c.id] = { name: c.name, emoji: c.emoji }; });
+      superCategories = superRes.data || [];
+      const cats = (catRes.data || []).filter(c => (c.visibility || 'active') === 'active');
+      (contentCatRes.data || []).forEach(r => categoriesWithContent.add(r.category));
 
-      const wrap = document.getElementById('filters');
-      allCategories.forEach(c => {
+      cats.forEach(c => {
+        categoryMeta[c.id] = { name: c.name, emoji: c.emoji, superId: c.super_category };
+        if (!categoriesBySuper[c.super_category]) categoriesBySuper[c.super_category] = [];
+        categoriesBySuper[c.super_category].push(c);
+        if (categoriesWithContent.has(c.id)) superWithContent.add(c.super_category);
+      });
+
+      renderRow1();
+      renderRow2();
+    }
+
+    // ── 1단계 필터: TOP5 + 대분류 ──
+    function renderRow1() {
+      const wrap = document.getElementById('filtersRow1');
+      wrap.innerHTML = '';
+
+      const top5Btn = document.createElement('button');
+      top5Btn.className = 'filter-btn top5' + (viewMode === 'top5' ? ' active' : '');
+      top5Btn.textContent = '🏆 TOP 5';
+      top5Btn.addEventListener('click', selectTop5);
+      wrap.appendChild(top5Btn);
+
+      superCategories.forEach(sc => {
+        const has = superWithContent.has(sc.id);
         const btn = document.createElement('button');
-        btn.className = 'filter-btn';
-        btn.dataset.cat = c.id;
-        btn.textContent = `${c.emoji} ${c.name}`;
-        btn.addEventListener('click', () => selectCategory(c.id));
+        btn.className = 'filter-btn' + (!has ? ' disabled' : '') +
+          (viewMode === 'browse' && currentSuperCat === sc.id ? ' active' : '');
+        btn.textContent = `${sc.emoji} ${sc.name}`;
+        btn.addEventListener('click', () => {
+          if (!has) { showToast('현재 준비중입니다 🙏'); return; }
+          selectSuperCategory(sc.id);
+        });
         wrap.appendChild(btn);
       });
     }
 
-    // ── 카테고리 선택 ──
-    function selectCategory(cat) {
-      currentCat = cat;
+    // ── 2단계 필터: 선택된 대분류의 카테고리들 ──
+    function renderRow2() {
+      const wrap = document.getElementById('filtersRow2');
+      wrap.innerHTML = '';
+      if (viewMode !== 'browse' || !currentSuperCat) {
+        wrap.classList.remove('show');
+        return;
+      }
+      wrap.classList.add('show');
+      (categoriesBySuper[currentSuperCat] || []).forEach(c => {
+        const has = categoriesWithContent.has(c.id);
+        const btn = document.createElement('button');
+        btn.className = 'filter-btn' + (!has ? ' disabled' : '') + (currentCat === c.id ? ' active' : '');
+        btn.textContent = `${c.emoji} ${c.name}`;
+        btn.addEventListener('click', () => {
+          if (!has) { showToast('현재 준비중입니다 🙏'); return; }
+          // 이미 선택된 카테고리를 다시 누르면 "대분류 전체 보기"로 토글
+          currentCat = (currentCat === c.id) ? null : c.id;
+          resetListState();
+          renderRow1();
+          renderRow2();
+          loadContents();
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function selectTop5() {
+      viewMode = 'top5';
+      currentSuperCat = null;
+      currentCat = null;
+      resetListState();
+      renderRow1();
+      renderRow2();
+      loadContents();
+    }
+
+    function selectSuperCategory(id) {
+      viewMode = 'browse';
+      currentSuperCat = id;
+      currentCat = null;
+      resetListState();
+      renderRow1();
+      renderRow2();
+      loadContents();
+    }
+
+    function resetListState() {
       page = 0;
       hasMore = true;
       lastSubtopicId = undefined;
       currentCardsWrap = null;
-      document.querySelectorAll('.filter-btn').forEach(b => {
-        b.classList.toggle('active', b.dataset.cat === cat);
-      });
       document.getElementById('content-list').innerHTML =
         '<div class="loading">콘텐츠를 불러오는 중...</div>';
-      loadContents();
     }
 
     // ── 콘텐츠 로드 ──
@@ -446,10 +634,6 @@ src="https://www.facebook.com/tr?id=1272994871446737&ev=PageView&noscript=1"
       if (loading) return;
       loading = true;
 
-      // 정렬: 주제(subtopic) 안에서 seq(1화→2화) 순서로 읽히도록.
-      // subtopics.display_order는 카테고리 간에도 전역적으로 이어지는 값이라
-      // (금융→테크→외국어…) '전체' 보기에서도 대분류/카테고리 순서가 자연히 맞음.
-      //
       // supabase-js의 .order(col, {foreignTable}) 옵션은 1:N 임베드 배열 내부를
       // 정렬하는 `subtopics.order=` 파라미터를 만들어서, 이 페이지처럼 N:1로
       // 임베드된 subtopics 컬럼 기준으로 바깥 contents 행 자체를 정렬하려는
@@ -457,12 +641,27 @@ src="https://www.facebook.com/tr?id=1272994871446737&ev=PageView&noscript=1"
       // `order=subtopics(display_order)` 문법을 쓰려면 REST 엔드포인트를
       // 직접 fetch해야 해서, 이 조회만 supabase-js 빌더를 안 쓰고 직접 호출.
       const params = new URLSearchParams();
-      params.set('select', 'id,date_str,category,headline,body,tags,subtopic_id,seq,subtopics(name,display_order),created_at');
+      params.set('select', 'id,date_str,category,headline,body,tags,subtopic_id,seq,subtopics(name,display_order),created_at,view_count');
       params.set('hidden', 'eq.false');
-      if (currentCat !== 'all') params.set('category', 'eq.' + currentCat);
-      params.set('order', 'subtopics(display_order).asc,seq.asc');
-      params.set('limit', String(PAGE_SIZE));
-      params.set('offset', String(page * PAGE_SIZE));
+
+      if (viewMode === 'top5') {
+        // 조회수 높은 순 TOP5 (increment_content_view RPC로 view_count 누적)
+        params.set('order', 'view_count.desc,id.desc');
+        params.set('limit', '5');
+      } else {
+        if (currentCat) {
+          params.set('category', 'eq.' + currentCat);
+        } else if (currentSuperCat) {
+          const ids = (categoriesBySuper[currentSuperCat] || []).map(c => c.id);
+          params.set('category', 'in.(' + ids.join(',') + ')');
+        }
+        // 주제(subtopic) 안에서 seq(1화→2화) 순서로 읽히도록.
+        // subtopics.display_order는 카테고리 간에도 전역적으로 이어지는 값이라
+        // 대분류 전체 보기에서도 카테고리 순서가 자연히 맞음.
+        params.set('order', 'subtopics(display_order).asc,seq.asc');
+        params.set('limit', String(PAGE_SIZE));
+        params.set('offset', String(page * PAGE_SIZE));
+      }
 
       let data = null, error = null;
       try {
@@ -503,69 +702,64 @@ src="https://www.facebook.com/tr?id=1272994871446737&ev=PageView&noscript=1"
         return;
       }
 
-      data.forEach(item => {
-        // 같은 주제(subtopic)가 이어지면 섹션을 새로 만들지 않고 카드만 이어붙임
-        // (load more로 페이지가 나뉘어도 같은 주제 중간이면 헤더가 중복되지 않음)
-        const subtopicKey = item.subtopic_id ?? null;
-        if (subtopicKey !== lastSubtopicId || !currentCardsWrap) {
-          lastSubtopicId = subtopicKey;
-          const info = catInfo(item.category);
-          const subName = item.subtopics?.name || null;
+      // TOP5는 "N번째(시리즈 내 순번)"가 아니라 순위(1위~5위)로, 주제 그룹핑 없이
+      // 평평한 5장 카드로 보여줌 — 서로 다른 주제에서 뽑힌 순위 목록이라
+      // subtopic-header로 묶는 게 의미 없음.
+      if (viewMode === 'top5') {
+        data.forEach((item, idx) => {
+          const card = buildContentCard(item, `${idx + 1}위`);
+          list.appendChild(card);
+        });
+      } else {
+        data.forEach(item => {
+          // 같은 주제(subtopic)가 이어지면 섹션을 새로 만들지 않고 카드만 이어붙임
+          // (load more로 페이지가 나뉘어도 같은 주제 중간이면 헤더가 중복되지 않음)
+          const subtopicKey = item.subtopic_id ?? null;
+          if (subtopicKey !== lastSubtopicId || !currentCardsWrap) {
+            lastSubtopicId = subtopicKey;
+            const info = catInfo(item.category);
+            const subName = item.subtopics?.name || null;
 
-          const section = document.createElement('div');
-          section.className = 'subtopic-section';
+            const section = document.createElement('div');
+            section.className = 'subtopic-section';
 
-          if (subName) {
-            const header = document.createElement('div');
-            header.className = 'subtopic-header';
-            header.textContent = currentCat === 'all'
-              ? `${info.emoji} ${info.name} · ${subName}`
-              : `${info.emoji} ${subName}`;
-            section.appendChild(header);
+            if (subName) {
+              const header = document.createElement('div');
+              header.className = 'subtopic-header';
+              header.textContent = currentCat
+                ? `${info.emoji} ${subName}`
+                : `${info.emoji} ${info.name} · ${subName}`;
+              section.appendChild(header);
+            }
+
+            const cardsWrap = document.createElement('div');
+            cardsWrap.className = 'subtopic-cards';
+            section.appendChild(cardsWrap);
+
+            list.appendChild(section);
+            currentCardsWrap = cardsWrap;
           }
 
-          const cardsWrap = document.createElement('div');
-          cardsWrap.className = 'subtopic-cards';
-          section.appendChild(cardsWrap);
+          currentCardsWrap.appendChild(buildContentCard(item, fmtSeqLabel(item)));
+        });
+      }
 
-          list.appendChild(section);
-          currentCardsWrap = cardsWrap;
-        }
-
-        const card = document.createElement('div');
-        card.className = 'content-card';
-        card.addEventListener('click', () => openDetail(item));
-
-        let tagsHtml = '';
-        if (item.tags) {
-          const tagArr = typeof item.tags === 'string'
-            ? item.tags.split(',').map(t => t.trim())
-            : item.tags;
-          tagsHtml = '<div class="card-tags">' +
-            tagArr.slice(0, 4).map(t => `<span class="card-tag">${t.startsWith('#') ? t : '#' + t}</span>`).join('') +
-            '</div>';
-        }
-
-        const info = catInfo(item.category);
-        const seqHtml = fmtSeqLabel(item);
-        card.innerHTML = `
-          <div class="card-meta">
-            <span class="card-emoji">${info.emoji}</span>
-            <span class="card-category">${info.name}</span>
-            ${seqHtml ? `<span class="card-seq">${seqHtml}</span>` : ''}
-          </div>
-          <div class="card-headline">${escHtml(item.headline)}</div>
-          ${tagsHtml}
-        `;
-        currentCardsWrap.appendChild(card);
-      });
-
-      hasMore = data.length === PAGE_SIZE;
+      // TOP5는 고정 5건이라 "더 보기" 없음
+      hasMore = viewMode !== 'top5' && data.length === PAGE_SIZE;
       btn.style.display = hasMore ? 'block' : 'none';
     }
 
     // ── 상세 보기 ──
     function openDetail(item) {
+      // 조회수 1 증가 (RPC — anon은 이 함수 실행만 허용, 다른 컬럼/행은 못 건드림).
+      // sb.rpc(...)는 PostgrestBuilder(thenable)라 .catch()가 없어서 바로 붙이면
+      // "not a function"으로 던짐 — 반드시 감싸서 안전하게 fire-and-forget.
+      if (item.id) {
+        try {
+          sb.rpc('increment_content_view', { content_id: item.id }).then(() => {}, () => {});
+        } catch (_) {}
+      }
+
       const info = catInfo(item.category);
       const seqHtml = fmtSeqLabel(item);
       document.getElementById('detail-meta').innerHTML = `
@@ -625,9 +819,8 @@ src="https://www.facebook.com/tr?id=1272994871446737&ev=PageView&noscript=1"
       if (e.target === e.currentTarget) closeDetail();
     });
     document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') closeDetail();
+      if (e.key === 'Escape') { closeDetail(); closeMobileMenu(); }
     });
-    document.querySelector('[data-cat="all"]').addEventListener('click', () => selectCategory('all'));
     document.getElementById('load-more').addEventListener('click', () => {
       page++;
       loadContents(true);
@@ -635,7 +828,7 @@ src="https://www.facebook.com/tr?id=1272994871446737&ev=PageView&noscript=1"
 
     // ── 초기 로드 ──
     (async () => {
-      await loadCategories();
+      await loadTaxonomy();
       await loadContents();
 
       // URL 해시로 직접 접근 시

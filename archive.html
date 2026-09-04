@@ -643,6 +643,10 @@ src="https://www.facebook.com/tr?id=1272994871446737&ev=PageView&noscript=1"
       const params = new URLSearchParams();
       params.set('select', 'id,date_str,category,headline,body,tags,subtopic_id,seq,subtopics(name,display_order),created_at,view_count');
       params.set('hidden', 'eq.false');
+      // 무료 아카이브는 각 주제(subtopic)당 1~5화까지만 공개. hidden 플래그와
+      // 무관하게 여기서 강제로 캡을 걸어야 함 — 실제로 심슨네 가족과 영어(35화),
+      // 한국 증시 첫걸음(60화) 등 유료 분량 전체가 hidden=false로 새고 있었음.
+      params.set('seq', 'lte.5');
 
       if (viewMode === 'top5') {
         // 조회수 높은 순 TOP5 (increment_content_view RPC로 view_count 누적)
@@ -831,14 +835,16 @@ src="https://www.facebook.com/tr?id=1272994871446737&ev=PageView&noscript=1"
       await loadTaxonomy();
       await loadContents();
 
-      // URL 해시로 직접 접근 시
+      // URL 해시로 직접 접근 시 — 이때도 무료 공개 범위(1~5화)를 벗어난
+      // 콘텐츠(id 직접 링크로 우회)는 열리지 않도록 seq<=5 조건을 그대로 적용
       if (location.hash) {
         const id = location.hash.slice(1);
         const { data } = await sb
           .from('contents')
-          .select('id, date_str, category, headline, body, tags, subtopic_id, subtopics(name), created_at')
+          .select('id, date_str, category, headline, body, tags, subtopic_id, seq, subtopics(name), created_at')
           .eq('id', id)
           .eq('hidden', false)
+          .lte('seq', 5)
           .single();
         if (data) {
           openDetail(data);
